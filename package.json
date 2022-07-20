@@ -1,0 +1,41 @@
+{
+  "name": "sqrm",
+  "version": "1.0.0",
+  "description": "sqrm (pronounced squirm) is markdown, but re-imagined from a clean sheet. There are two main differences between sqrm and markdown:",
+  "main": "build/main.min.js",
+  "bin": {
+    "sqrm": "bin/sqrm.js"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "mocha",
+    "test:mocha": "mocha --grep 'hash bang' ",
+    "build": "rollup --config",
+    "postbuild": "copyfiles ./build/** public/.",
+    "watch": "rollup -c --watch --watch.onEnd='npm run postbuild'",
+    "serve": "./node_modules/.bin/http-server"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^22.0.1",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "chai": "^4.3.6",
+    "copyfiles": "^2.4.1",
+    "github-markdown-css": "^5.1.0",
+    "http-server": "^14.1.1",
+    "mocha": "^10.0.0",
+    "monaco-editor": "^0.33.0",
+    "rollup": "^2.75.5",
+    "rollup-plugin-terser": "^7.0.2"
+  },
+  "dependencies": {
+    "acorn": "^8.7.1",
+    "acorn-walk": "^8.2.0",
+    "hastscript": "^7.0.2",
+    "json5": "^2.2.1",
+    "linkify-string": "^3.0.4",
+    "smile2emoji": "^2.9.0"
+  }
+}

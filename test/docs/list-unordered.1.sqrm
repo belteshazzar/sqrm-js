@@ -1,0 +1,20 @@
+
+- first item
+  continues onto
+next line
+
++ second item
++ next item
+
+
+* third
+  item
+
+  - Indented item
+  onto the next line
+
+  * Indented item
+
+
+- forth
+item continues

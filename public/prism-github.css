@@ -1,0 +1,105 @@
+
+/*  from
+https://www.samclarke.com/assets/migrating-to-hugo/github.html
+*/
+
+code[class*="language-"], pre[class*="language-"] {
+  color: #333;
+  background: none;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.4;
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+/* Code blocks */
+
+pre[class*="language-"] {
+  padding: 10px;
+  overflow: auto;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  background: #fff;
+}
+
+/* Inline code */
+
+:not(pre) > code[class*="language-"] {
+  padding: .1em;
+  border-radius: .3em;
+  white-space: normal;
+  background: #f5f5f5;
+}
+
+.token.comment, .token.blockquote {
+  color: #969896;
+}
+
+.token.cdata {
+  color: #183691;
+}
+
+.token.doctype, .token.punctuation, .token.variable, .token.macro.property {
+  color: #333;
+}
+
+.token.operator, .token.important, .token.keyword, .token.rule, .token.builtin {
+  color: #a71d5d;
+}
+
+.token.string, .token.url, .token.regex, .token.attr-value {
+  color: #183691;
+}
+
+.token.property, .token.number, .token.boolean, .token.entity, .token.atrule, .token.constant, .token.symbol, .token.command, .token.code {
+  color: #0086b3;
+}
+
+.token.tag, .token.selector, .token.prolog {
+  color: #63a35c;
+}
+
+.token.function, .token.namespace, .token.pseudo-element, .token.class, .token.class-name, .token.pseudo-class, .token.id, .token.url-reference .token.variable, .token.attr-name {
+  color: #795da3;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+.token.title, .token.title .token.punctuation {
+  font-weight: bold;
+  color: #1d3e81;
+}
+
+.token.list {
+  color: #ed6a43;
+}
+
+.token.inserted {
+  background-color: #eaffea;
+  color: #55a532;
+}
+
+.token.deleted {
+  background-color: #ffecec;
+  color: #bd2c00;
+}
+
+.token.bold {
+  font-weight: bold;
+}
+
+.token.italic {
+  font-style: italic;
+}

@@ -1,0 +1,22 @@
+
+this is an image: #!image("my_image.png",200,200,"alt text") inline
+
+
+this is an image: #!image("my_image.png",200
+,200,"alt text") inline
+
+a list:
+- my image #!image("my_image.png",200,200,"alt text")
+- also my image #!image("my_image.png",200,
+200,"alt text") on this line
+
+in a table
+
+| my image in a table                                            |
+| text on #!image("my_image.png",200,200,"alt text") either side |
+
+in code
+
+<% include('image', 'my_image.png', 200, 200, 'alt text') %>
+
+in yaml ???

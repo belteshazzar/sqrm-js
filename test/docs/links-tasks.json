@@ -1,0 +1,19 @@
+{
+    "tasks": [
+      {
+        "line": 5,
+        "done": false,
+        "text": "this is task one"
+      },
+      {
+        "line": 6,
+        "done": true,
+        "text": "task has been done"
+      },
+      {
+        "line": 7,
+        "done": false,
+        "text": "this is still pending"
+      }
+    ]
+  }

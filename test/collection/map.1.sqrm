@@ -1,0 +1,4 @@
+
+
+<map latitude="${request.args[0]}" longitude="${request.args[1]}"
+

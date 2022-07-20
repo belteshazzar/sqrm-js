@@ -1,0 +1,20 @@
+
+This is a page.
+<%
+    let cities = docs.find((doc) => doc.city !== undefined)
+
+
+//    console.log(cities);
+%>
+
+#woot( "fred" )
+
+#!forEach( docs.find('city') )
+
+#!paris( 4.3 , fred )
+
+#!info_box
+
+#!london
+
+#!info_box

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en-au">
+
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+        <title>test</title>
+        <script src="https://unpkg.com/monaco-editor@latest/min/vs/loader.js"></script>
+        <script src="/build/main.js"></script>
+        <link href="github-markdown.css" rel="stylesheet">
+        <link href="styles.css" rel="stylesheet">
+
+        <link href="prism-github.css" rel="stylesheet">
+
+            </head>
+    <body>
+
+      <div id="header">
+        <h1>[ Square Embrace ] Markdown - Live Preview</h1>
+      </div>
+
+      <div id="container">
+
+        <div id="editor" class="column">
+        </div>
+
+        <div id="display" class="column">
+
+          <div class="tab">
+            <button class="tablinks" onclick="openCity(event, 'HTML')">HTML</button>
+            <button class="tablinks" onclick="openCity(event, 'JSON')">JSON</button>
+          </div>
+          
+          <div id="HTML" class="tabcontent markdown-body">
+            <p>London is the capital city of England.</p>
+          </div>
+          
+          <div id="JSON" class="tabcontent">
+            <p>Paris is the capital of France.</p> 
+          </div>
+        </div>
+      </div>
+
+         <script type="application/sqrm" id="init-doc">
+
+
+= Heading
+
+== Sub Heading
+
+This is plain text. It can be following be a list:
+this is extra text
+- Text had to be on 
+asdfsadf - should be consistent!
+- fred also
+
+| simple | table |
+| like this | can 
+| mus tstart with \| |
+
+m:
+- n:
+  o: p
+  q: r
+
+- s
+
+- v:
+
+```javascript
+function s() {
+  let a = 5.3;
+  return a;
+}
+```
+         </script>
+         <script>
+          "use strict";
+
+const htmlEl = document.getElementById('render')
+
+function render(str) {
+  try {
+    const { json, html } = sqrm(str);
+    htmlEl.innerHTML = html;
+    console.log(json);
+
+  } catch (e) {
+    document.getElementById('render').innerHTML = e;
+    console.error(e);
+  }
+}
+
+require.config({ paths: { 'vs': 'https://unpkg.com/monaco-editor@latest/min/vs' }});
+
+window.MonacoEnvironment = { getWorkerUrl: () => proxy };
+
+let proxy = URL.createObjectURL(new Blob([`
+	self.MonacoEnvironment = {
+		baseUrl: 'https://unpkg.com/monaco-editor@latest/min/'
+	};
+	importScripts('https://unpkg.com/monaco-editor@latest/min/vs/base/worker/workerMain.js');
+`], { type: 'text/javascript' }));
+
+require(["vs/editor/editor.main"], function () {
+	let editor = monaco.editor.create(document.getElementById('editor'), {
+		value: document.getElementById('init-doc').innerHTML,
+		language: 'text',
+		theme: 'vs-light',
+    automaticLayout: true
+	});
+
+  editor.getModel().onDidChangeContent((event) => {
+    render(editor.getModel().getValue())
+    Prism.highlightAll();
+  });
+
+  render(editor.getModel().getValue())
+  Prism.highlightAll();
+});
+
+
+function openCity(evt, cityName) {
+  // Declare all variables
+  var i, tabcontent, tablinks;
+
+  // Get all elements with class="tabcontent" and hide them
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+
+  // Get all elements with class="tablinks" and remove the class "active"
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+
+  // Show the current tab, and add an "active" class to the button that opened the tab
+  document.getElementById(cityName).style.display = "block";
+  evt.currentTarget.className += " active";
+}
+
+
+        </script> 
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/components/prism-core.min.js" integrity="sha512-9khQRAUBYEJDCDVP2yw3LRUQvjJ0Pjx0EShmaQjcHa6AXiOv6qHQu9lCAIR8O+/D8FtaCoJ2c0Tf9Xo7hYH01Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/autoloader/prism-autoloader.min.js" integrity="sha512-fTl/qcO1VgvKtOMApX2PdZzkziyr2stM65GYPLGuYMnuMm1z2JLJG6XVU7C/mR+E7xBUqCivykuhlzfqxXBXbg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    </body>
+</html>

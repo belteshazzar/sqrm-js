@@ -1,0 +1,36 @@
+
+
+<% 
+  html.p('fr\'"`ed%>');
+  html.p("fr\"'`ed%>");
+  html.p(`fr\`'"ed%>`);
+  html.p('this is a list')
+
+  for (let i=1 ; i<=10; i++) {
+      html.ul(i + ' apples')
+  }
+
+%>
+
+
+<% html.p('fred') %>
+
+#value( 42 )
+
+yaml: 33
+
+and this is inline value = ${json.value} and yaml = ${json.yaml} but this is \${escaped} as is this
+
+this is just a \ back slash
+
+this is just a 33 % percentage
+
+this is just formula 3 < 4 also 6 > 5
+
+an escaped block looks like a div :( not sure ...
+
+\<%
+
+escaped block
+
+%>

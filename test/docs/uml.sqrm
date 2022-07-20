@@ -1,0 +1,22 @@
+
+
+```
+Line -+--> EmptyLine
+      |
+      +--> NonEmptyLine -+--> BlockQuote
+                         |
+                         +--> Div
+                         |
+                         +--> Heading
+                         |
+                         +--> ListItem
+                         |
+                         +--> Tag (ListItem) -+--> ListItemNoValueTag
+                         |         |
+                         |         +--> ListItemTag (ListItem)
+                         |
+                         +--> Paragraph
+                         |
+                         +--> TableRow
+```
+

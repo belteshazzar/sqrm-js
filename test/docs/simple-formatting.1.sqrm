@@ -1,0 +1,25 @@
+
+= hea\der 1
+
+== header 2
+
+=== header 3
+
+== Markdown plus h2 with a custom ID
+
+[Link back to H2 | #id-goes-here ]
+
+fred ** bold ** ~~italic~~ asdf
+asdf --strike through-- __underline sdf
+sadf ``code`` sd ^^ super ^^ lfkj ends at end of line
+
+inline #tag and mentions @fred like twitter
+this is at location #!location ok
+
+sdf \[Link back to H2] fred
+sdf [Link back to H2\] fred
+sdf [ Link back to H2 ] fred
+sdf [ Link | with text ] fred
+sdf [Link ba\|ck to H2] fred
+sdf [Link ba\]ck to H2] fred
+sdf [Link ba\ck to H2] fred

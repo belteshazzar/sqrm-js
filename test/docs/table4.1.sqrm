@@ -1,0 +1,10 @@
+
+
+header row can split into thead and tbody
+
+| fred | was |
+| a    | b   |
+| --- -- -- | --
+| c | d|
+| e | f |
+

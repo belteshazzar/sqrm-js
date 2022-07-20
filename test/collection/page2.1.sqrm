@@ -1,0 +1,8 @@
+
+This is a page.
+<%
+
+    let cities = docs.find((doc) => doc.city !== undefined)
+    console.log('cities',cities);
+%>
+
