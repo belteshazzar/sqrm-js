@@ -37,15 +37,15 @@ export default class ListItem extends NonEmptyLine {
 
         if (this.marker) {
             if (isTask) {
-                os.ut(this.ln,this.indent, isTask[1]!='', os.format(isTask[2],0,'').str)
+                os.ut(this.ln,this.indent, isTask[1]!='', isTask[2])
             } else {
-                os.ul(this.ln,this.indent, os.format(this.item,0,'').str);
+                os.ul(this.ln,this.indent,this.item);
             }
         } else {
             if (isTask) {
-                os.ot(this.ln,this.indent, isTask[1]!='', os.format(isTask[2],0,'').str)
+                os.ot(this.ln,this.indent, isTask[1]!='', isTask[2])
             } else {
-                os.ol(this.ln,this.indent, os.format(this.item,0,'').str);
+                os.ol(this.ln,this.indent, this.item);
             }
         }
 

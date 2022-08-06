@@ -15,7 +15,7 @@ export default class Footnote extends NonEmptyLine {
             is.next();
         }
 
-        os.footnote(this.indent, this.ref, os.format(this.text,0,'').str);
+        os.footnote(this.indent, this.ref, this.text);
     }
 
 }

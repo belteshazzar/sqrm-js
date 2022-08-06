@@ -2,7 +2,7 @@
 import { emojiMap } from 'smile2emoji';
 import NonEmptyLine from './NonEmptyLine.js'
 
-export default    class Table extends NonEmptyLine {
+export default class Table extends NonEmptyLine {
         constructor(ln,indent,text,row) {
             super(ln,indent,text);
             this.row = row;
@@ -48,41 +48,57 @@ export default    class Table extends NonEmptyLine {
 //            console.log("founder header row @ ",rows[headerRow])
 
 //            os.table(this.indent)
-            os.el(this.indent,'table')
+//            os.el(this.indent,'table')
+            os.h(this.indent,"table")
 
             if (headerRow>0) {
 //                os.thead(this.indent+2)
-                os.el(this.indent+2,'thead')
+//                os.el(this.indent+2,'thead')
+                os.h(this.indent + 2, "thead")
                 for (let r = 0 ; r<headerRow ; r++) {
                     const row = rows[r];
 //                    os.tr(this.indent+4)
-                    os.el(this.indent+4,'tr')
+//                    os.el(this.indent+4,'tr')
+                    os.h(this.indent + 4, "tr")
                     for (let c=0 ; c<row.cells.length ; c++) {
                         let {isHeading,attrs,str} = this.tableFormatting(c,row.cells[c])
-                        os.th(this.indent+6,os.format(str,0,'').str,attrs);
+//                        os.th(this.indent+6,os.format(str,0,'').str,attrs);
+                        os.h(this.indent + 6, "th", attrs, str)
+  //                      os._h();
                     }
-                    os._el();
+                    // os._el();
+//                    os._h()
                 }
-                os._el();
+//                os._el();
+//                os._h()
             }
 
-            os.el(this.indent+2,'tbody');
+//            os.el(this.indent+2,'tbody');
+            os.h(this.indent + 2, 'tbody')
             for (let r = headerRow + 1 ; r<rows.length ; r++) {
                 const row = rows[r];
-                os.el(this.indent+4,'tr')
+//                os.el(this.indent+4,'tr')
+                os.h(this.indent + 4, 'tr')
                 for (let c=0 ; c<row.cells.length ; c++) {
                     let {isHeading,attrs,str} = this.tableFormatting(c,row.cells[c])
                     if (isHeading) {
-                        os.th(this.indent+6,os.format(str,0,'').str,attrs);
+//                        os.th(this.indent+6,os.format(str,0,'').str,attrs);
+                        os.h(this.indent + 6, 'th',attrs,str)
+//                        os._h();
                     } else {
-                        os.td(this.indent+6,os.format(str,0,'').str,attrs);
+//                        os.td(this.indent+6,os.format(str,0,'').str,attrs);
+                        os.h(this.indent + 6, 'td',attrs,str);
+//                        os._h();
                     }
                 }
-                os._el();
+//                os._el();
+//                os._h();
             };
-            os._el(); // /tbody
+//            os._el(); // /tbody
+//            os._h();
 
-            os._el(); // /table
+//            os._el(); // /table
+//            os._h()
         }
 
         splitFormatting(s) {
@@ -97,9 +113,9 @@ export default    class Table extends NonEmptyLine {
 
         colAttributes(c) {
             if (this.colAlignment[c] != undefined) {
-                return ` align="${this.colAlignment[c]}"`
+                return { align :this.colAlignment[c] }
             } else {
-                return undefined;
+                return {};
             }
         }
 
@@ -166,26 +182,25 @@ export default    class Table extends NonEmptyLine {
                 }
             }
 
-            let attrs = undefined
+            let attrs = {}
 
             if (isHeading && align!=null) {
                 this.colAlignment[c] = align;
             }
 
             if (align!=null || this.colAlignment[c] != undefined || rowspan!=null || colspan!=null) {
-                attrs = '';
                 if (align != null) {
-                    attrs += ` align="${align}"`
+                    attrs.align = align
                 } else if (this.colAlignment[c] != undefined) {
-                    attrs += ` align="${this.colAlignment[c]}"`
+                    attrs.align = this.colAlignment[c]
                 }
 
                 if (rowspan != null) {
-                    attrs += ` rowspan="${rowspan}"`
+                    attrs.rowspan = rowspan
                 }
 
                 if (colspan != null) {
-                    attrs += ` colspan="${colspan}"`
+                    attrs.colspan = colspan
                 }
             }
 

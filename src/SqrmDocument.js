@@ -12,6 +12,7 @@ import ListItemNoValueTag from './lines/ListItemNoValueTag.js';
 import InputStream from './InputStream.js';
 
 
+
 export default class SqrmDocument {
     constructor(collection, id,rev) {
         this.collection = collection;
@@ -42,6 +43,10 @@ export default class SqrmDocument {
         }
 
         const js = os.build();
+
+        console.log('---------------------')
+        console.log(js);
+        console.log('---------------------')
 
         try {
             this.fn = new Function(js);

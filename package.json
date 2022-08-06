@@ -33,9 +33,11 @@
   "dependencies": {
     "acorn": "^8.7.1",
     "acorn-walk": "^8.2.0",
+    "hast-util-to-html": "^8.0.3",
     "hastscript": "^7.0.2",
     "json5": "^2.2.1",
     "linkify-string": "^3.0.4",
-    "smile2emoji": "^2.9.0"
+    "smile2emoji": "^2.9.0",
+    "unist-util-visit": "^4.1.0"
   }
 }

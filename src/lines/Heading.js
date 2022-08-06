@@ -15,26 +15,29 @@ export default class Heading extends NonEmptyLine {
             //     is.next();
             // }
     
-            switch (this.level) {
-                case 1:
-                    os.h1(this.indent,os.format(this.heading,0,'').str);
-                    break;
-                case 2:
-                    os.h2(this.indent,os.format(this.heading,0,'').str);
-                    break;
-                case 3:
-                    os.h3(this.indent,os.format(this.heading,0,'').str);
-                    break;
-                case 4:
-                    os.h4(this.indent,os.format(this.heading,0,'').str);
-                    break;
-                case 5:
-                    os.h5(this.indent,os.format(this.heading,0,'').str);
-                    break;
-                default:
-                    os.h6(this.indent,os.format(this.heading,0,'').str);
-                    break;
-            }
+
+            os.h(this.indent, `h${Math.min(this.level,6)}`,{}, this.heading)
+
+            // switch (this.level) {
+            //     case 1:
+            //         os.h1(this.indent,os.format(this.heading,0,'').str);
+            //         break;
+            //     case 2:
+            //         os.h2(this.indent,os.format(this.heading,0,'').str);
+            //         break;
+            //     case 3:
+            //         os.h3(this.indent,os.format(this.heading,0,'').str);
+            //         break;
+            //     case 4:
+            //         os.h4(this.indent,os.format(this.heading,0,'').str);
+            //         break;
+            //     case 5:
+            //         os.h5(this.indent,os.format(this.heading,0,'').str);
+            //         break;
+            //     default:
+            //         os.h6(this.indent,os.format(this.heading,0,'').str);
+            //         break;
+            // }
 
             // if (nextLine && nextLine instanceof EmptyLine) {
             //     out.write('<h'+this.level+'>'+this.heading+'</h'+this.level+'>\n');

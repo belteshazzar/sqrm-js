@@ -13,7 +13,8 @@ export default class Paragraph extends NonEmptyLine {
             is.next();
         }
         
-        os.p(this.indent,os.format(this.text,0,'').str);
+        os.h(this.indent, 'p' ,{}, this.text)
+
     }
 }
 

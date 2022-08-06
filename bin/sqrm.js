@@ -2,8 +2,8 @@
 
 import fs from 'fs'
 import SqrmCollection from '../src/SqrmCollection.js'
-import SqrmDocument from '../src/SqrmDocument.js'
-import HTMLOutputStream from '../src/HTMLOutputStream.js';
+// import SqrmDocument from '../src/SqrmDocument.js'
+// import HTMLOutputStream from '../src/HTMLOutputStream.js';
 import SqrmRequest from '../src/SqrmRequest.js'
 import SqrmResponse from '../src/SqrmResponse.js'
 

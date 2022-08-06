@@ -1,19 +1,20 @@
 
 
 <% 
-  html.p('fr\'"`ed%>');
-  html.p("fr\"'`ed%>");
-  html.p(`fr\`'"ed%>`);
-  html.p('this is a list')
+  html.append(0,h('fr\'"`ed%>'));
+  html.append(0,h("fr\"'`ed%>"));
+  html.append(0,h(`fr\`'"ed%>`));
+  html.append(0,h('this is a list'))
 
+  const ul = html.append(0,h('ul'))
   for (let i=1 ; i<=10; i++) {
-      html.ul(i + ' apples')
+      ul.children.push(h('li',{},[t(i + ' apples')]))
   }
 
 %>
 
 
-<% html.p('fred') %>
+<% html.append(0,h('fred')) %>
 
 #value( 42 )
 
