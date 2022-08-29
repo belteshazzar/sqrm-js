@@ -12,6 +12,7 @@ export default class HtmlOutputTree {
         this.curr = this.root;
         this.parents = {0 : this.root }
         this.level = 0
+        this.footnotes = {};
     }
 
     append(i,el) {

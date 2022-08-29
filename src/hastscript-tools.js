@@ -6,7 +6,7 @@ export function t(str) {
     return {type: 'text', value: checkText(str)};
 }
 
-export function i(str) {
-    return {type: 'include', value: str};
+export function i(str,args) {
+    return {type: 'include', value: str, args: args};
 }
 

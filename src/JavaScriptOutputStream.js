@@ -23,6 +23,7 @@ export default class JavaScriptOutputStream {
         this.out += 'const request = arguments[0];\n'
         this.out += 'const h = request.libs.h;\n'
         this.out += 'const t = request.libs.t;\n'
+        this.out += 'const include = request.libs.include;\n'
         // this.out += 'let tree = request.libs.tree;\n'
         // this.out += 'let util = request.libs.util;\n'
         this.out += 'const docs = request.docs;\n';
@@ -71,9 +72,9 @@ export default class JavaScriptOutputStream {
         this.out += `${t}.push(${JSON5.stringify(v)});\n`
     }
 
-    // raw(i,str) {
-    //     this.out += "html.raw("+i+",\`"+str+"\`);\n";
-    // }
+    raw(i,str) {
+        this.out += "html.raw("+i+",\`"+str+"\`);\n";
+    }
 
     footnoteNum(id,text) {
         for (let i=0 ; i<this.footnotes.length ; i++) {
@@ -182,10 +183,9 @@ export default class JavaScriptOutputStream {
                 checked : done,
                 type: 'checkbox',
                 task: ln,
-                onChange: 'this.form.submit()'
-            },[
-                t(str)
-            ])
+                onchange: 'this.form.submit()'
+            },[]),
+            t(' ' + str)
         ]);
 //        const form = `<form method="PUT"><input ${(done?'checked':'')} type="checkbox" task="${ln}" onChange="this.form.submit()">&nbsp;`
 //        str.unshift(form);
@@ -326,21 +326,22 @@ export default class JavaScriptOutputStream {
 
         if (this.out == null) return this.out;
 
-//         if (this.footnotes.length > 0) {
-//             this.out += `html.append(0,h("hr"))\n`
-//             this.out += `html.append(0,h("ol",{class:"footnotes"},[`
-//             for (let i = 0 ; i<this.footnotes.length ; i++) {
-//                 const fn = this.footnotes[i];
+        if (this.footnotes.length > 0) {
+            this.out += `html.append(0,h("hr"))\n`
+             this.out += `html.append(0,h("ol",{class:"footnotes"},[`
+            for (let i = 0 ; i<this.footnotes.length ; i++) {
+                const fn = this.footnotes[i];
 // //                this.out += `html.footnote(${i+1},'${fn.id}',\`${fn.text}\`);\n`;
 
-//                 if (i>0) this.out += ','
-//                 this.out += `h("li",{},[h("a",{name:"#footnote-${fn.id}"},`
-//                 this.out += new LineParser(fn.text).code()
-//                 this.out += ')])'
-//             }
+                if (i>0) this.out += ','
+                this.out += `h("li",{},[h("a",{name:"#footnote-${fn.id}"},`
+                console.log(`footnote text: ${fn.text}`)
+                if (fn.text !== undefined) this.out += new LineParser(this,fn.text).code()
+                this.out += ')])'
+            }
 
-//             this.out += ']));\n'
-//         }
+            this.out += ']));\n'
+        }
 
 //        this.out += '  console.log(tree.build());'
         this.out += '\n} catch (e) {\n'

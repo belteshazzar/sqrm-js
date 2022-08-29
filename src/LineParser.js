@@ -20,7 +20,7 @@ export default class LineParser {
         } else {
             this.root.children.push(strOrEls);
         }
-//        console.log(util.inspect(this.root,false,null,true));
+        console.log(util.inspect(this.root,false,null,true));
         this.codeStr = LineParser.genCode(this.root.children)
     }
 
@@ -34,6 +34,8 @@ export default class LineParser {
                 codeStr += `h("${child.tagName}",${util.inspect(child.properties,false,null,false)},`
                 codeStr += this.genCode(child.children)
                 codeStr += ')'
+            } else if (child.type == 'include') {
+                codeStr += `include("${child.value}",${util.inspect(child.args,false,null,false)})`
             } else {
                 throw new Error("child.type: " + child.type);
             }
@@ -135,7 +137,7 @@ export default class LineParser {
 
             if (u[0] == '^') {
                 u = u.substring(1).trim();
-                const fn = this.jsout.footnoteNum(u);
+                const fn = this.jsout.footnote(u);
                 // return "<sup><a href=\\\"#footnote-" + u + "\\\">[" + fn + "]</a></sup>";
                 return h('sup',{},[ h('a',{'href': `#footnote-${u}`},[t(`[${fn}]`)])])
             } else {
@@ -281,10 +283,10 @@ export default class LineParser {
 
 
                     if (bang) {
-                        strs.push(str)
-                        strs.push({ name: tag, args: tagValue })
-                        str = ''
-
+                        //strs.push(str)
+                        //strs.push({ name: tag, args: tagValue })
+                        //str = ''
+                        parent.children.push(i(tag,tagValue))
                     } else {
 
 

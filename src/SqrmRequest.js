@@ -9,8 +9,13 @@ export default class SqrmRequest {
         this.args = args;
        this.libs = {
             h: h,
-            t: t
+            t: t,
+            include: this.include
         };//, tree: new Tree(), util: util };
+    }
+
+    include(doc,args) {
+        console.error(arguments)
     }
 
 }
