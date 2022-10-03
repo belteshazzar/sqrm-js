@@ -52,7 +52,7 @@ export default function sqrmToJs(sqrm) {
     }
 
     
-    out += 'try {'
+    out += 'try {\n'
     out += 'const request = arguments[0];\n'
     out += 'const h = request.libs.h;\n'
     out += 'const t = request.libs.t;\n'

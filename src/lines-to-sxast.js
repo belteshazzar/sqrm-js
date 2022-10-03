@@ -150,7 +150,7 @@ function lineToSqrm(ln) {
 
     m = ln.text.match(RE_Heading)
     if (m) {
-        return {type:'heading',level:m[2].length,indent:ln.indent,children:textToHast(m[3]),line:ln.line}
+        return {type:'heading',text: ln.text, level:m[2].length,indent:ln.indent,children:textToHast(m[3]),line:ln.line}
     }
 
     m = ln.text.match(RE_ListItem)
@@ -160,34 +160,38 @@ function lineToSqrm(ln) {
             let t = m[3].match(RE_ListItemTask)
             if (t) {
                 let task = { line: ln.line, done: t[1]!='', text: t[2] }
-                return {type:'unordered-list-item',indent:ln.indent,marker:m[1],children:textToHast(t[2]),line:ln.line, task: task}
+                return {type:'unordered-list-item',text: ln.text, indent:ln.indent,marker:m[1],children:textToHast(t[2]),line:ln.line, task: task}
             } else {
-                return {type:'unordered-list-item',indent:ln.indent,marker:m[1],children:textToHast(m[3]),line:ln.line}
+                return {type:'unordered-list-item',text: ln.text, indent:ln.indent,marker:m[1],children:textToHast(m[3]),line:ln.line}
             }
         } else if (m[2]!==undefined) {
             let t = m[3].match(RE_ListItemTask)
             if (t) {
                 let task = { line: ln.line, done: t[1]!='', text: t[2] }
-                return {type:'ordered-list-item',indent:ln.indent,number:m[2],children:textToHast(t[2]),line:ln.line, task : task}
+                return {type:'ordered-list-item',text: ln.text, indent:ln.indent,number:m[2],children:textToHast(t[2]),line:ln.line, task : task}
             } else {
-                return {type:'ordered-list-item',indent:ln.indent,number:m[2],children:textToHast(m[3]),line:ln.line}
+                return {type:'ordered-list-item',text: ln.text, indent:ln.indent,number:m[2],children:textToHast(m[3]),line:ln.line}
             }
         }
     }
 
     if (ch=='<') {
         if (ln.text.length>1 && ln.text[1]=='%') {
-            return {type:'script',indent:ln.indent,text:ln.text.slice(2),line:ln.line}
+            return {type:'script',indent:ln.indent,text: ln.text, code: ln.text.slice(2),line:ln.line}
         } else {
             m = ln.text.match(RE_Div)
-            return {type:'div',indent:ln.indent,tag:(m[2]?m[2]:'div'),line:ln.line}
+            if (m) {
+                return {type:'div',indent:ln.indent,tag:(m[2]?m[2]:'div'), text: ln.text, line:ln.line}
+            }
         }
     }
 
     if (ch=='|') {
         m = ln.text.match(RE_Table)
-        const divider = ln.text.match(RE_TableHeader) !== null
-        return { type: 'table-row', indent: ln.indent, divider: divider, cells: textToCells(m[2]), line: ln.line }
+        if (m) {
+            const divider = ln.text.match(RE_TableHeader) !== null
+            return { type: 'table-row', indent: ln.indent, divider: divider, text: ln.text, cells: textToCells(m[2]), line: ln.line }
+        }
     }
 
     m = ln.text.match(RE_BlankLine) 
@@ -197,25 +201,25 @@ function lineToSqrm(ln) {
 
     m = ln.text.match(RE_Tag);
     if (m) {
-        return {type:'tag',indent:ln.indent, name:m[2], value: m[3],line:ln.line}
+        return {type:'tag',indent:ln.indent, name:m[2], value: m[3],line:ln.line, text: ln.text}
     }
 
     m = ln.text.match(RE_Footnote);
     if (m) {
-        return { type: 'footnote', indent: ln.indent, id: m[1], hast: textToHast(m[2]) }
+        return { type: 'footnote', indent: ln.indent, id: m[1], children: textToHast(m[2]), text: ln.text }
     }
 
     m = ln.text.match(RE_CodeBlock);
     if (m) {
-        return {type:'code-block',indent:ln.indent,text:ln.text,line:ln.line}
+        return {type:'code-block',indent:ln.indent,language: m[1],line:ln.line}
     }
 
     m = ln.text.match(RE_HR);
     if (m) {
-        return {type:'hr',indent:ln.indent,line:ln.line}
+        return {type:'hr',indent:ln.indent,line:ln.line, text: ln.text}
     }
 
     
-    return {type:'text',indent:ln.indent,children:textToHast(ln.text),line:ln.line}
+    return {type:'text',indent:ln.indent,children:textToHast(ln.text),line:ln.line, text: ln.text}
 
 }

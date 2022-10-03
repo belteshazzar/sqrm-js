@@ -38,26 +38,28 @@ export default class SqrmDocument {
         // const re_doc = /^---$/
         // const re_inline_tag = /^([a-zA-Z_$][a-zA-Z\d_$]*)/
 
-        let lines = sqrmToLines(this.src)
-        let sxast = linesToSxast(lines)
-        const js = sxastToJs(sxast)
-
         if (process.env.npm_config_src) {
             console.log('= src ================')
             console.log(this.src)
         }
+
+        let lines = sqrmToLines(this.src)
 
         if (process.env.npm_config_lines) {
             console.log('= lines =============')
             console.log(util.inspect(lines,false,null,false));
         }
 
+        let sxast = linesToSxast(lines)
+
         if (process.env.npm_config_sxast) {
-            console.log('= sqrm =============')
+            console.log('= sxast =============')
             console.log(util.inspect(sxast,false,null,false));
         }
 
-        if (process.env.npm_config_js) {
+        const js = sxastToJs(sxast)
+
+        if (process.env.npm_config_code) {
             console.log('= js =============')
             console.log(js)
         }

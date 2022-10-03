@@ -63,19 +63,20 @@ function test(name,source,expectedHtml,expectedJson={},includeCallback) {
         const json = response.json;
 
         const sast = response.root
-        const hast = sastToHast(sast)
-        const html = toHtml(hast)
-
+        
         if (process.env.npm_config_sast) {
             console.log('= sast =================')
             console.log(util.inspect(sast,false,null,false));
         }
+
+        const hast = sastToHast(sast)
 
         if (process.env.npm_config_hast) {
             console.log('= hast =================')
             console.log(util.inspect(hast,false,null,false));
         }
 
+        const html = toHtml(hast)
 
         if (process.env.npm_config_html) {
             console.log('= html =================')
@@ -343,6 +344,8 @@ describe("Sqrm Render", function() {
     
         // divs
         testFF('divs',"divs5");
+
+        testFF('divs-raw','divs-raw')
 
         test(38,'fred\n\n< blockquote\n\n  <div id="fred" class="woot" \n woot\n\n','<p>\n  fred\n</p>\n<blockquote>\n  <div id="fred" class="woot"> <p>   woot </p>\n  </div>\n</blockquote>\n')
         test(39,'fred\n\n<blockquote\n\n  with more\n\n  <div\n\n    another indented','<p>fred</p><blockquote><p> with more</p><div> <p>   another indented </p></div></blockquote>')

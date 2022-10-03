@@ -132,6 +132,17 @@ function tableOf(rows) {
     return table;
 }
 
+function blockOf(language,lines) {
+    const code = h('code',{class: 'language-' + language})
+    for (let i=0 ; i<lines.length ; i++) {
+        code.children.push(t(lines[i].text))
+        code.children.push(t('\n'))
+    }
+    console.log(code.children)
+
+    return h('pre',{},[code])
+}
+
 export default function sastToHast(sqrm) {
 
     const doc = { type: "root", children: [] }
@@ -166,7 +177,7 @@ export default function sastToHast(sqrm) {
         function div() {
             let n = next()
             let div = h(`${n.tag}`)
-            div.children.push(processIndentation(indent+1))
+            div.children = processIndentation(indent+1)
             return div
         }
     
@@ -232,7 +243,7 @@ export default function sastToHast(sqrm) {
             if (n==null || n.type != 'blank') {
                 throw new Error('expected blank but found ' + n.type)
             }
-            return null
+            return t('\n')
         }
         
         function paragraph() {
@@ -250,6 +261,25 @@ export default function sastToHast(sqrm) {
         function hr() {
             let n = next()
             return h('hr')
+        }
+
+        function codeBlock() {
+            let n = next()
+            if (n==null || n.type != 'code-block') {
+                throw new Error('expected code-block but found ' + n.type)
+            }
+            const language = n.language
+            let lines = []
+            n = peek()
+            while (n!=null) {
+                if (n.type == 'code-block' && n.indent == indent) {
+                    next() // consume
+                    break
+                }
+                lines.push(next())
+                n = peek()
+            }
+            return blockOf(language,lines)
         }
     
         function table() {
@@ -269,65 +299,79 @@ export default function sastToHast(sqrm) {
         function tag() {
             let n = next()   
         }
-    
-        const ln = peek()
-//        console.log('processIndentation',indent, ln)
 
-        if (ln.indent == undefined) {
-            return blank()
-        }
+        function processLine() {
+            let ln = peek()
+console.log('processLine',ln)
 
-        if (ln.indent < indent) {
-            // reduced indentation, exit indented scope
-            return null
-        }
-
-        if (ln.indent > indent) {
-            let div = h('div')
-            const divIndent = indent + 1
-            let n = peek()
-            while (n!=null && (n.indent == undefined || n.indent >= divIndent)) {
-                if (n.indent == undefined) {
-                    blank()
-                } else {
-                    let child = processIndentation(divIndent)
-                    if (child) div.children.push(child)
-                }
-                n = peek()
+            if (ln.indent == undefined) {
+                return blank()
             }
-            return div
+    
+            if (ln.indent < indent) {
+                // reduced indentation, exit indented scope
+                return -1
+            }
+    
+            if (ln.indent > indent) {
+                let div = h('div')
+                const divIndent = indent + 1
+                div.children = processIndentation(divIndent)
+                // let n = peek()
+                // while (n!=null && (n.indent == undefined || n.indent >= divIndent)) {
+                //     if (n.indent == undefined) {
+                //         blank()
+                //     } else {
+                //         let child = processIndentation(divIndent)
+                //         if (child) div.children.push(child)
+                //     }
+                //     n = peek()
+                // }
+                return div
+            }
+    
+            switch (ln.type) {
+                case 'code-block':
+                    return codeBlock()
+                case "div":
+                    return div()
+                case "footnote":
+                    footnotes.push(next())
+                    return null
+                case "heading":
+                    return heading()
+                case 'hr':
+                    return hr()
+                case "ordered-list-item":
+                    return orderedList()
+                case "unordered-list-item":
+                    return unorderedList()
+                case "text":
+                    return paragraph()
+                case "table-row":
+                    return table()
+                case "tag":
+                    return tag()
+                default:
+                    console.error(util.inspect(ln,false,null,false));
+                    throw new Error('un-handled type: ' + ln.type)                
+            }
+    
         }
 
-        switch (ln.type) {
-            case "div":
-                return div()
-            case "footnote":
-                footnotes.push(next())
-                return null
-            case "heading":
-                return heading()
-            case 'hr':
-                return hr()
-            case "ordered-list-item":
-                return orderedList()
-            case "unordered-list-item":
-                return unorderedList()
-            case "text":
-                return paragraph()
-            case "table-row":
-                return table()
-            case "tag":
-                return tag()
-            default:
-                console.error(util.inspect(ln,false,null,false));
-                throw new Error('un-handled type: ' + ln.type)                
+        const lines = [];
+
+        while (peek()!=null) {
+            let child = processLine()
+            if (child == -1) break
+            if (child) lines.push(child)
         }
+
+        return lines
+
     }
 
-    while (peek()!=null) {
-        let child = processIndentation(0)
-        if (child) doc.children.push(child)
-    }
+    doc.children = processIndentation(0)
 
     // http://www.java2s.com/example/html-css/css-widget/adding-parentheses-in-html-ordered-list.html
     if (footnotes.length>0) {
