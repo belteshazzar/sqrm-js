@@ -1,27 +1,31 @@
 
 import {h} from 'hastscript'
-import {t,i} from './hastscript-tools.js'
+import {j,t,i} from './hastscript-tools.js'
 import util from 'node:util'
 import {visit} from 'unist-util-visit'
 import linkifyStr from 'linkify-string';
 import JSON5 from 'json5'
-import JavaScriptOutputStream from './JavaScriptOutputStream.js';
+//import JavaScriptOutputStream from './_JavaScriptOutputStream.js';
+import * as acorn from 'acorn'
+
 
 export default class LineParser {
 
-    constructor(jsout,strOrEls) {
-        this.jsout = jsout;
+    constructor(strOrEls) {
         this.root = h()
         this.linkifyOptions = { defaultProtocol: 'https' };
 
-        console.log(typeof strOrEls)
+//        console.log(typeof strOrEls)
         if (typeof strOrEls == 'string') {
             this.process(this.root,strOrEls,0,'')
         } else {
             this.root.children.push(strOrEls);
         }
-        console.log(util.inspect(this.root,false,null,true));
-        this.codeStr = LineParser.genCode(this.root.children)
+
+    //     console.log('++++++++++++++++')
+    //    console.log(util.inspect(this.root,false,null,true));
+    //    console.log('++++++++++++++++')
+       this.codeStr = LineParser.genCode(this.root.children)
     }
 
     static genCode(children) {
@@ -35,7 +39,11 @@ export default class LineParser {
                 codeStr += this.genCode(child.children)
                 codeStr += ')'
             } else if (child.type == 'include') {
-                codeStr += `include("${child.value}",${util.inspect(child.args,false,null,false)})`
+                codeStr += `i("${child.value}",${util.inspect(child.args,false,null,false)})`
+            } else if (child.type == 'json') {
+                codeStr += `j("${child.name}",${util.inspect(child.value,false,null,false)})`
+//                codeStr += `(() => { json["${child.name}"] = ${util.inspect(child.value,false,null,false)}})()`
+//                codeStr += `json.${child.name} = ${child.value}`
             } else {
                 throw new Error("child.type: " + child.type);
             }
@@ -48,6 +56,30 @@ export default class LineParser {
     code() {
         return this.codeStr;
     }
+
+    parse(str) {
+
+        function ap() {
+            try {
+                const node = acorn.parse(str, {ecmaVersion: 2020})
+                return 'acorn parsed'
+            } catch (e) {
+                return 'acorn FAILED'
+            }
+        }
+
+        try {
+            const res = JSON5.parse(str);
+            console.log("json5 parsed: ",str)
+            console.log(ap())
+            return res
+        } catch (e) {
+            console.log("json5 FAILED to parse:",str)
+            console.log(ap())
+            throw e;
+        }
+    }
+
 
     escapeChar(c) {
         if (c=='`') {
@@ -137,9 +169,10 @@ export default class LineParser {
 
             if (u[0] == '^') {
                 u = u.substring(1).trim();
-                const fn = this.jsout.footnote(u);
+//                const fn = this.jsout.footnoteNum(u);
+//                console.log('footnote',u,fn)
                 // return "<sup><a href=\\\"#footnote-" + u + "\\\">[" + fn + "]</a></sup>";
-                return h('sup',{},[ h('a',{'href': `#footnote-${u}`},[t(`[${fn}]`)])])
+                return h('sup',{},[ h('a',{'footnote-u':u,'href': `#footnote-${u}`},[t(`TBD`)])])
             } else {
                 //return "<a href=\\\"" + this.url(u) + "\\\">" + u + "</a>";
                 return h('a',{'href':this.url(u)},[t(u)])
@@ -157,11 +190,12 @@ export default class LineParser {
             const caller = new Error().stack.split('\n')[2].replace(/.*\//,'').replace(')','')
 //            console.log(`${caller} > ${t} = ${JSON5.stringify(v)}`)
         }
-        this.out += `${t} = ${JSON5.stringify(v)};\n`
+
+        this.codeStr += `${t} = ${JSON5.stringify(v)};\n`
     }
     
     process(parent,s,index,inChar) {
-        console.log(`process(parent,${s},${index},${inChar})`)
+//        console.log(`process(parent,${s},${index},${inChar})`)
         var a, b;
 
 //        let strs = []
@@ -188,14 +222,14 @@ export default class LineParser {
             if (a == '[') {
                 let prev = a;
                 let curr
-                for (var j = index; j < s.length; j++) {
-                    curr = s.charAt(j)
+                for (let k = index; k < s.length; k++) {
+                    curr = s.charAt(k)
                     if (curr == ']' && prev !='\\')	{
                         //str += this.link(s.substring(index, j));
                         parent.children.push(t(str))
                         str = ''
-                    parent.children.push(this.link(s.substring(index,j)))
-                        index = j + 1;
+                    parent.children.push(this.link(s.substring(index,k)))
+                        index = k + 1;
                         if (index >= s.length) {
 //                            if (inChar != "") str += "</" + this.tagFor(inChar);
                             parent.children.push(t(str))
@@ -213,9 +247,10 @@ export default class LineParser {
                 const ch0 = /^[a-zA-Z]$/
                 const chx = /^[a-zA-Z\d_]$/
                 let user = ''
-                for (var j = index; j < s.length; j++) {
-                    let ch = s.charAt(j)
-                    if ((j==index && ch.match(ch0))
+                let k = index
+                for (; k < s.length; k++) {
+                    let ch = s.charAt(k)
+                    if ((k==index && ch.match(ch0))
                             || (ch.match(chx))) {
                         user += ch;
                     } else {
@@ -223,7 +258,7 @@ export default class LineParser {
                     }
                 }
                 if (user !== '') {
-                    index = j;
+                    index = k;
                     a = s.charAt(index++);
                     parent.children.push(t(str))
                     str = ''
@@ -233,11 +268,11 @@ export default class LineParser {
             }
             if (a == '$' && b == '{') {
                 str += '$'
-                for (var j = index; j < s.length; j++) {
-                    let ch = s.charAt(j)
+                for (let k = index; k < s.length; k++) {
+                    let ch = s.charAt(k)
                     str += ch;
                     if (ch=='}') {
-                        index = j + 1
+                        index = k + 1
                         a = s.charAt(index++);
                         break;
                     }
@@ -252,9 +287,10 @@ export default class LineParser {
                     bang = true;
                     index++;
                 }
-                for (var j = index; j < s.length; j++) {
-                    let ch = s.charAt(j)
-                    if ((j==index && ch.match(ch0))
+                let jj = index
+                for (; jj < s.length; jj++) {
+                    let ch = s.charAt(jj)
+                    if ((jj==index && ch.match(ch0))
                             || (ch.match(chx))) {
                         tag += ch;
                     } else {
@@ -262,20 +298,26 @@ export default class LineParser {
                     }
                 }
                 if (tag !== '') {
-                    index = j;
+                    index = jj;
                     a = s.charAt(index++);
                     let tagValue = null;
+                    let tagValueStr = null
                     if (a=='(') {
-                        for (var j = index; j < s.length; j++) {
-                            let ch = s.charAt(j)
+                        for (var k = index; k < s.length; k++) {
+                            let ch = s.charAt(k)
                             if (ch==')') {
                                 try {
-                                    let jsonStr = '{args:[' + s.substring(index,j) + ']}'
+                                    let jsonStr = '{args:[' + s.substring(index,k) + ']}'
+                                    console.log('jsonStr',jsonStr)
                                     tagValue = this.parse(jsonStr);
-                                    index = j + 1
+                                    console.log('tagValue',tagValue)
+                                    console.log("tag text: " + s.substring(index-1,k + 1))
+                                    tagValueStr = s.substring(index-1,k + 1)
+                                    index = k + 1
                                     a = s.charAt(index++);
                                     break;
                                 } catch (e) {
+                                    console.log(e)
                                 }
                             }
                         }
@@ -298,6 +340,7 @@ export default class LineParser {
                                 tagValue = tagValue.args[0]
                             } else {
                                 tagValue = tagValue.args;
+                                console.log('tagValue === array',tagValue)
                             }
                         } else {
                             tagValue = true;
@@ -305,13 +348,18 @@ export default class LineParser {
     
 
 
-                        this.tag(-1,'json.'+tag,tagValue);
+//                        this.tag(-1,'json.'+tag,tagValue);
 //                        this.code(`json.${tag} = JSON.parse('${JSON.stringify(tagValue)}')`);
 //                        this.json[tag] = tagValue
-                        parent.children.push(t(str))
-                        str = ''
+                        if (str != '') {
+                            parent.children.push(t(str))
+                            str = ''
+                        }
                         //str += `<a href="/tags/${tag}">#${tag}</a>`
-                        parent.children.push(h('a',{href:`/tags/${tag}`},[t(`#${tag}`)]))
+                        parent.children.push(h('a',{href:`/tags/${tag}`},[t(`#${tag}${tagValueStr==null?'':tagValueStr}`)]))
+                        parent.children.push(j(tag,tagValue))
+
+                        console.log('at: ' + s.substring(index-3,index+3))
                     }
 
                     if (index >= s.length) {

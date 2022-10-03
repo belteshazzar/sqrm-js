@@ -9,7 +9,7 @@ export default class ListItemNoValueTag extends Tag {
 
     process(is,os,parent) {
 //        console.log('ListItemNoValueTag',parent,this.name)
-        os.push(this.indent,parent,this.name)
+        os.tag(this.indent,parent,this.name)
 return
         if (is.nextLine !== false) {
 

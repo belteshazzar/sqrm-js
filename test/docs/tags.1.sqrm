@@ -1,20 +1,21 @@
 
 
 <% 
-  html.append(0,h('fr\'"`ed%>'));
-  html.append(0,h("fr\"'`ed%>"));
-  html.append(0,h(`fr\`'"ed%>`));
-  html.append(0,h('this is a list'))
+  root.push({type:'text',indent: 0, children: [t('fr\'"`ed%>')] })
+  root.push({type:'text',indent: 0, children: [t("fr\"'`ed%>")] })
+  root.push({type:'text',indent: 0, children: [t(`fr\`'"ed%>`)] })
+  root.push({type:'text',indent: 0, children: [t('this is a list')] })
 
-  const ul = html.append(0,h('ul'))
+  const ul = h('ul')
   for (let i=1 ; i<=10; i++) {
       ul.children.push(h('li',{},[t(i + ' apples')]))
   }
+  root.push({type:'text',indent: 0, children: ul })
 
 %>
 
 
-<% html.append(0,h('fred')) %>
+<% root.push({type:'text',indent: 0, children: [t('fred')] }) %>
 
 #value( 42 )
 

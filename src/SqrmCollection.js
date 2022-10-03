@@ -5,11 +5,11 @@ import fs from 'node:fs'
 import * as acorn from 'acorn'
 import * as walk from "acorn-walk"
 
-walk.simple(acorn.parse("let x = 10"), {
-  Literal(node) {
-    console.log(`Found a literal: ${node.value}`)
-  }
-})
+// walk.simple(acorn.parse("let x = 10"), {
+//   Literal(node) {
+//     console.log(`Found a literal: ${node.value}`)
+//   }
+// })
 
 import SqrmDocument from './SqrmDocument.js'
 import SqrmRequest from '../src/SqrmRequest.js'

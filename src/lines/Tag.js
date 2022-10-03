@@ -1,5 +1,5 @@
 
-import EmptyLine from "./EmptyLine.js";
+import BlankLine from "./BlankLine.js";
 import NonEmptyLine from "./NonEmptyLine.js";
 import ListItem from './ListItem.js'
 //import JSON5 from 'json5'
@@ -20,7 +20,7 @@ export default class Tag extends NonEmptyLine {
 
     process(is,os,parent) {
 
-        while (is.nextLine instanceof EmptyLine) {
+        while (is.nextLine instanceof BlankLine) {
             is.next();
         }
         
@@ -35,7 +35,7 @@ export default class Tag extends NonEmptyLine {
             // no value with list after indented or at same level
             // defines a named array
 
-            const ref = (parent?parent+'.'+this.name:'json.'+this.name)
+            const ref = (parent?parent+'.'+this.name:this.name)
 
             os.tag(this.indent,ref,[]);
 
@@ -48,7 +48,7 @@ export default class Tag extends NonEmptyLine {
 //                console.log(`   ${ref}.push:`)
                 tag.process(is,os,ref);
 
-                while (is.nextLine instanceof EmptyLine) {
+                while (is.nextLine instanceof BlankLine) {
                     is.next();
                 }
             }
@@ -64,7 +64,7 @@ export default class Tag extends NonEmptyLine {
             // has value with tags after at same "apparent" level
             // defines an un-named object in list of parent
 //            console.log('Tag -> un-named object',parent)
-            os.push(this.indent,parent,{})
+            os.tag(this.indent,parent,{})
             const ref = parent + '['+parent+'.length - 1]'
 //            console.log('Tag -> un-named object',ref)
             os.tag(this.indent,ref+'.'+this.name,this.value)
@@ -78,7 +78,7 @@ export default class Tag extends NonEmptyLine {
 //                console.log('Tag -> Tag')
                 tag.process(is,os,ref);
 
-                while (is.nextLine instanceof EmptyLine) {
+                while (is.nextLine instanceof BlankLine) {
                     is.next();
                 }
             }
@@ -93,7 +93,7 @@ export default class Tag extends NonEmptyLine {
                     
             // no value with a tag indented after it
             // defines a named object
-            const ref = (parent?parent+'.'+this.name:'json.'+this.name)
+            const ref = (parent?parent+'.'+this.name:this.name)
 //            console.log('Tag -> named object',ref)
             os.tag(this.indent,ref,{})
 
@@ -106,7 +106,7 @@ export default class Tag extends NonEmptyLine {
 //                console.log('Tag -> Tag')
                 tag.process(is,os,ref);
 
-                while (is.nextLine instanceof EmptyLine) {
+                while (is.nextLine instanceof BlankLine) {
                     is.next();
                 }
             }
@@ -114,14 +114,14 @@ export default class Tag extends NonEmptyLine {
         } else if (this.value !== undefined) {
 
             try {
-                os.tag(this.indent,`${parent===undefined?'json':parent}.${this.name}`,os.parse(this.value));
+                os.tag(this.indent,`${parent===undefined?'':parent+'.'}${this.name}`,os.parse(this.value));
             } catch (e) {
-                os.tag(this.indent,`${parent===undefined?'json':parent}.${this.name}`,this.value);
+                os.tag(this.indent,`${parent===undefined?'':parent+'.'}${this.name}`,this.value);
             }
 
         } else {
 
-            os.tag(this.indent,`${parent===undefined?'json':parent}.${this.name}`,null);
+            os.tag(this.indent,`${parent===undefined?'':parent+'.'}${this.name}`,null);
 
         }
 

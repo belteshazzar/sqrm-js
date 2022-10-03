@@ -1,6 +1,6 @@
 
 import NonEmptyLine from "./NonEmptyLine.js";
-import EmptyLine from "./EmptyLine.js";
+import BlankLine from "./BlankLine.js";
 import {h} from 'hastscript'
 import {t,i} from '../hastscript-tools.js'
 
@@ -14,13 +14,13 @@ export default class CodeBlock extends NonEmptyLine {
         let code = '';
 
         while (is.nextLine !== false
-                && (is.nextLine instanceof EmptyLine
+                && (is.nextLine instanceof BlankLine
                     ||
                     (is.nextLine instanceof NonEmptyLine
                     && is.nextLine.indent >= this.indent
                     && !(is.nextLine instanceof CodeBlock)))) {
 
-            if (is.nextLine instanceof EmptyLine) {
+            if (is.nextLine instanceof BlankLine) {
                 code += '\n';
             } else {
                 for (let i=this.indent ; i<is.nextLine.indent ; i++) {

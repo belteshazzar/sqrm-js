@@ -6,6 +6,12 @@ individual cell formatting
 |>   span 2                       |v  span down 2   |
 |     c1         |        c2      |
 
+table header
+
+|l a  |r b | 
+|-----|----|
+| 1   | 2  |
+
 multiple horizontal span
 
 | a | b | c | d | e |

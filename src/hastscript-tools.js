@@ -10,3 +10,6 @@ export function i(str,args) {
     return {type: 'include', value: str, args: args};
 }
 
+export function j(name,value) {
+    return {type: 'json', name: name, value: value};
+}

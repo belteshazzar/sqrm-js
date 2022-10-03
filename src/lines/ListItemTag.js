@@ -1,6 +1,6 @@
 
 import NonEmptyLine from "./NonEmptyLine.js";
-import EmptyLine from "./EmptyLine.js";
+import BlankLine from "./BlankLine.js";
 import Tag from './Tag.js'
 import ListItem from './ListItem.js'
 
@@ -19,7 +19,7 @@ export default class ListItemTag extends NonEmptyLine {
 
 //            console.log('ListItemTag list item tag',this.name,this.value);
 
-            while (is.nextLine instanceof EmptyLine) {
+            while (is.nextLine instanceof BlankLine) {
                 is.next();
             }
             
@@ -33,7 +33,7 @@ export default class ListItemTag extends NonEmptyLine {
 
                 // no value with list after indented or at same level
                 // defines a named array
-                const ref = (parent?parent+'.'+this.name:'json.'+this.name)
+                const ref = (parent?parent+'.'+this.name:this.name)
 //                console.log('ListItemTag -> named array',ref);
                 os.tag(this.indent,ref,[]);
                 while (is.nextLine !== false
@@ -46,7 +46,7 @@ export default class ListItemTag extends NonEmptyLine {
                     let tag = is.line.asTag();
                     tag.process(is,os,ref);
 
-                    while (is.nextLine instanceof EmptyLine) {
+                    while (is.nextLine instanceof BlankLine) {
                         is.next();
                     }
                 }
@@ -56,7 +56,7 @@ export default class ListItemTag extends NonEmptyLine {
                     && is.nextLine.indent == this.indent + 2
                     && is.nextLine instanceof Tag) {
 
-                os.push(this.indent,parent,{})
+                os.tag(this.indent,parent,{})
 
                 let ref = `${parent}[${parent}.length-1]`
                 os.tag(this.indent,`${ref}.${this.name}`,os.parse(this.value))
@@ -69,7 +69,7 @@ export default class ListItemTag extends NonEmptyLine {
                     let tag = is.line;
                     tag.process(is,os,ref);
 
-                    while (is.nextLine instanceof EmptyLine) {
+                    while (is.nextLine instanceof BlankLine) {
                         is.next();
                     }
                 }
@@ -79,7 +79,7 @@ export default class ListItemTag extends NonEmptyLine {
                     && is.nextLine.indent > this.indent
                     && is.nextLine instanceof Tag) {
                         
-                os.push(this.indent,parent,{})
+                os.tag(this.indent,parent,{})
 
                 let ref = `${parent}[${parent}.length-1]`
                 os.tag(this.indent,`${ref}.${this.name}`,{})
@@ -101,7 +101,7 @@ export default class ListItemTag extends NonEmptyLine {
                         throw new Error()
                     }
 
-                    while (is.nextLine instanceof EmptyLine) {
+                    while (is.nextLine instanceof BlankLine) {
                         is.next();
                     }
                 }
@@ -114,11 +114,11 @@ export default class ListItemTag extends NonEmptyLine {
                     v[this.name] = this.value
                 }
 
-                os.push(this.indent,parent,v);
+                os.tag(this.indent,parent,v);
 
 
             } else {
-                os.push(this.indent,parent,{})
+                os.tag(this.indent,parent,{})
                 let ref = `${parent}[${parent}.length-1]`
                 os.tag(this.indent,`${ref}.${this.name}`,null)
             }

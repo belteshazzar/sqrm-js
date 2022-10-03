@@ -1,17 +1,21 @@
 
-import fs from 'fs'
+// import fs from 'fs'
 
 
-import Line from './lines/Line.js'
-import EmptyLine from './lines/EmptyLine.js'
-import NonEmptyLine from './lines/NonEmptyLine.js'
-import Heading from './lines/Heading.js'
-import Paragraph from './lines/Paragraph.js';
-import JavaScriptOutputStream from './JavaScriptOutputStream.js';
-import ListItemNoValueTag from './lines/ListItemNoValueTag.js';
-import InputStream from './InputStream.js';
+// import Line from './lines/Line.js'
+// import BlankLine from './lines/BlankLine.js'
+// import NonEmptyLine from './lines/NonEmptyLine.js'
+// import Heading from './lines/Heading.js'
+// import Paragraph from './lines/Paragraph.js';
+// import JavaScriptOutputStream from './JavaScriptOutputStream.js';
+// import ListItemNoValueTag from './lines/ListItemNoValueTag.js';
+//import InputStream from './_InputStream.js';
 
 
+import sqrmToLines from './sqrm-to-lines.js';
+import linesToSxast from './lines-to-sxast.js'
+import sxastToJs from './sxast-to-js.js'
+import util from 'node:util'
 
 export default class SqrmDocument {
     constructor(collection, id,rev) {
@@ -34,25 +38,56 @@ export default class SqrmDocument {
         // const re_doc = /^---$/
         // const re_inline_tag = /^([a-zA-Z_$][a-zA-Z\d_$]*)/
 
-        const is = new InputStream(this.src);
-        const os = new JavaScriptOutputStream();
+        let lines = sqrmToLines(this.src)
+        let sxast = linesToSxast(lines)
+        const js = sxastToJs(sxast)
 
-        while (is.line !== false) {
-            is.line.process(is,os);
-            is.next();
+        if (process.env.npm_config_src) {
+            console.log('= src ================')
+            console.log(this.src)
         }
 
-        const js = os.build();
+        if (process.env.npm_config_lines) {
+            console.log('= lines =============')
+            console.log(util.inspect(lines,false,null,false));
+        }
 
-        console.log('---------------------')
-        console.log(js);
-        console.log('---------------------')
+        if (process.env.npm_config_sxast) {
+            console.log('= sqrm =============')
+            console.log(util.inspect(sxast,false,null,false));
+        }
+
+        if (process.env.npm_config_js) {
+            console.log('= js =============')
+            console.log(js)
+        }
 
         try {
             this.fn = new Function(js);
+
         } catch (e) {
-            throw new Error(e,js);
+            throw new Error(e);
         }
+
+        // const is = new InputStream(this.src);
+        // const os = new JavaScriptOutputStream();
+
+        // while (is.line !== false) {
+        //     is.line.process(is,os);
+        //     is.next();
+        // }
+
+        // const js = os.build();
+
+        // // console.log('---------------------')
+        // // console.log(js);
+        // // console.log('---------------------')
+
+        // try {
+        //     this.fn = new Function(js);
+        // } catch (e) {
+        //     throw new Error(e,js);
+        // }
     }
 
     execute(request,response) {

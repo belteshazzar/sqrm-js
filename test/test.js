@@ -8,8 +8,12 @@ import SqrmDocument from '../src/SqrmDocument.js';
 import SqrmRequest from '../src/SqrmRequest.js';
 import SqrmResponse from '../src/SqrmResponse.js';
 import * as acorn from 'acorn'
+import sastToHast from './../src/sast-to-hast.js';
+//import {toHast} from './../src/snast-to-hast.js';
+import {toHtml} from 'hast-util-to-html'
+import util from 'node:util'
 
-console.log(acorn.parse("let x = {a:1 , b:2}").body[0].declarations[0].init);
+//console.log(acorn.parse("let x = {a:1 , b:2}").body[0].declarations[0].init);
 
 class TestSqrmCollection {
 
@@ -40,6 +44,7 @@ class TestSqrmCollection {
 }
 
 function test(name,source,expectedHtml,expectedJson={},includeCallback) {
+    
     it(name+"", function() {
 
         const collection = new TestSqrmCollection(source,includeCallback);
@@ -50,13 +55,39 @@ function test(name,source,expectedHtml,expectedJson={},includeCallback) {
         const response = new SqrmResponse();
 
 //if (includeCallback) {
-//    console.log(doc.fn.toString());
+//       console.log(doc.fn.toString());
 //}
 
         doc.execute(request,response);
 
-        const html = response.html.toString()
         const json = response.json;
+
+        const sast = response.root
+        const hast = sastToHast(sast)
+        const html = toHtml(hast)
+
+        if (process.env.npm_config_sast) {
+            console.log('= sast =================')
+            console.log(util.inspect(sast,false,null,false));
+        }
+
+        if (process.env.npm_config_hast) {
+            console.log('= hast =================')
+            console.log(util.inspect(hast,false,null,false));
+        }
+
+
+        if (process.env.npm_config_html) {
+            console.log('= html =================')
+            console.log(html)
+        }
+
+        if (process.env.npm_config_json) {
+            console.log('= json =================')
+            console.log(util.inspect(json,false,null,false));
+        }
+
+        console.log('==================')
         expect(json).to.eql(expectedJson)
         expect(html).to.eql(expectedHtml);
     })
@@ -112,7 +143,7 @@ describe("Sqrm Render", function() {
 
         test("heading 5",
             '= head\r\ning\nand some more\n',
-            '<h1>head</h1><p>ing and some more</p>',
+            '<h1>head</h1><p>ing\nand some more</p>',
             {})
 
         test("heading 6", 
@@ -162,7 +193,7 @@ describe("Sqrm Render", function() {
 
         test("heading 14", 
             '\n=\n\n',
-            '<p>=</p>',
+            '<hr>',
             {})
 
         test("heading 15",
@@ -185,17 +216,17 @@ describe("Sqrm Render", function() {
 
         test("paragraphs 2",
             'a\nb\n',
-            '<p>a b</p>',
+            '<p>a\nb</p>',
             {})
 
         test("paragraphs 3",
             'a\nb\n',
-            '<p>a b</p>',
+            '<p>a\nb</p>',
             {})
 
         test("paragraphs 4",
             'a\nb\n\nc\n',
-            '<p>a b</p><p>c</p>',
+            '<p>a\nb</p><p>c</p>',
             {})
 
     });
@@ -314,7 +345,7 @@ describe("Sqrm Render", function() {
         testFF('divs',"divs5");
 
         test(38,'fred\n\n< blockquote\n\n  <div id="fred" class="woot" \n woot\n\n','<p>\n  fred\n</p>\n<blockquote>\n  <div id="fred" class="woot"> <p>   woot </p>\n  </div>\n</blockquote>\n')
-        test(39,'fred<blockquotewith more<div another indented','<p>fred</p><blockquote><p> with more</p><div> <p>   another indented </p></div></blockquote>')
+        test(39,'fred\n\n<blockquote\n\n  with more\n\n  <div\n\n    another indented','<p>fred</p><blockquote><p> with more</p><div> <p>   another indented </p></div></blockquote>')
         
     });
 
@@ -362,17 +393,17 @@ describe("Sqrm Render", function() {
         // tags with parameters
         
         test(50,'this is a tag #a(1,2,[")"]) in a line',
-            '<p>this is a tag <a href="/tags/a">#a</a> in a line</p>',
+            '<p>this is a tag <a href="/tags/a">#a(1,2,[")"])</a> in a line</p>',
             {  "a": [    1,    2,   [     ")"    ]  ]})
         test(51,'this is a tag ending a #line("with () text")',
-            '<p>this is a tag ending a <a href="/tags/line">#line</a></p>',
+            '<p>this is a tag ending a <a href="/tags/line">#line("with () text")</a></p>',
             { "line": "with () text"})
         test(52,'#tag_me(1,2) is at the start of the line',
-            '<p><a href="/tags/tag_me">#tag_me</a> is at the start of the line</p>',
+            '<p><a href="/tags/tag_me">#tag_me(1,2)</a> is at the start of the line</p>',
             {  "tag_me": [    1,    2  ]})
         test(53,'multiple tags #here and #there, also #here',
             '<p>multiple tags <a href="/tags/here">#here</a> and <a href="/tags/there">#there</a>, also <a href="/tags/here">#here</a></p>',
-            {"here": true, "there": true})
+            {"here": [true,true], "there": true})
         test(54,'#tag',
             '<p><a href="/tags/tag">#tag</a></p>',
             {"tag": true})
@@ -426,6 +457,7 @@ describe("Sqrm Render", function() {
         // script elements
         
         testFFF("scriptlet","scriptlet");
+        testFFF("scriptlet","scriptlet-table");
             
         // script elements
         

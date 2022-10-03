@@ -2,7 +2,7 @@
 import NonEmptyLine from "./NonEmptyLine.js";
 import ListItemTag from "./ListItemTag.js";
 import ListItemNoValueTag from "./ListItemNoValueTag.js";
-import EmptyLine from "./EmptyLine.js";
+import BlankLine from "./BlankLine.js";
 import Tag from './Tag.js'
 
 export default class ListItem extends NonEmptyLine {
@@ -27,7 +27,7 @@ export default class ListItem extends NonEmptyLine {
 //        os.write(os.indent(this.indent) + (this.marker ? '<ul>' : '<ol>'));
 
         while (is.nextLine !== false 
-                && !(is.nextLine instanceof EmptyLine) 
+                && !(is.nextLine instanceof BlankLine) 
                 && !(is.nextLine instanceof ListItem)) {
             this.item += ' ' + is.nextLine.text;
             is.next();

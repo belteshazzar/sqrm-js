@@ -1,6 +1,6 @@
 
 import NonEmptyLine from './NonEmptyLine.js'
-import EmptyLine from './EmptyLine.js'
+import BlankLine from './BlankLine.js'
 
 export default class Div extends NonEmptyLine {
         constructor(ln,re) { //indent,text,tag,attributes) {
@@ -21,10 +21,10 @@ export default class Div extends NonEmptyLine {
             if (this.tag=='style' || this.tag=='script') {
 
                 while (is.nextLine !== false
-                    && (is.nextLine instanceof EmptyLine
+                    && (is.nextLine instanceof BlankLine
                         || is.nextLine.indent > this.indent)) {
 
-                    if (is.nextLine instanceof EmptyLine) {
+                    if (is.nextLine instanceof BlankLine) {
                         os.raw(this.indent,'')
                     } else {
                         os.raw(is.nextLine.indent,is.nextLine.text)
@@ -35,10 +35,10 @@ export default class Div extends NonEmptyLine {
             } else if (this.tag=='pre') {
 
                 while (is.nextLine !== false
-                    && (is.nextLine instanceof EmptyLine
+                    && (is.nextLine instanceof BlankLine
                         || is.nextLine.indent > this.indent)) {
 
-                    if (is.nextLine instanceof EmptyLine) {
+                    if (is.nextLine instanceof BlankLine) {
                         os.raw(this.indent,'')
                     } else if (is.nextLine instanceof Div) {
                         let l = is.nextLine

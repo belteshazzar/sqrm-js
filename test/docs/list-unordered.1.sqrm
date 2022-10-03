@@ -1,7 +1,7 @@
 
 - first item
-  continues onto
-next line
+  continues onto this line
+but not this line
 
 + second item
 + next item
@@ -11,10 +11,10 @@ next line
   item
 
   - Indented item
-  onto the next line
+    onto the next line
 
   * Indented item
 
 
 - forth
-item continues
+  item continues
