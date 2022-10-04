@@ -26,7 +26,7 @@ export default function sqrmToJs(sqrm) {
             } else {
                 s += ','
             }
-            if (key=='text' || key=='value') {
+            if (key=='value') {
                 s += `"${key}":\`${value}\``
             } else if (key=='children' || key=='cells') {
                 s += `"${key}":${stringifyA(value)}`

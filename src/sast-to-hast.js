@@ -199,7 +199,7 @@ export default function sastToHast(sqrm) {
                     } else if (n.type == 'blank') {
                         blank()
                     } else if (n.indent >= indent + 1 ) {
-                        list.children.push(processIndentation(indent+1))
+                        list.children = list.children.concat(processIndentation(indent+1))
                     } else {
                         break
                     }
@@ -243,7 +243,7 @@ export default function sastToHast(sqrm) {
             if (n==null || n.type != 'blank') {
                 throw new Error('expected blank but found ' + n.type)
             }
-            return t('\n')
+            return null
         }
         
         function paragraph() {
@@ -302,7 +302,7 @@ export default function sastToHast(sqrm) {
 
         function processLine() {
             let ln = peek()
-console.log('processLine',ln)
+//console.log('processLine',ln)
 
             if (ln.indent == undefined) {
                 return blank()
@@ -385,7 +385,7 @@ console.log('processLine',ln)
 // console.log(util.inspect([t(`[${i+1}]`)].concat(footnotes[i].hast),false,null,false))
 
             ol.children.push(h('li',{},[ h('a',{name:`footnote-${footnotes[i].id}`}
-            )].concat([t(' ')]).concat(footnotes[i].hast)))
+            )].concat([t(' ')]).concat(footnotes[i].children)))
         }
 
         visit(doc, (node) => {
