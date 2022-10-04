@@ -14,8 +14,7 @@
 
 %>
 
-
-<% root.push({type:'text',indent: 0, children: [t('fred')] }) %>
+    <% root.push({type:'text',indent: 0, children: [t('fred')] }) %>
 
 #value( 42 )
 

@@ -38,7 +38,7 @@ export default function sqrmToLines(str, indentation = 2) {
     let indent = 0
 
     function addLine(split) {
-        lines.push({line: n, indent: Math.floor(indent/indentation), text: str.substring(i,j).trim()})
+        lines.push({line: n, indent: Math.floor(indent/indentation), text: str.substring(i,j)})
         ++n
         atLineStart = true
         indent = 0
@@ -52,7 +52,7 @@ export default function sqrmToLines(str, indentation = 2) {
         if (atLineStart) {
             if (s==' ') {
                 ++indent
-                ++i
+//                ++i
             } else {
                 atLineStart = false
             }

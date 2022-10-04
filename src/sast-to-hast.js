@@ -176,9 +176,20 @@ export default function sastToHast(sqrm) {
 
         function div() {
             let n = next()
-            let div = h(`${n.tag}`)
-            div.children = processIndentation(indent+1)
-            return div
+
+            if (n.tag == '!DOCTYPE') {
+                let doctype = { type: 'doctype', properties: n.properties }
+                doctype.children = processIndentation(indent+1)
+                return doctype
+            } else if (n.type == '!--') {
+                let comment = { type: 'comment' }
+                comment.children = processIndentation(indent+1)
+                return comment
+            } else {
+                let div = h(`${n.tag}`,n.properties)
+                div.children = processIndentation(indent+1)
+                return div
+            }
         }
     
         function heading() {

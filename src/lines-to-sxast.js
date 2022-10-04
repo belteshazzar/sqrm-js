@@ -8,18 +8,19 @@ import LineParser from './LineParser.js'
 import { table } from 'node:console'
 
 const RE_BlankLine = /^\s*$/
-const RE_Tag = /^(([a-zA-Z_$][a-zA-Z\d_$]*)\s*:(?:\s+(.*?))?)\s*$/
-const RE_Script = /^<%.*$/
-const RE_Footnote = /^\[ *\^ *(\S+) *\] *: *(.+?) *$/
-const RE_CodeBlock = /^```(([a-zA-Z]+)?)\s*$/
-const RE_Div = /^(<\s*((\!html)|([a-z]+))((?:\s+[a-z]+(="[^"]*")?)*)\s*>?\s*)$/i
-const RE_Heading = /^((=+)\s*(\S.*?)\s*[-=]*)\s*$/
-const RE_HR = /^[=-\s]+$/
-const RE_ListItem = /^(?:(?:([-*+])|(\d+[\.)]))\s+(\S.*?))\s*$/
+const RE_Tag = /^\s*(([a-zA-Z_$][a-zA-Z\d_$]*)\s*:(?:\s+(.*?))?)\s*$/
+const RE_Script = /^(\s*)<%(.*?)\s*$/
+const RE_Footnote = /^\s*\[ *\^ *(\S+) *\] *: *(.+?) *$/
+const RE_CodeBlock = /^\s*```(([a-zA-Z]+)?)\s*$/
+const RE_Div = /^\s*(<\s*((\!doctype)|([a-z]+))((?:\s+[a-z]+(="[^"]*")?)*)\s*>?\s*)$/i
+const RE_Heading = /^\s*((=+)\s*(\S.*?)\s*[-=]*)\s*$/
+const RE_HR = /^\s*[=-\s]+$/
+const RE_ListItem = /^\s*(?:(?:([-*+])|(\d+[\.)]))\s+(\S.*?))\s*$/
 const RE_ListItemTask = /^\s*\[ *([xX]?) *\]\s+(.*?)\s*$/
-const RE_Table = /^(\|(.+?)\|?)\s*$/
-const RE_TableHeader = /^[-| ]+$/
+const RE_Table = /^\s*(\|(.+?)\|?)\s*$/
+const RE_TableHeader = /^\s*[-| ]+$/
 
+const RE_ScriptEnd = /%>\s*$/
 
 export default function linesToSxast(lines) {
     let doc = []
@@ -28,18 +29,20 @@ export default function linesToSxast(lines) {
     for (let i=0 ; i<lines.length ; i++) {
         let ln = lines[i]
         if (inScript) {
-            if (ln.text.trim().slice(-2) == '%>') {
-                doc.push({ type: 'script', text: ln.text.trim().slice(0,-2) })
+            let m = ln.text.match(RE_ScriptEnd)
+            if (m) {
+                doc.push({ type: 'script', code: ln.text.replace(RE_ScriptEnd,'') })
                 inScript = false
             } else {
-                doc.push({ type: 'script', text: ln.text })
+                doc.push({ type: 'script', code: ln.text })
             }
         } else {
             const s = lineToSqrm(ln)
 
             if (s.type == 'script') {
-                if (s.text.trim().slice(-2) == '%>') {
-                    s.text = s.text.trim().slice(0,-2)
+                let m = ln.text.match(RE_ScriptEnd)
+                if (m) {
+                    s.code = s.code.replace(RE_ScriptEnd,'')
                 } else {
                     inScript = true
                 }
@@ -145,7 +148,7 @@ function lineToSqrm(ln) {
         return {type:'blank', line:ln.line}
     }
 
-    const ch = ln.text[0]
+//    const ch = ln.text[0]
     let m;
 
     m = ln.text.match(RE_Heading)
@@ -175,23 +178,32 @@ function lineToSqrm(ln) {
         }
     }
 
-    if (ch=='<') {
-        if (ln.text.length>1 && ln.text[1]=='%') {
-            return {type:'script',indent:ln.indent,text: ln.text, code: ln.text.slice(2),line:ln.line}
-        } else {
-            m = ln.text.match(RE_Div)
-            if (m) {
-                return {type:'div',indent:ln.indent,tag:(m[2]?m[2]:'div'), text: ln.text, line:ln.line}
-            }
-        }
+    m = ln.text.match(RE_Script)
+    if (m) {
+        console.log(m)
+        return {type:'script',indent:ln.indent, code: m[1] + '  ' + m[2], line:ln.line}
     }
 
-    if (ch=='|') {
-        m = ln.text.match(RE_Table)
-        if (m) {
-            const divider = ln.text.match(RE_TableHeader) !== null
-            return { type: 'table-row', indent: ln.indent, divider: divider, text: ln.text, cells: textToCells(m[2]), line: ln.line }
+    m = ln.text.match(RE_Div)
+    if (m) {
+        let properties = {}
+        if (m[5]) {
+            let props =  [... m[5].matchAll(/([^\s=]+)(=["]([^"]*)["])?/g) ]
+            for (let prop of props) {
+                if (prop[3]) {
+                    properties[prop[1]] = prop[3]
+                } else {
+                    properties[prop[1]] = true
+                }
+            }
         }
+        return {type:'div',indent:ln.indent,tag:(m[2]?m[2]:'div'),properties:properties, text: ln.text, line:ln.line}
+    }
+
+    m = ln.text.match(RE_Table)
+    if (m) {
+        const divider = ln.text.match(RE_TableHeader) !== null
+        return { type: 'table-row', indent: ln.indent, divider: divider, text: ln.text, cells: textToCells(m[2]), line: ln.line }
     }
 
     m = ln.text.match(RE_BlankLine) 
@@ -220,6 +232,6 @@ function lineToSqrm(ln) {
     }
 
     
-    return {type:'text',indent:ln.indent,children:textToHast(ln.text),line:ln.line, text: ln.text}
+    return {type:'text',indent:ln.indent,children:textToHast(ln.text.trim()),line:ln.line, text: ln.text}
 
 }

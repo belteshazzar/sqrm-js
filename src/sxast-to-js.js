@@ -74,7 +74,7 @@ export default function sqrmToJs(sqrm) {
         let ln = sqrm[i]
 //        out += '// ln:' + ln.line + '\n'
         if (ln.type == 'script') {
-            out += ln.text + '\n'
+            out += ln.code + '\n'
         } else if (ln.type == 'tag') {
             out += `j('${ln.name}',${ln.value})\n`
         } else {
@@ -92,7 +92,7 @@ export default function sqrmToJs(sqrm) {
     }
 
     out += '\n} catch (e) {\n'
-    out += '  console.log(e);\n'
+    out += '  console.log(e.stack);\n'
     out += '  throw e;\n'
     out += '}\n'      
     

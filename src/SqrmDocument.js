@@ -68,7 +68,8 @@ export default class SqrmDocument {
             this.fn = new Function(js);
 
         } catch (e) {
-            throw new Error(e);
+            console.log(e.stack)
+            throw e
         }
 
         // const is = new InputStream(this.src);
