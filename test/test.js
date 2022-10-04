@@ -347,8 +347,8 @@ describe("Sqrm Render", function() {
 
         testFF('divs-raw','divs-raw')
 
-        test(38,'fred\n\n< blockquote\n\n  <div id="fred" class="woot" \n woot\n\n','<p>\n  fred\n</p>\n<blockquote>\n  <div id="fred" class="woot"> <p>   woot </p>\n  </div>\n</blockquote>\n')
-        test(39,'fred\n\n<blockquote\n\n  with more\n\n  <div\n\n    another indented','<p>fred</p><blockquote><p> with more</p><div> <p>   another indented </p></div></blockquote>')
+        test(38,'fred\n\n< blockquote\n\n  <div id="fred" class="woot" \n woot\n\n','<p>fred</p><blockquote><div id="fred" class="woot"></div></blockquote><p>woot</p>')
+        test(39,'fred\n\n<blockquote\n\n  with more\n\n  <div\n\n    another indented','<p>fred</p><blockquote><p>with more</p><div><p>another indented</p></div></blockquote>')
         
     });
 
