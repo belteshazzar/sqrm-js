@@ -132,16 +132,6 @@ function tableOf(rows) {
     return table;
 }
 
-function blockOf(language,lines) {
-    const code = h('code',{class: 'language-' + language})
-    for (let i=0 ; i<lines.length ; i++) {
-        code.children.push(t(lines[i].text))
-        code.children.push(t('\n'))
-    }
-    console.log(code.children)
-
-    return h('pre',{},[code])
-}
 
 export default function sastToHast(sqrm) {
 
@@ -172,8 +162,92 @@ export default function sastToHast(sqrm) {
         return footnotes.length;
     }
 
+
+
     function processIndentation(indent) {
 
+        function raw() {
+            const lines = [t('\n')];
+    
+            while (peek()!=null) {
+                if (peek().type == 'blank') {
+                    next()
+                    lines.push(t('\n'))
+                } else if (peek().indent > indent) {
+                    let n = next()
+                    lines.push(t(n.text))
+                    lines.push(t('\n'))
+                } else {
+                    break;
+                }
+            }
+    
+            return lines
+    
+        }
+
+        function pre(indent) {
+            const lines = [t('\n')];
+    
+            while (peek()!=null) {
+                if (peek().type == 'blank') {
+                    next()
+                    lines.push(t('\n'))
+                } else if (peek().indent > indent) {
+                    let n = next()
+                    if (n.type == 'div') {
+                        let div = h(`${n.tag}`,n.properties)
+                        div.children = div.children.concat(pre(n.indent))
+                        lines.push(div)
+                        lines.push(t('\n'))
+                    } else {
+                        lines.push(t(n.text))
+                        lines.push(t('\n'))
+                    }
+                } else {
+                    break;
+                }
+            }
+    
+            return lines
+    
+        }
+
+        function blockOf(language,lines) {
+            switch(language) {
+                case "info":
+                case "tip":
+                case "note":
+                case "warning":
+                    {
+                        const div = h('div',{class: 'alert-' + language})
+                        for (let i=0 ; i<lines.length ; i++) {
+                            if (lines[i].type != 'blank') {
+                                if (div.children.length > 0) div.children.push(t('\n'))
+                                div.children.push(t(lines[i].text.substring((indent+1)*2))) // TODO: hard coded
+                            }
+                        }
+            //            console.log('blockOf',code.children)
+                        return div
+            
+                    }
+                default:
+                    {
+                        const code = h('code',{class: 'language-' + language})
+                        code.children.push(t('\n'))
+                        for (let i=0 ; i<lines.length ; i++) {
+                            if (lines[i].type != 'blank') {
+                                code.children.push(t(lines[i].text.substring((indent+1)*2))) // TODO: hard coded
+                            }
+                            code.children.push(t('\n'))
+                        }
+            //            console.log('blockOf',code.children)
+                        return h('pre',{},[code])
+            
+                    }
+            }
+        }
+        
         function div() {
             let n = next()
 
@@ -181,10 +255,18 @@ export default function sastToHast(sqrm) {
                 let doctype = { type: 'doctype', properties: n.properties }
                 doctype.children = processIndentation(indent+1)
                 return doctype
-            } else if (n.type == '!--') {
+            } else if (n.tag == '!--') {
                 let comment = { type: 'comment' }
-                comment.children = processIndentation(indent+1)
+                comment.children = raw()
                 return comment
+            } else if (n.tag == 'script' || n.tag == 'style') {
+                let el = h(n.tag)
+                el.children = raw()
+                return el
+            } else if (n.tag == 'pre') {
+                let el = h('pre')
+                el.children = pre(n.indent)
+                return el
             } else {
                 let div = h(`${n.tag}`,n.properties)
                 div.children = processIndentation(indent+1)
@@ -282,11 +364,7 @@ export default function sastToHast(sqrm) {
             const language = n.language
             let lines = []
             n = peek()
-            while (n!=null) {
-                if (n.type == 'code-block' && n.indent == indent) {
-                    next() // consume
-                    break
-                }
+            while (n!=null && (n.type == "blank" || n.indent >= indent + 1)) {
                 lines.push(next())
                 n = peek()
             }

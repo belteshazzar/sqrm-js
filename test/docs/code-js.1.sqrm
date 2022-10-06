@@ -1,0 +1,14 @@
+
+before
+
+  ```javascript
+
+    let message = 'Hello world';
+    alert(message);
+
+    function (x) {
+        indented();
+    }
+
+after
+

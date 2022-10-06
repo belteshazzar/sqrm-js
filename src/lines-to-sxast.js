@@ -180,7 +180,6 @@ function lineToSqrm(ln) {
 
     m = ln.text.match(RE_Script)
     if (m) {
-        console.log(m)
         return {type:'script',indent:ln.indent, code: m[1] + '  ' + m[2], line:ln.line}
     }
 
