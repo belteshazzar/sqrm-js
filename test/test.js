@@ -1,4 +1,6 @@
 
+// TODO: yaml docs from https://www.cloudbees.com/blog/yaml-tutorial-everything-you-need-get-started
+
 import {expect} from 'chai';
 
 import * as fs from 'fs'//const fs = require("fs");
@@ -324,7 +326,8 @@ describe("Sqrm Render", function() {
 
     describe("code blocks", function() {
 
-        testFF('code blocks',"code")
+        testFF('code javascript',"code-js")
+        testFF('code blocks',"code-blocks")
 
     })
 
