@@ -7,6 +7,7 @@ import util from 'node:util'
 import LineParser from './LineParser.js'
 import { table } from 'node:console'
 
+import JSON5 from 'json5'
 
 export default function sqrmToJs(sqrm) {
 
@@ -76,7 +77,7 @@ export default function sqrmToJs(sqrm) {
         if (ln.type == 'script') {
             out += ln.code + '\n'
         } else if (ln.type == 'tag') {
-            out += `j('${ln.name}',${ln.value})\n`
+            out += `j('${ln.name}',${JSON5.stringify(ln.value)})\n`
         } else {
             out += `root.push(${stringify(ln)})\n`
 

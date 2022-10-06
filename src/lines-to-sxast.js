@@ -6,6 +6,7 @@ import {t} from './hastscript-tools.js'
 import util from 'node:util'
 import LineParser from './LineParser.js'
 import { table } from 'node:console'
+import { Script } from 'node:vm'
 
 const RE_BlankLine = /^\s*$/
 const RE_Tag = /^\s*(([a-zA-Z_$][a-zA-Z\d_$]*)\s*:(?:\s+(.*?))?)\s*$/
@@ -24,31 +25,43 @@ const RE_ScriptEnd = /%>\s*$/
 
 export default function linesToSxast(lines) {
     let doc = []
-    let inScript = false
+    let i = 0
 
-    for (let i=0 ; i<lines.length ; i++) {
-        let ln = lines[i]
-        if (inScript) {
+    function next() {
+        if (i==lines.length) return null
+        return lines[i++]
+    }
+
+    function peek() {
+        if (i==lines.length) return null
+        return lines[i]
+    }
+
+    function script() {
+        while (peek()!=null) {
+            let ln = next()
             let m = ln.text.match(RE_ScriptEnd)
             if (m) {
                 doc.push({ type: 'script', code: ln.text.replace(RE_ScriptEnd,'') })
-                inScript = false
+                break
             } else {
                 doc.push({ type: 'script', code: ln.text })
             }
-        } else {
-            const s = lineToSqrm(ln)
+        }
+    }
 
-            if (s.type == 'script') {
-                let m = ln.text.match(RE_ScriptEnd)
-                if (m) {
-                    s.code = s.code.replace(RE_ScriptEnd,'')
-                } else {
-                    inScript = true
-                }
-            }        
-                
-            doc.push(s)
+    while (peek()!=null) {
+        let ln = next()
+        const s = lineToSqrm(ln)
+        doc.push(s)
+
+        if (s.type == 'script') {
+            let m = ln.text.match(RE_ScriptEnd)
+            if (m) {
+                s.code = s.code.replace(RE_ScriptEnd,'')
+            } else {
+                script()
+            }
         }
     }
 
