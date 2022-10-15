@@ -9,7 +9,8 @@ import { table } from 'node:console'
 import { Script } from 'node:vm'
 
 const RE_BlankLine = /^\s*$/
-const RE_Tag = /^\s*(([a-zA-Z_$][a-zA-Z\d_$]*)\s*:(?:\s+(.*?))?)\s*$/
+const RE_Tag = /^\s*([a-zA-Z_$][a-zA-Z\d_$]*)\s*:(\s+(.*?))?\s*$/
+const RE_ListItemTag = /^\s*-\s+([a-zA-Z_$][a-zA-Z\d_$]*)(\s*:(\s+(.*?))?)?\s*$/
 const RE_Script = /^(\s*)<%(.*?)\s*$/
 const RE_Footnote = /^\s*\[ *\^ *(\S+) *\] *: *(.+?) *$/
 const RE_CodeBlock = /^\s*```(([a-zA-Z]+)?)\s*$/
@@ -178,7 +179,20 @@ function lineToSqrm(ln) {
                 let task = { line: ln.line, done: t[1]!='', text: t[2] }
                 return {type:'unordered-list-item',text: ln.text, indent:ln.indent,marker:m[1],children:textToHast(t[2]),line:ln.line, task: task}
             } else {
-                return {type:'unordered-list-item',text: ln.text, indent:ln.indent,marker:m[1],children:textToHast(m[3]),line:ln.line}
+                let uli = {type:'unordered-list-item',text: ln.text, indent:ln.indent,marker:m[1],children:textToHast(m[3]),line:ln.line}
+
+                let tag = ln.text.match(RE_ListItemTag)
+                if (tag) {
+                    uli.tag = { value: tag[1], indent: ln.indent }
+                    if (tag[4]) {
+                        uli.tag.name = tag[1]
+                        uli.tag.value = tag[4]
+                    } else if (tag[2]) {
+                        uli.tag.canHaveChildren = true
+                    }
+                }
+
+                return uli
             }
         } else if (m[2]!==undefined) {
             let t = m[3].match(RE_ListItemTask)
@@ -225,7 +239,13 @@ function lineToSqrm(ln) {
 
     m = ln.text.match(RE_Tag);
     if (m) {
-        return {type:'tag',indent:ln.indent, name:m[2], value: m[3],line:ln.line, text: ln.text}
+        let tag = {type:'tag',indent:ln.indent, name:m[1], line:ln.line, text: ln.text}
+        if (m[3]) {
+            tag.value = m[3]
+        } else {
+            tag.canHaveChildren = true
+        }
+        return tag
     }
 
     m = ln.text.match(RE_Footnote);

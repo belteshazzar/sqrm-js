@@ -54,21 +54,19 @@ export default function sqrmToJs(sqrm) {
 
     
     out += 'try {\n'
+    out += '\n'
     out += 'const request = arguments[0];\n'
-    out += 'const h = request.libs.h;\n'
-    out += 'const t = request.libs.t;\n'
-    out += 'const i = request.libs.i;\n'
-    // out += 'let tree = request.libs.tree;\n'
-    // out += 'let util = request.libs.util;\n'
-    out += 'const docs = request.docs;\n';
     out += 'const response = arguments[1];\n'
-//    out += 'const html = response.html;\n';
+    out += '\n'
+    out += 'const docs = request.docs;\n';
+    out += '\n'
+    out += 'const h = response.libs.h;\n'
+    out += 'const t = response.libs.t;\n'
+    out += 'const i = response.libs.i;\n'
     out += 'const json = response.json;\n'
     out += 'const root = response.root;\n'
-    out += '\n'
-    out += 'const j = request.libs.j.bind(json);\n'
-    out += '\n'
-    out += 'const append = request.libs.append;\n'
+    out += 'const j = response.libs.j;\n'
+//    out += 'const append = response.libs.append;\n'
     out += '\n'
 
     for (let i=0 ; i<sqrm.length ; i++) {
@@ -77,7 +75,9 @@ export default function sqrmToJs(sqrm) {
         if (ln.type == 'script') {
             out += ln.code + '\n'
         } else if (ln.type == 'tag') {
-            out += `j('${ln.name}',${JSON5.stringify(ln.value)})\n`
+            out += `j(${ stringify({ indent: ln.indent, isArrayElement: false, name: ln.name, value: ln.value, canHaveChildren: ln.canHaveChildren } )})\n`
+        } else if (ln.type == 'unordered-list-item' && ln.tag !== undefined) {
+            out += `j(${ stringify({ indent: ln.indent, isArrayElement: true, name: ln.tag.name, value: ln.tag.value, canHaveChildren: ln.tag.canHaveChildren })})\n`
         } else {
             out += `root.push(${stringify(ln)})\n`
 

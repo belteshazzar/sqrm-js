@@ -11,6 +11,7 @@ import SqrmRequest from '../src/SqrmRequest.js';
 import SqrmResponse from '../src/SqrmResponse.js';
 import * as acorn from 'acorn'
 import sastToHast from './../src/sast-to-hast.js';
+import toJson from './../src/jast-to-json.js'
 //import {toHast} from './../src/snast-to-hast.js';
 import {toHtml} from 'hast-util-to-html'
 import util from 'node:util'
@@ -62,8 +63,6 @@ function test(name,source,expectedHtml,expectedJson={},includeCallback) {
 
         doc.execute(request,response);
 
-        const json = response.json;
-
         const sast = response.root
         
         if (process.env.npm_config_sast) {
@@ -84,6 +83,13 @@ function test(name,source,expectedHtml,expectedJson={},includeCallback) {
             console.log('= html =================')
             console.log(html)
         }
+
+        const jsonStructure = response.jsonStructure
+
+        console.log('= json-structure =================')
+        console.log(util.inspect(jsonStructure,false,null,false));
+
+        const json = toJson(jsonStructure);
 
         if (process.env.npm_config_json) {
             console.log('= json =================')
