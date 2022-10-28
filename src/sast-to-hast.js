@@ -386,7 +386,8 @@ export default function sastToHast(sqrm) {
         }
     
         function tag() {
-            let n = next()   
+            let n = next()
+            return h('p',{}, n.children)
         }
 
         function processLine() {

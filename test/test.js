@@ -84,12 +84,15 @@ function test(name,source,expectedHtml,expectedJson={},includeCallback) {
             console.log(html)
         }
 
-        const jsonStructure = response.jsonStructure
+        const jast = response.jsonTree
 
-        console.log('= json-structure =================')
-        console.log(util.inspect(jsonStructure,false,null,false));
+        if (process.env.npm_config_jast) {
+            console.log('= jast =================')
+            console.log(util.inspect(jast,false,null,false));
+        }
 
-        const json = toJson(jsonStructure);
+        let json = toJson(jast)
+        if (json==null) json = {}
 
         if (process.env.npm_config_json) {
             console.log('= json =================')

@@ -9,7 +9,7 @@ import { table } from 'node:console'
 import { Script } from 'node:vm'
 
 const RE_BlankLine = /^\s*$/
-const RE_Tag = /^\s*([a-zA-Z_$][a-zA-Z\d_$]*)\s*:(\s+(.*?))?\s*$/
+const RE_Tag = /^\s*(([a-zA-Z_$][a-zA-Z\d_$]*)\s*:(\s+(.*?))?)\s*$/
 const RE_ListItemTag = /^\s*-\s+([a-zA-Z_$][a-zA-Z\d_$]*)(\s*:(\s+(.*?))?)?\s*$/
 const RE_Script = /^(\s*)<%(.*?)\s*$/
 const RE_Footnote = /^\s*\[ *\^ *(\S+) *\] *: *(.+?) *$/
@@ -183,12 +183,17 @@ function lineToSqrm(ln) {
 
                 let tag = ln.text.match(RE_ListItemTag)
                 if (tag) {
-                    uli.tag = { value: tag[1], indent: ln.indent }
+                    uli.tag = { indent: ln.indent }
                     if (tag[4]) {
                         uli.tag.name = tag[1]
                         uli.tag.value = tag[4]
+                        uli.tag.colon = true
                     } else if (tag[2]) {
-                        uli.tag.canHaveChildren = true
+                        uli.tag.name = tag[1]
+                        uli.tag.colon = true
+                    } else {
+                        uli.tag.value = tag[1]
+                        uli.tag.colon = false
                     }
                 }
 
@@ -239,11 +244,9 @@ function lineToSqrm(ln) {
 
     m = ln.text.match(RE_Tag);
     if (m) {
-        let tag = {type:'tag',indent:ln.indent, name:m[1], line:ln.line, text: ln.text}
-        if (m[3]) {
-            tag.value = m[3]
-        } else {
-            tag.canHaveChildren = true
+        let tag = {type:'tag',indent:ln.indent, name:m[2], colon: true, line:ln.line, children: textToHast(m[1]), text: ln.text}
+        if (m[4]) {
+            tag.value = m[4]
         }
         return tag
     }

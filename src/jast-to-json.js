@@ -19,8 +19,9 @@ export default function toJson(jast) {
         }
         return o
     }
+
     if (jast.type == 'unknown') {
-        return null
+        return null;
     }
 
     console.log('toJson Error, unhandles type: ',jast)

@@ -28,7 +28,11 @@ export default function sqrmToJs(sqrm) {
                 s += ','
             }
             if (key=='value') {
-                s += `"${key}":\`${value}\``
+                if (value==undefined) {
+                    s += `"${key}":undefined`
+                } else {
+                    s += `"${key}":\`${value}\``
+                }
             } else if (key=='children' || key=='cells') {
                 s += `"${key}":${stringifyA(value)}`
             } else {
@@ -75,9 +79,13 @@ export default function sqrmToJs(sqrm) {
         if (ln.type == 'script') {
             out += ln.code + '\n'
         } else if (ln.type == 'tag') {
-            out += `j(${ stringify({ indent: ln.indent, isArrayElement: false, name: ln.name, value: ln.value, canHaveChildren: ln.canHaveChildren } )})\n`
+            out += `if ( ! j(${ stringify({ indent: ln.indent, isArrayElement: false, name: ln.name, colon: ln.colon, value: ln.value } )}) ) {\n`
+            out += `  root.push(${stringify(ln)})\n`
+            out += '}\n'
         } else if (ln.type == 'unordered-list-item' && ln.tag !== undefined) {
-            out += `j(${ stringify({ indent: ln.indent, isArrayElement: true, name: ln.tag.name, value: ln.tag.value, canHaveChildren: ln.tag.canHaveChildren })})\n`
+            out += `if ( ! j(${ stringify({ indent: ln.indent, isArrayElement: true, name: ln.tag.name, colon: ln.tag.colon, value: ln.tag.value })}) ) {\n`
+            out += `  root.push(${stringify(ln)})\n`
+            out += '}\n'
         } else {
             out += `root.push(${stringify(ln)})\n`
 
