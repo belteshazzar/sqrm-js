@@ -302,7 +302,6 @@ export default function sastToHast(sqrm) {
         function blank() {
             let n = next()
             if (n==null || n.type != 'blank') {
-                console.log(n)
                 throw new Error('expected blank but found ' + n.type)
             }
             return null
