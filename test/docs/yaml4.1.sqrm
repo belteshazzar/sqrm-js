@@ -8,7 +8,7 @@ obj2: {a:1,b:2}
 obj3: {a:1,b:2}
 
 #obj4({a:1,b:2})
-#obj5({a:1,b: '2*3' })
+#obj5({a:1,b: 2*3 })
 
 a: steve was here
 b : -4.3
