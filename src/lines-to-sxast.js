@@ -25,6 +25,10 @@ const RE_TableHeader = /^\s*[-| ]+$/
 
 const RE_ScriptEnd = /%>\s*$/
 
+function escapeValue(str) {
+    return str.replaceAll('`','\\`')
+}
+
 export default function linesToSxast(lines) {
     let doc = []
     let i = 0
@@ -190,6 +194,7 @@ function lineToSqrm(ln) {
                         // try {
                         //     uli.yaml.value = strToJson(yaml[4])
                         // } catch (e) {
+                            console.log(4,yaml[4])
                             uli.yaml.value = yaml[4]                            
                         // }
                         uli.yaml.colon = true
@@ -201,6 +206,7 @@ function lineToSqrm(ln) {
                         //     uli.yaml.value = strToJson(yaml[1])
                         // } catch (e) {
                             uli.yaml.value = yaml[1]
+                            console.log(1,yaml[1])
                         // }
                         uli.yaml.colon = false
                     }
@@ -258,7 +264,8 @@ function lineToSqrm(ln) {
             // try {
             //     tag.value = strToJson(m[4])
             // } catch (e) {
-                tag.value = m[4]
+                console.log(263,m[4])
+                tag.value = escapeValue(m[4])
             // }
         }
         return tag

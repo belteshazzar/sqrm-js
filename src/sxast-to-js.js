@@ -72,9 +72,9 @@ export default function sqrmToJs(sqrm) {
     out += 'let json = response.json;\n'
     out += 'const root = response.root;\n'
 //    out += 'const j = response.libs.j;\n'
-    out += 'const maybeYaml = function(params) { let r = response.libs.maybeYaml(params); json = response.json; console.log(json); return r }\n'
-    out += 'const inlineTag = function(params) { let r = response.libs.inlineTag(params); json = response.json; console.log(json); return r }\n'
-    out += 'const addTask = function(params) { let r = response.libs.addTask(params); json = response.json; console.log(json); return r }\n'
+    out += 'const maybeYaml = function(params) { let r = response.libs.maybeYaml(params); json = response.json; return r }\n'
+    out += 'const inlineTag = function(params) { let r = response.libs.inlineTag(params); json = response.json; return r }\n'
+    out += 'const addTask = function(params) { let r = response.libs.addTask(params); json = response.json; return r }\n'
 //    out += 'const append = response.libs.append;\n'
     out += '\n'
 
