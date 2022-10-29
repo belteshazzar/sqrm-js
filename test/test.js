@@ -99,7 +99,6 @@ function test(name,source,expectedHtml,expectedJson={},includeCallback) {
             console.log(util.inspect(json,false,null,false));
         }
 
-        console.log('==================')
         expect(json).to.eql(expectedJson)
         expect(html).to.eql(expectedHtml);
     })

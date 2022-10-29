@@ -59,10 +59,6 @@ function tableOf(rows) {
         return el
     }
 
-    console.log('table +++++++++++++++++++++++++++++++')
-    console.log(util.inspect(head,false,null,false))
-    console.log(util.inspect(body,false,null,false))
-    console.log(util.inspect(foot,false,null,false))
     const table = h('table')
 
     if (head.length>0) {
