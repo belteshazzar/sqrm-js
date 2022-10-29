@@ -281,21 +281,20 @@ export default class LineParser {
                     index = jj;
                     a = s.charAt(index++);
                     let tagStr = null
-                    let tagValue = null;
                     let tagValueStr = null
                     if (a=='(') {
                         for (var k = index; k < s.length; k++) {
                             let ch = s.charAt(k)
                             if (ch==')') {
-                                try {
-                                    tagValue = strToJson(s.substring(index,k))
+                                tagValueStr = s.substring(index,k)
+                                if (strToJson(tagValueStr)) {
                                     tagStr = s.substring(tagAt,k+1)
-                                    tagValueStr = s.substring(index-1,k + 1)
                                     // console.log(tagStr,tagValueStr,tagValue)
                                     index = k + 1
                                     a = s.charAt(index++);
                                     break;
-                                } catch (e) {
+                                } else {
+                                    tagValueStr = null
                                     console.log('FAILED to parse:' + s.substring(index,k))
                                 }
                             }
@@ -305,7 +304,7 @@ export default class LineParser {
                     }
 
 
-                    console.log('tag',tag,tagStr,tagValueStr,tagValue)
+                    console.log('tag',tag,tagStr,tagValueStr)
 
                     if (bang) {
                         //strs.push(str)
@@ -313,7 +312,7 @@ export default class LineParser {
                         //str = ''
                         // console.log('adding include',tag,tagValueStr,tagValue)
 
-                        parent.children.push(i(tag,tagValue))
+                        parent.children.push(i(tag,tagValueStr))
                     } else {
 
 
@@ -350,7 +349,7 @@ export default class LineParser {
                             indent: 0,
                             name: tag,
                             colon: true,
-                            value: tagValue,
+                            value: tagValueStr,
                             children: [t(tagStr)] 
                         })
 

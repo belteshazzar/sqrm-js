@@ -187,21 +187,21 @@ function lineToSqrm(ln) {
                     uli.yaml = { indent: ln.indent, isArrayElement: true }
                     if (yaml[4]) {
                         uli.yaml.name = yaml[1]
-                        try {
-                            uli.yaml.value = strToJson(yaml[4])
-                        } catch (e) {
+                        // try {
+                        //     uli.yaml.value = strToJson(yaml[4])
+                        // } catch (e) {
                             uli.yaml.value = yaml[4]                            
-                        }
+                        // }
                         uli.yaml.colon = true
                     } else if (yaml[2]) {
                         uli.yaml.name = yaml[1]
                         uli.yaml.colon = true
                     } else {
-                        try {
-                            uli.yaml.value = strToJson(yaml[1])
-                        } catch (e) {
+                        // try {
+                        //     uli.yaml.value = strToJson(yaml[1])
+                        // } catch (e) {
                             uli.yaml.value = yaml[1]
-                        }
+                        // }
                         uli.yaml.colon = false
                     }
                 }
@@ -255,11 +255,11 @@ function lineToSqrm(ln) {
     if (m) {
         let tag = {type:'yaml',indent:ln.indent, name:m[2], colon: true, isArrayElement: false, line:ln.line, children: textToHast(m[1]), text: ln.text}
         if (m[4]) {
-            try {
-                tag.value = strToJson(m[4])
-            } catch (e) {
+            // try {
+            //     tag.value = strToJson(m[4])
+            // } catch (e) {
                 tag.value = m[4]
-            }
+            // }
         }
         return tag
     }

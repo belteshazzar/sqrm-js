@@ -4,15 +4,18 @@ import * as acorn from 'acorn'
 import JSON5 from 'json5'
 import util from 'node:util'
 
-const TEST = false
+const TEST = true
 
 export default function strToJson(str) {
 
+    if (TEST) {
+        console.log('---- strToJson ------')
+    }
     let jsonStr = '{value:[' + str + ']}'
 
     try {
         const node = acorn.parse(jsonStr, {ecmaVersion: 2020})
-         if (TEST) {
+        if (TEST) {
             console.log(`strToJson - acorn ("${str}") = yes`)
             let ok = true
             if (node.type=='Program') {
@@ -29,6 +32,7 @@ export default function strToJson(str) {
                                     const id = as.elements[0]
                                     console.log(`strToJson - acorn ... actually identifier`)
                                     ok = false
+                                    throw new Error()
                                 }
                             }
                         }
@@ -37,10 +41,12 @@ export default function strToJson(str) {
             }
             console.log(ok)
         }
+        return true
     } catch (e) {
         if (TEST) {
             console.log(`strToJson - acorn ("${str}") = no`)
         }
+        return false
     }
 
     try {

@@ -33,6 +33,7 @@ export default function sqrmToJs(sqrm) {
                 if (value==undefined) {
                     s += `"${key}":undefined`
                 } else {
+                    console.log('inspect',value,util.inspect(value,false,null,false))
                     s += `"${key}": ${util.inspect(value,false,null,false)}`
                 }
             } else if (key=='children' || key=='cells') {

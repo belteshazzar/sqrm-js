@@ -409,7 +409,8 @@ describe("Sqrm Render", function() {
         
         test(50,'this is a tag #a(1,2,[")"]) in a line',
             '<p>this is a tag <a href="/tags/a">#a(1,2,[")"])</a> in a line</p>',
-            {  "a": [    1,    2,   [     ")"    ]  ]})
+            {  "a": "1,2,[\")\"]"})
+//            {  "a": [    1,    2,   [     ")"    ]  ]})
         test(51,'this is a tag ending a #line("with () text")',
             '<p>this is a tag ending a <a href="/tags/line">#line("with () text")</a></p>',
             { "line": "with () text"})
@@ -462,12 +463,13 @@ describe("Sqrm Render", function() {
         
     describe("misc", function() {
 
+        // detect this and make it a list rather than yaml?
         test(57,'text followed by a list:\n- one\n- two\n',
-            '<p>text followed by a list:</p><ul><li>one</li><li>two</li></ul>')
+            '<p>text followed by a list:</p>',["one","two"])
         
-        // is this yaml (json) or a list (html)? hint: its a list
+        // is this yaml (json) or a list (html)? ... its a json array
         test(58,'- one\n- two',
-            '<ul><li>one</li><li>two</li></ul>')
+            '',["one","two"])
         
         // script elements
         
