@@ -1,13 +1,8 @@
 
 import {h} from 'hastscript'
-// import {toHtml} from 'hast-util-to-html'
 import {visit} from 'unist-util-visit'
 import {t} from './hastscript-tools.js'
 import util from 'node:util'
-import { hrtime } from 'node:process'
-// import LineParser from './LineParser.js'
-// import { table } from 'node:console'
-//import BlankLine from './lines/BlankLine.js'
 
 function tableOf(rows) {
     let head = []
@@ -143,8 +138,6 @@ export default function sastToHast(sqrm) {
         return footnotes.length;
     }
 
-
-
     function processIndentation(indent) {
 
         function raw() {
@@ -208,7 +201,6 @@ export default function sastToHast(sqrm) {
                                 div.children.push(t(lines[i].text.substring((indent+1)*2))) // TODO: hard coded
                             }
                         }
-            //            console.log('blockOf',code.children)
                         return div
             
                     }
@@ -222,7 +214,6 @@ export default function sastToHast(sqrm) {
                             }
                             code.children.push(t('\n'))
                         }
-            //            console.log('blockOf',code.children)
                         return h('pre',{},[code])
             
                     }
@@ -374,7 +365,6 @@ export default function sastToHast(sqrm) {
 
         function processLine() {
             let ln = peek()
-//console.log('processLine',ln)
 
             if (ln.indent == undefined) {
                 return blank()
@@ -389,16 +379,6 @@ export default function sastToHast(sqrm) {
                 let div = h('div')
                 const divIndent = indent + 1
                 div.children = processIndentation(divIndent)
-                // let n = peek()
-                // while (n!=null && (n.indent == undefined || n.indent >= divIndent)) {
-                //     if (n.indent == undefined) {
-                //         blank()
-                //     } else {
-                //         let child = processIndentation(divIndent)
-                //         if (child) div.children.push(child)
-                //     }
-                //     n = peek()
-                // }
                 return div
             }
     
@@ -452,9 +432,6 @@ export default function sastToHast(sqrm) {
         doc.children.push(h('section',{ class: 'footnotes'},[ol]))
         for (let i=0 ; i<footnotes.length ; i++) {
             footnotesLookup[footnotes[i].id] = i+1
-//             console.log('footnote ========================')
-// console.log(util.inspect(footnotes[i],false,null,false))
-// console.log(util.inspect([t(`[${i+1}]`)].concat(footnotes[i].hast),false,null,false))
 
             ol.children.push(h('li',{},[ h('a',{name:`footnote-${footnotes[i].id}`}
             )].concat([t(' ')]).concat(footnotes[i].children)))
@@ -463,16 +440,11 @@ export default function sastToHast(sqrm) {
         visit(doc, (node) => {
             return node.type=='element' && node.tagName=='a' && node.properties['footnote-u'] !== undefined
         }, (node) => {
-            // console.log('reference to footnote ========================')
-            // console.log(node)
             const id = node.properties['footnote-u']
-            // console.log('id',id)
             let num = footnotesLookup[node.properties['footnote-u']]
-            // console.log('num',num)
             if (num===undefined) {
                 // used but not defined
                 num = Object.keys(footnotesLookup).length + 1
-                // console.log('num => ',num)
                 footnotesLookup[id] = num
                 ol.children.push(h('li',{},[ h('a',{name:`footnote-${id}`}) ]))
             }
@@ -480,7 +452,5 @@ export default function sastToHast(sqrm) {
         })
     }
 
-
     return doc
-
 }

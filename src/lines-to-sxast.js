@@ -1,13 +1,6 @@
 
-import {h} from 'hastscript'
-import {toHtml} from 'hast-util-to-html'
-import {visit} from 'unist-util-visit'
-import {t} from './hastscript-tools.js'
-import util from 'node:util'
-import LineParser from './LineParser.js'
-import { table } from 'node:console'
-import { Script } from 'node:vm'
-import strToJson from './str-to-json.js'
+
+import lineToSxast from './line-to-sxast.js'
 
 const RE_BlankLine = /^\s*$/
 const RE_Tag = /^\s*(([a-zA-Z_$][a-zA-Z\d_$]*)\s*:(\s+(.*?))?)\s*$/
@@ -133,7 +126,6 @@ function textToCells(text) {
                     }
 
                     break;
-
             }
         }
         return attr
@@ -158,7 +150,7 @@ function textToCells(text) {
 }
 
 function textToHast(text) {
-    return new LineParser(text).root.children
+    return lineToSxast(text)
 }
 
 function lineToSqrm(ln) {
@@ -167,7 +159,6 @@ function lineToSqrm(ln) {
         return {type:'blank', line:ln.line}
     }
 
-//    const ch = ln.text[0]
     let m;
 
     m = ln.text.match(RE_Heading)
@@ -191,23 +182,13 @@ function lineToSqrm(ln) {
                     uli.yaml = { indent: ln.indent, isArrayElement: true }
                     if (yaml[4]) {
                         uli.yaml.name = yaml[1]
-                        // try {
-                        //     uli.yaml.value = strToJson(yaml[4])
-                        // } catch (e) {
-                            console.log(4,yaml[4])
-                            uli.yaml.value = yaml[4]                            
-                        // }
+                        uli.yaml.value = yaml[4]                            
                         uli.yaml.colon = true
                     } else if (yaml[2]) {
                         uli.yaml.name = yaml[1]
                         uli.yaml.colon = true
                     } else {
-                        // try {
-                        //     uli.yaml.value = strToJson(yaml[1])
-                        // } catch (e) {
-                            uli.yaml.value = yaml[1]
-                            console.log(1,yaml[1])
-                        // }
+                        uli.yaml.value = yaml[1]
                         uli.yaml.colon = false
                     }
                 }
@@ -261,12 +242,7 @@ function lineToSqrm(ln) {
     if (m) {
         let tag = {type:'yaml',indent:ln.indent, name:m[2], colon: true, isArrayElement: false, line:ln.line, children: textToHast(m[1]), text: ln.text}
         if (m[4]) {
-            // try {
-            //     tag.value = strToJson(m[4])
-            // } catch (e) {
-                console.log(263,m[4])
-                tag.value = escapeValue(m[4])
-            // }
+            tag.value = escapeValue(m[4])
         }
         return tag
     }
@@ -286,7 +262,6 @@ function lineToSqrm(ln) {
         return {type:'hr',indent:ln.indent,line:ln.line, text: ln.text}
     }
 
-    
     return {type:'text',indent:ln.indent,children:textToHast(ln.text.trim()),line:ln.line, text: ln.text}
 
 }

@@ -1,30 +1,4 @@
 
-import {h} from 'hastscript'
-import {toHtml} from 'hast-util-to-html'
-import {visit} from 'unist-util-visit'
-import {t} from './hastscript-tools.js'
-import util from 'node:util'
-import LineParser from './LineParser.js'
-import { table } from 'node:console'
-
-
-/*
-
-    1. string             -> lines              (stringToLines)
-
-    2. lines              -> flat-sqrm-w-script (linesToSqrm)
-
-    3. flat-sqrm-w-script -> javascript         (sqrmToCode)
-
-    4. javascript         -> flat-sqrm          (fn response)
-
-    5. flat-sqrm          -> sqrm-tree          (sqrmToSqrmTree)
-
-    6. sqrm-tree          -> hast               (sqrmToHast)
-
-    7. hast               -> html               (hastToHtml)
-
-*/
 
 export default function sqrmToLines(str, indentation = 2) {
 
@@ -52,7 +26,6 @@ export default function sqrmToLines(str, indentation = 2) {
         if (atLineStart) {
             if (s==' ') {
                 ++indent
-//                ++i
             } else {
                 atLineStart = false
             }
@@ -70,6 +43,6 @@ export default function sqrmToLines(str, indentation = 2) {
         }
     }
     addLine(0)
-    return lines;
 
+    return lines;
 }

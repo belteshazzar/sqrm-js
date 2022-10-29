@@ -24,5 +24,5 @@ export default function toJson(jast) {
         return null;
     }
 
-    console.log('toJson Error, unhandles type: ',jast)
+    console.log('toJson Error, unhandled type: ',jast)
 }

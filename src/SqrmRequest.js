@@ -6,8 +6,5 @@ export default class SqrmRequest {
         this.docs = collection
         this.args = args;
         this.lines = [];
-//        this.root = [];
     }
-
-
 }
