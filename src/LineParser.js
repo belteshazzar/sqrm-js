@@ -296,7 +296,7 @@ export default class LineParser {
                                     a = s.charAt(index++);
                                     break;
                                 } catch (e) {
-                                    console.log(e)
+                                    console.log('FAILED to parse:' + s.substring(index,k))
                                 }
                             }
                         }
@@ -305,7 +305,7 @@ export default class LineParser {
                     }
 
 
-                    // console.log('tag',tag,tagValueStr,tagValue)
+                    console.log('tag',tag,tagStr,tagValueStr,tagValue)
 
                     if (bang) {
                         //strs.push(str)
