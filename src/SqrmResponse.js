@@ -17,7 +17,9 @@ function iterateLikeStack(tree,cb) {
     while (el != null) {
         if (cb.call(null,el) === false) return
         el = (el.children ? el.children[el.children.length-1] : null)
-        el = (el.type == 'value' ? null : el)
+        if (el!=null && el.type == 'value') {
+            el = null
+        }
     }
 }
 
@@ -44,8 +46,33 @@ export default class SqrmResponse {
         console.error(arguments)
     }
 
-    j({indent,isArrayElement,name,colon,value}) {
 
+    j(name,value) {
+        console.log('j',name,value)
+
+        if (typeof name == 'object') {
+            if (this.jsonTag(name)) {
+                // valid yaml, added to json
+                return h('a',{href:`/tags/${name.name}`},name.children)
+            } else {
+                return name.children
+            }
+        } else {
+            if (this.jsonTag({
+                    indent: 0,
+                    isArrayElement: false,
+                    name: name,
+                    colon: true,
+                    value: value})) {
+                // valid yaml, added to json
+                return h('a',{href:`/tags/${name.name}`},name.children)
+            } else {
+                return name.children
+            }
+        }
+    }
+
+    jsonTag({indent,isArrayElement,name,colon,value}) {
 //debug = (name=='v' || name=='n' || name=='s') // (name=='h')// || name=='i' || name == 'k')
 
         if (debug) {

@@ -40,7 +40,7 @@ export default class LineParser {
                 codeStr += ')'
             } else if (child.type == 'include') {
                 codeStr += `i("${child.value}",${util.inspect(child.args,false,null,false)})`
-            } else if (child.type == 'json') {
+            } else if (child.type == 'tag') {
                 codeStr += `j("${child.name}",${util.inspect(child.value,false,null,false)})`
 //                codeStr += `(() => { json["${child.name}"] = ${util.inspect(child.value,false,null,false)}})()`
 //                codeStr += `json.${child.name} = ${child.value}`
@@ -70,12 +70,12 @@ export default class LineParser {
 
         try {
             const res = JSON5.parse(str);
-            console.log("json5 parsed: ",str)
-            console.log(ap())
+            // console.log("json5 parsed: ",str)
+            // console.log(ap())
             return res
         } catch (e) {
-            console.log("json5 FAILED to parse:",str)
-            console.log(ap())
+            // console.log("json5 FAILED to parse:",str)
+            // console.log(ap())
             throw e;
         }
     }
@@ -185,14 +185,14 @@ export default class LineParser {
         }
     }
 
-    tag(i,t,v) {
-        if (this.debug) {
-            const caller = new Error().stack.split('\n')[2].replace(/.*\//,'').replace(')','')
-//            console.log(`${caller} > ${t} = ${JSON5.stringify(v)}`)
-        }
-
-        this.codeStr += `${t} = ${JSON5.stringify(v)};\n`
-    }
+//     tag(i,t,v) {
+//         if (this.debug) {
+//             const caller = new Error().stack.split('\n')[2].replace(/.*\//,'').replace(')','')
+// //            console.log(`${caller} > ${t} = ${JSON5.stringify(v)}`)
+//         }
+// console.log('tag is called =========')
+//         this.codeStr += `${t} = ${JSON5.stringify(v)};\n`
+//     }
     
     process(parent,s,index,inChar) {
 //        console.log(`process(parent,${s},${index},${inChar})`)
@@ -279,6 +279,7 @@ export default class LineParser {
                 }
             }
             if (a == '#') {
+                const tagAt = index-1
                 const ch0 = /^[a-zA-Z]$/
                 const chx = /^[a-zA-Z\d_]$/
                 let tag = ''
@@ -300,6 +301,7 @@ export default class LineParser {
                 if (tag !== '') {
                     index = jj;
                     a = s.charAt(index++);
+                    let tagStr = null
                     let tagValue = null;
                     let tagValueStr = null
                     if (a=='(') {
@@ -308,11 +310,13 @@ export default class LineParser {
                             if (ch==')') {
                                 try {
                                     let jsonStr = '{args:[' + s.substring(index,k) + ']}'
-                                    console.log('jsonStr',jsonStr)
+//                                    console.log('try parsing jsonStr = ',jsonStr)
+
                                     tagValue = this.parse(jsonStr);
-                                    console.log('tagValue',tagValue)
-                                    console.log("tag text: " + s.substring(index-1,k + 1))
+//                                    console.log('tagValue= ',tagValue)
+                                    tagStr = s.substring(tagAt,k+1)
                                     tagValueStr = s.substring(index-1,k + 1)
+//                                    console.log("tag text= " + tagValueStr)
                                     index = k + 1
                                     a = s.charAt(index++);
                                     break;
@@ -324,10 +328,14 @@ export default class LineParser {
                     }
 
 
+                    // console.log('tag',tag,tagValueStr,tagValue)
+
                     if (bang) {
                         //strs.push(str)
                         //strs.push({ name: tag, args: tagValue })
                         //str = ''
+                        // console.log('adding include',tag,tagValueStr,tagValue)
+
                         parent.children.push(i(tag,tagValue))
                     } else {
 
@@ -340,7 +348,7 @@ export default class LineParser {
                                 tagValue = tagValue.args[0]
                             } else {
                                 tagValue = tagValue.args;
-                                console.log('tagValue === array',tagValue)
+                                // console.log('tagValue === array',tagValue)
                             }
                         } else {
                             tagValue = true;
@@ -355,11 +363,21 @@ export default class LineParser {
                             parent.children.push(t(str))
                             str = ''
                         }
-                        //str += `<a href="/tags/${tag}">#${tag}</a>`
-                        parent.children.push(h('a',{href:`/tags/${tag}`},[t(`#${tag}${tagValueStr==null?'':tagValueStr}`)]))
-                        parent.children.push(j(tag,tagValue))
 
-                        console.log('at: ' + s.substring(index-3,index+3))
+                        // console.log('adding tag',tag,tagValueStr,tagValue)
+
+                        //str += `<a href="/tags/${tag}">#${tag}</a>`
+//                        parent.children.push(h('a',{href:`/tags/${tag}`},[t(`#${tag}${tagValueStr==null?'':tagValueStr}`)]))
+                        parent.children.push({
+                            type:'tag',
+                            indent: 0,
+                            name: tag,
+                            colon: true,
+                            value: tagValue,
+                            children: [t(tagStr)] 
+                        })
+
+                        // console.log('at: ' + s.substring(index-3,index+3))
                     }
 
                     if (index >= s.length) {

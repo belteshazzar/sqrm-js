@@ -12,13 +12,15 @@ import JSON5 from 'json5'
 export default function sqrmToJs(sqrm) {
 
     let out = ''
-    let js = ''
 
     function stringify(obj) {
-        if (obj.type !== undefined && obj.type == 'json') {
-            js += `j("${obj.name}",${obj.value})\n`
-            return ''
+        if (obj.type !== undefined && obj.type == 'tag') {
+            return `j(${stringifyO(obj)})`
         }
+        return stringifyO(obj)
+    }
+
+    function stringifyO(obj) {
         let s = '{'
         let first = true
         for (const [key, value] of Object.entries(obj)) {
@@ -31,7 +33,7 @@ export default function sqrmToJs(sqrm) {
                 if (value==undefined) {
                     s += `"${key}":undefined`
                 } else {
-                    s += `"${key}":\`${value}\``
+                    s += `"${key}": ${util.inspect(value,false,null,false)}`
                 }
             } else if (key=='children' || key=='cells') {
                 s += `"${key}":${stringifyA(value)}`
@@ -79,23 +81,14 @@ export default function sqrmToJs(sqrm) {
         if (ln.type == 'script') {
             out += ln.code + '\n'
         } else if (ln.type == 'tag') {
-            out += `if ( ! j(${ stringify({ indent: ln.indent, isArrayElement: false, name: ln.name, colon: ln.colon, value: ln.value } )}) ) {\n`
-            out += `  root.push(${stringify(ln)})\n`
-            out += '}\n'
+            out += `root.push(j(${ stringify(ln) }))\n`
         } else if (ln.type == 'unordered-list-item' && ln.tag !== undefined) {
-            out += `if ( ! j(${ stringify({ indent: ln.indent, isArrayElement: true, name: ln.tag.name, colon: ln.tag.colon, value: ln.tag.value })}) ) {\n`
-            out += `  root.push(${stringify(ln)})\n`
-            out += '}\n'
+            out += `root.push(j(${ stringify(ln) }))\n`
         } else {
-            out += `root.push(${stringify(ln)})\n`
+            out += `root.push(${ stringify(ln) })\n`
 
             if ((ln.type == 'ordered-list-item' || ln.type == 'unordered-list-item') && ln.task) {
-                out += `j('tasks',${stringify(ln.task)})\n`
-            }
-
-            if (js.length>0) {
-                out += js
-                js = ''
+                out += `j(${stringify(ln.task)})\n`
             }
         }
     }

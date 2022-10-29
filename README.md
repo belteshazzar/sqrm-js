@@ -13,3 +13,20 @@ are formatted.
 4. includes -- sqrm documents can easily include other documents
 
 Check out the wiki for more info: [sqrm wiki](https://github.com/belteshazzar/sqrm/wiki)
+
+
+# processing pipeline
+
+    1. string             -> lines              (stringToLines)  sqrm-to-last (intermeddiatry lines)
+
+    2. lines              -> flat-sqrm-w-script (linesToSqrm)    last-to-sxast (sqrm-scripted ast)
+
+    3. flat-sqrm-w-script -> javascript         (sqrmToCode)     sxast-to-js
+
+    4. javascript         -> flat-sqrm          (fn response)    produces sqrm ast (no script elements)
+
+    5. flat-sqrm          -> sqrm-tree          (sqrmToSqrmNested)
+
+    6. sqrm-tree          -> hast               (sqrmToHast)
+
+    7. hast               -> html               (hastToHtml)

@@ -9,25 +9,6 @@ import { hrtime } from 'node:process'
 // import { table } from 'node:console'
 //import BlankLine from './lines/BlankLine.js'
 
-
-/*
-
-    1. string             -> lines              (stringToLines)  sqrm-to-last (intermeddiatry lines)
-
-    2. lines              -> flat-sqrm-w-script (linesToSqrm)    last-to-sxast (sqrm-scripted ast)
-
-    3. flat-sqrm-w-script -> javascript         (sqrmToCode)     sxast-to-js
-
-    4. javascript         -> flat-sqrm          (fn response)    produces sqrm ast (no script elements)
-
-    5. flat-sqrm          -> sqrm-tree          (sqrmToSqrmNested)
-
-    6. sqrm-tree          -> hast               (sqrmToHast)
-
-    7. hast               -> html               (hastToHtml)
-
-*/
-
 function tableOf(rows) {
     let head = []
     let body = []

@@ -418,7 +418,7 @@ describe("Sqrm Render", function() {
             {  "tag_me": [    1,    2  ]})
         test(53,'multiple tags #here and #there, also #here',
             '<p>multiple tags <a href="/tags/here">#here</a> and <a href="/tags/there">#there</a>, also <a href="/tags/here">#here</a></p>',
-            {"here": [true,true], "there": true})
+            {"here": true, "there": true})
         test(54,'#tag',
             '<p><a href="/tags/tag">#tag</a></p>',
             {"tag": true})
