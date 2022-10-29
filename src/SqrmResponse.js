@@ -49,9 +49,25 @@ export default class SqrmResponse {
         console.error(arguments)
     }
 
-    maybeYaml() {
-        console.log('maybeYaml',arguments)
-    }
+    maybeYaml(obj) {
+
+        const yaml = ( obj.type == 'yaml' ? obj : obj.yaml )
+        const line = obj
+
+        if (this.jsonTag(yaml)) {
+            // console.log('is yaml')
+            // console.log(toJson(this.jsonTree))
+            // valid yaml, added to json
+            return { type: 'blank', line: obj.line } // h('a',{href:`/tags/${obj.name}`},obj.children)
+        } else {
+            console.log('------------')
+            console.log('maybeYaml',obj)
+            console.log("not yaml")
+            console.log(toJson(this.jsonTree))
+            if (obj.type == 'yaml') obj.type = 'text'
+            return obj // { type: 'text', line: obj.line, text: obj.text, indent: obj.indent, children: obj.children }
+        }
+}
 
     addTask({line,done,text}) {
         let tasksNode = null

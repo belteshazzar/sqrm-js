@@ -15,7 +15,7 @@ export default function sqrmToJs(sqrm) {
 
     function stringify(obj) {
         if (obj.type !== undefined && obj.type == 'tag') {
-            return `j(${stringifyO(obj)})`
+            return `inlineTag(${stringifyO(obj)})`
         }
         return stringifyO(obj)
     }
@@ -73,6 +73,7 @@ export default function sqrmToJs(sqrm) {
     out += 'const root = response.root;\n'
 //    out += 'const j = response.libs.j;\n'
     out += 'const maybeYaml = response.libs.maybeYaml;\n'
+    out += 'const inlineTag = response.libs.inlineTag;\n'
     out += 'const addTask = response.libs.addTask;\n'
 //    out += 'const append = response.libs.append;\n'
     out += '\n'
@@ -82,9 +83,9 @@ export default function sqrmToJs(sqrm) {
 //        out += '// ln:' + ln.line + '\n'
         if (ln.type == 'script') {
             out += ln.code + '\n'
-        } else if (ln.type == 'tag') {
+        } else if (ln.type == 'yaml') {
             out += `root.push(maybeYaml(${ stringify(ln) }))\n`
-        } else if (ln.type == 'unordered-list-item' && ln.tag !== undefined) {
+        } else if (ln.type == 'unordered-list-item' && ln.yaml !== undefined) {
             out += `root.push(maybeYaml(${ stringify(ln) }))\n`
         } else {
             out += `root.push(${ stringify(ln) })\n`

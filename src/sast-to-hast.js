@@ -367,7 +367,7 @@ export default function sastToHast(sqrm) {
             return tableOf(rows)
         }
     
-        function tag() {
+        function yaml() {
             let n = next()
             return h('p',{}, n.children)
         }
@@ -422,8 +422,8 @@ export default function sastToHast(sqrm) {
                     return paragraph()
                 case "table-row":
                     return table()
-                case "tag":
-                    return tag()
+                case "yaml":
+                    return yaml()
                 default:
                     console.error(util.inspect(ln,false,null,false));
                     throw new Error('un-handled type: ' + ln.type)                

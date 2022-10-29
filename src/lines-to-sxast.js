@@ -181,19 +181,19 @@ function lineToSqrm(ln) {
             } else {
                 let uli = {type:'unordered-list-item',text: ln.text, indent:ln.indent,marker:m[1],children:textToHast(m[3]),line:ln.line}
 
-                let tag = ln.text.match(RE_ListItemTag)
-                if (tag) {
-                    uli.tag = { indent: ln.indent }
-                    if (tag[4]) {
-                        uli.tag.name = tag[1]
-                        uli.tag.value = tag[4]
-                        uli.tag.colon = true
-                    } else if (tag[2]) {
-                        uli.tag.name = tag[1]
-                        uli.tag.colon = true
+                let yaml = ln.text.match(RE_ListItemTag)
+                if (yaml) {
+                    uli.yaml = { indent: ln.indent, isArrayElement: true }
+                    if (yaml[4]) {
+                        uli.yaml.name = yaml[1]
+                        uli.yaml.value = yaml[4]
+                        uli.yaml.colon = true
+                    } else if (yaml[2]) {
+                        uli.yaml.name = yaml[1]
+                        uli.yaml.colon = true
                     } else {
-                        uli.tag.value = tag[1]
-                        uli.tag.colon = false
+                        uli.yaml.value = yaml[1]
+                        uli.yaml.colon = false
                     }
                 }
 
@@ -244,7 +244,7 @@ function lineToSqrm(ln) {
 
     m = ln.text.match(RE_Tag);
     if (m) {
-        let tag = {type:'tag',indent:ln.indent, name:m[2], colon: true, line:ln.line, children: textToHast(m[1]), text: ln.text}
+        let tag = {type:'yaml',indent:ln.indent, name:m[2], colon: true, isArrayElement: false, line:ln.line, children: textToHast(m[1]), text: ln.text}
         if (m[4]) {
             tag.value = m[4]
         }
