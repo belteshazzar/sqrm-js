@@ -27,7 +27,7 @@ export default class SqrmResponse {
     constructor() {
 //        this.html = new HtmlOutputTree();//new HTMLOutputStream();
         this.root = [];
-        this.json = {};
+        this.json = null
 
         this.libs = {
             h: h,
@@ -42,6 +42,10 @@ export default class SqrmResponse {
         };//, tree: new Tree(), util: util };
 
         this.jsonTree = { minChildIndent: 0, type: 'unknown', name: 'root' }
+    }
+
+    updateJson() {
+        this.json = toJson(this.jsonTree)
     }
 
 
@@ -102,6 +106,8 @@ export default class SqrmResponse {
         taskNode.children.push({ type: 'value', name: 'text', value: text })
         taskNode.children.push({ type: 'value', name: 'done', value: done })
         tasksNode.children.push(taskNode)
+
+        this.updateJson()
     }
 
     inlineTag(obj) {
@@ -225,6 +231,7 @@ export default class SqrmResponse {
                  console.log('json tree ----')
                  console.log(toJson(this.jsonTree))
                 }
+                this.updateJson()
             return true
         }
 
@@ -252,6 +259,7 @@ export default class SqrmResponse {
                  console.log('json tree ----')
                  console.log(toJson(this.jsonTree))
                 }
+                this.updateJson()
             return true
 
             // let o = { indent: indent, type: "object", childrenIndent: indent+1 }
@@ -286,7 +294,7 @@ export default class SqrmResponse {
                  console.log('json tree ----')
                  console.log(toJson(this.jsonTree))
                 }
-
+                this.updateJson()
             return true
         }
 
@@ -311,7 +319,7 @@ export default class SqrmResponse {
                  console.log(util.inspect(this.jsonTree,false,null,true))
                  console.log(toJson(this.jsonTree))
                 }
-
+                this.updateJson()
             return true
 
         }

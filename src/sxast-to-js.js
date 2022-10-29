@@ -33,8 +33,7 @@ export default function sqrmToJs(sqrm) {
                 if (value==undefined) {
                     s += `"${key}":undefined`
                 } else {
-                    console.log('inspect',value,util.inspect(value,false,null,false))
-                    s += `"${key}": ${util.inspect(value,false,null,false)}`
+                    s += `"${key}": \`${value}\``
                 }
             } else if (key=='children' || key=='cells') {
                 s += `"${key}":${stringifyA(value)}`
@@ -70,12 +69,12 @@ export default function sqrmToJs(sqrm) {
     out += 'const h = response.libs.h;\n'
     out += 'const t = response.libs.t;\n'
     out += 'const i = response.libs.i;\n'
-    out += 'const json = response.json;\n'
+    out += 'let json = response.json;\n'
     out += 'const root = response.root;\n'
 //    out += 'const j = response.libs.j;\n'
-    out += 'const maybeYaml = response.libs.maybeYaml;\n'
-    out += 'const inlineTag = response.libs.inlineTag;\n'
-    out += 'const addTask = response.libs.addTask;\n'
+    out += 'const maybeYaml = function(params) { let r = response.libs.maybeYaml(params); json = response.json; console.log(json); return r }\n'
+    out += 'const inlineTag = function(params) { let r = response.libs.inlineTag(params); json = response.json; console.log(json); return r }\n'
+    out += 'const addTask = function(params) { let r = response.libs.addTask(params); json = response.json; console.log(json); return r }\n'
 //    out += 'const append = response.libs.append;\n'
     out += '\n'
 

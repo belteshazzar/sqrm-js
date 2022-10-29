@@ -59,15 +59,15 @@ export default class LineParser {
 
 
     escapeChar(c) {
-        // if (c=='`') {
-        //     return '&#96;'
+        if (c=='`') {
+            return '\\`' // '&#96;'
         // } else if (c==':') {
         //     return '&#58;'
-        // } else if (c=='\\') {
-        //     return '\\\\'
-        // } else {
+        } else if (c=='\\') {
+            return '\\\\'
+        } else {
             return c;
-        // }
+        }
     }
 
     tagFor(c) {
