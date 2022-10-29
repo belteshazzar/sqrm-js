@@ -4,10 +4,9 @@ import {j,t,i} from './hastscript-tools.js'
 import util from 'node:util'
 import {visit} from 'unist-util-visit'
 import linkifyStr from 'linkify-string';
-import JSON5 from 'json5'
 //import JavaScriptOutputStream from './_JavaScriptOutputStream.js';
-import * as acorn from 'acorn'
 
+import strToJson from './str-to-json.js'
 
 export default class LineParser {
 
@@ -57,28 +56,6 @@ export default class LineParser {
         return this.codeStr;
     }
 
-    parse(str) {
-
-        function ap() {
-            try {
-                const node = acorn.parse(str, {ecmaVersion: 2020})
-                return 'acorn parsed'
-            } catch (e) {
-                return 'acorn FAILED'
-            }
-        }
-
-        try {
-            const res = JSON5.parse(str);
-            // console.log("json5 parsed: ",str)
-            // console.log(ap())
-            return res
-        } catch (e) {
-            // console.log("json5 FAILED to parse:",str)
-            // console.log(ap())
-            throw e;
-        }
-    }
 
 
     escapeChar(c) {
@@ -311,14 +288,10 @@ export default class LineParser {
                             let ch = s.charAt(k)
                             if (ch==')') {
                                 try {
-                                    let jsonStr = '{args:[' + s.substring(index,k) + ']}'
-//                                    console.log('try parsing jsonStr = ',jsonStr)
-
-                                    tagValue = this.parse(jsonStr);
-//                                    console.log('tagValue= ',tagValue)
+                                    tagValue = strToJson(s.substring(index,k))
                                     tagStr = s.substring(tagAt,k+1)
                                     tagValueStr = s.substring(index-1,k + 1)
-//                                    console.log("tag text= " + tagValueStr)
+                                    // console.log(tagStr,tagValueStr,tagValue)
                                     index = k + 1
                                     a = s.charAt(index++);
                                     break;
@@ -345,18 +318,18 @@ export default class LineParser {
 
 
                     // process tag value
-                        if (tagValue !== null) {
-                            if (tagValue.args.length==0) {
-                                tagValue = true;
-                            } else if (tagValue.args.length==1) {
-                                tagValue = tagValue.args[0]
-                            } else {
-                                tagValue = tagValue.args;
-                                // console.log('tagValue === array',tagValue)
-                            }
-                        } else {
-                            tagValue = true;
-                        }
+                        // if (tagValue !== null) {
+                        //     if (tagValue.value.length==0) {
+                        //         tagValue = true;
+                        //     } else if (tagValue.value.length==1) {
+                        //         tagValue = tagValue.value[0]
+                        //     } else {
+                        //         tagValue = tagValue.value;
+                        //         // console.log('tagValue === array',tagValue)
+                        //     }
+                        // } else {
+                        //     tagValue = true;
+                        // }
     
 
 

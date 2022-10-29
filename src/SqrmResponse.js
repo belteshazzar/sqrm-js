@@ -50,7 +50,8 @@ export default class SqrmResponse {
     }
 
     maybeYaml(obj) {
-
+        // console.log('maybeYaml',util.inspect(obj,false,null,true))
+        
         const yaml = ( obj.type == 'yaml' ? obj : obj.yaml )
         const line = obj
 
@@ -60,14 +61,14 @@ export default class SqrmResponse {
             // valid yaml, added to json
             return { type: 'blank', line: obj.line } // h('a',{href:`/tags/${obj.name}`},obj.children)
         } else {
-            console.log('------------')
-            console.log('maybeYaml',obj)
-            console.log("not yaml")
-            console.log(toJson(this.jsonTree))
+            // console.log('------------')
+            // console.log('maybeYaml',obj)
+            // console.log("not yaml")
+            // console.log(toJson(this.jsonTree))
             if (obj.type == 'yaml') obj.type = 'text'
             return obj // { type: 'text', line: obj.line, text: obj.text, indent: obj.indent, children: obj.children }
         }
-}
+    }
 
     addTask({line,done,text}) {
         let tasksNode = null
@@ -103,8 +104,18 @@ export default class SqrmResponse {
         tasksNode.children.push(taskNode)
     }
 
-    inlineTag() {
-        console.log('inlineTag',arguments)
+    inlineTag(obj) {
+        // console.log('inlineTag',util.inspect(obj,false,null,true))
+
+        this.jsonTag({
+            indent: 0,
+            isArrayElement: false,
+            name: obj.name,
+            colon: true,
+            value: (obj.value === undefined ? true : obj.value )
+        })
+
+        return h('a',{ href: `/tags/${obj.name}` }, obj.children )
     }
 
     j(name,value) {
