@@ -47,14 +47,14 @@ export default class SqrmDocument {
 
         if (process.env.npm_config_lines) {
             console.log('= lines =============')
-            console.log(util.inspect(lines,false,null,false));
+            console.log(util.inspect(lines,false,null,true));
         }
 
         let sxast = linesToSxast(lines)
 
         if (process.env.npm_config_sxast) {
             console.log('= sxast =============')
-            console.log(util.inspect(sxast,false,null,false));
+            console.log(util.inspect(sxast,false,null,true));
         }
 
         const js = sxastToJs(sxast)

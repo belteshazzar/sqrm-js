@@ -71,7 +71,9 @@ export default function sqrmToJs(sqrm) {
     out += 'const i = response.libs.i;\n'
     out += 'const json = response.json;\n'
     out += 'const root = response.root;\n'
-    out += 'const j = response.libs.j;\n'
+//    out += 'const j = response.libs.j;\n'
+    out += 'const maybeYaml = response.libs.maybeYaml;\n'
+    out += 'const addTask = response.libs.addTask;\n'
 //    out += 'const append = response.libs.append;\n'
     out += '\n'
 
@@ -81,14 +83,14 @@ export default function sqrmToJs(sqrm) {
         if (ln.type == 'script') {
             out += ln.code + '\n'
         } else if (ln.type == 'tag') {
-            out += `root.push(j(${ stringify(ln) }))\n`
+            out += `root.push(maybeYaml(${ stringify(ln) }))\n`
         } else if (ln.type == 'unordered-list-item' && ln.tag !== undefined) {
-            out += `root.push(j(${ stringify(ln) }))\n`
+            out += `root.push(maybeYaml(${ stringify(ln) }))\n`
         } else {
             out += `root.push(${ stringify(ln) })\n`
 
             if ((ln.type == 'ordered-list-item' || ln.type == 'unordered-list-item') && ln.task) {
-                out += `j(${stringify(ln.task)})\n`
+                out += `addTask(${stringify(ln.task)})\n`
             }
         }
     }

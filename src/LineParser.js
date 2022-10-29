@@ -82,13 +82,15 @@ export default class LineParser {
 
 
     escapeChar(c) {
-        if (c=='`') {
-            return '\\`'
-        } else if (c=='\\') {
-            return '\\\\'
-        } else {
+        // if (c=='`') {
+        //     return '&#96;'
+        // } else if (c==':') {
+        //     return '&#58;'
+        // } else if (c=='\\') {
+        //     return '\\\\'
+        // } else {
             return c;
-        }
+        // }
     }
 
     tagFor(c) {
@@ -325,6 +327,8 @@ export default class LineParser {
                                 }
                             }
                         }
+                    } else {
+                        tagStr = s.substring(tagAt,index-1)
                     }
 
 

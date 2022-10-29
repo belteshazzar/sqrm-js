@@ -34,6 +34,9 @@ export default class SqrmResponse {
             t: t,
             i: this.include,
             j: this.j.bind(this),
+            maybeYaml: this.maybeYaml.bind(this),
+            addTask: this.addTask.bind(this),
+            inlineTag: this.inlineTag.bind(this),
             set: this.set,
             append: this.append//.bind(this),
         };//, tree: new Tree(), util: util };
@@ -46,6 +49,17 @@ export default class SqrmResponse {
         console.error(arguments)
     }
 
+    maybeYaml() {
+        console.log('maybeYaml',arguments)
+    }
+
+    addTask() {
+        console.log('addTask',arguments)
+    }
+
+    inlineTag() {
+        console.log('inlineTag',arguments)
+    }
 
     j(name,value) {
         console.log('j',name,value)
