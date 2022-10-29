@@ -53,8 +53,38 @@ export default class SqrmResponse {
         console.log('maybeYaml',arguments)
     }
 
-    addTask() {
-        console.log('addTask',arguments)
+    addTask({line,done,text}) {
+        let tasksNode = null
+
+        if (this.jsonTree.type == 'unknown') {
+            this.jsonTree.type = 'object'
+            this.jsonTree.childrenIndent = 0
+            delete this.jsonTree.minChildIndent
+            tasksNode = { type: 'array', name: 'tasks', childrenIndent: 1, children: [] }
+            this.jsonTree.children = [tasksNode]
+        } else if (this.jsonTree.type == 'object') {
+            for (let i=0 ; i<this.jsonTree.children.length ; i++) {
+                const child = this.jsonTree.children[i]
+                if (child.name == 'tasks') {
+                    tasksNode = child
+                    break
+                }
+            }
+
+            if (tasksNode == null) {
+                tasksNode = { type: 'array', name: 'tasks', childrenIndent: 1, children: [] }
+                this.jsonTree.children.push(tasksNode)
+            }
+        } else {
+            // silently not supported if the root is an array
+            return
+        }
+
+        const taskNode = { type: 'object', childrenIndent: 2, children: [] }
+        taskNode.children.push({ type: 'value', name: 'line', value: line })
+        taskNode.children.push({ type: 'value', name: 'text', value: text })
+        taskNode.children.push({ type: 'value', name: 'done', value: done })
+        tasksNode.children.push(taskNode)
     }
 
     inlineTag() {
