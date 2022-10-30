@@ -21,6 +21,8 @@ export default class SqrmResponse {
         this.root = [];
         this.json = null
 
+        this.yamlNotAllowedIndent = -1
+
         this.libs = {
             h: h,
             t: t,
@@ -29,6 +31,7 @@ export default class SqrmResponse {
             maybeYaml: this.maybeYaml.bind(this),
             addTask: this.addTask.bind(this),
             inlineTag: this.inlineTag.bind(this),
+            appendToHtml: this.appendToHtml.bind(this),
 //            set: this.set,
 //            append: this.append//.bind(this),
         };//, tree: new Tree(), util: util };
@@ -45,15 +48,44 @@ export default class SqrmResponse {
         return this.docs.include(args)
     }
 
+    appendToHtml(obj) {
+
+        if (this.yamlNotAllowedIndent != -1 && obj.type != 'blank') {
+            if (obj.indent < this.yamlNotAllowedIndent) {
+                this.yamlNotAllowedIndent = -1
+            }
+        }
+
+        if (this.yamlNotAllowedIndent == -1 && obj.type == 'div') {
+            switch (obj.tag) {
+                case 'pre':
+                case 'script':
+                case 'style':
+                case '!--':
+                    this.yamlNotAllowedIndent = obj.indent + 1
+            }
+        }
+
+        this.root.push(obj)
+    }
+
     maybeYaml(obj) {
+
+        if (this.yamlNotAllowedIndent != -1 && obj.indent < this.yamlNotAllowedIndent) {
+            this.yamlNotAllowedIndent = -1
+        }
+
         const yaml = ( obj.type == 'yaml' ? obj : obj.yaml )
         const line = obj
 
-        if (this.jsonTag(yaml)) {
-            return { type: 'blank', line: obj.line } // h('a',{href:`/tags/${obj.name}`},obj.children)
+        if (this.yamlNotAllowedIndent != -1) {
+            if (obj.type == 'yaml') obj.type = 'text'
+            this.root.push( obj )// { type: 'text', line: obj.line, text: obj.text, indent: obj.indent, children: obj.children }
+        } else if (this.jsonTag(yaml)) {
+            this.root.push( { type: 'blank', line: obj.line } )// h('a',{href:`/tags/${obj.name}`},obj.children)
         } else {
             if (obj.type == 'yaml') obj.type = 'text'
-            return obj // { type: 'text', line: obj.line, text: obj.text, indent: obj.indent, children: obj.children }
+            this.root.push( obj )// { type: 'text', line: obj.line, text: obj.text, indent: obj.indent, children: obj.children }
         }
     }
 
