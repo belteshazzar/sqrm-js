@@ -11,7 +11,7 @@ const RE_Footnote = /^\s*\[ *\^ *(\S+) *\] *: *(.+?) *$/
 const RE_CodeBlock = /^\s*```(([a-zA-Z]+)?)\s*$/
 const RE_Div = /^\s*(<\s*((\!doctype)|([a-z]+))((?:\s+[a-z]+(="[^"]*")?)*)\s*>?\s*)$/i
 const RE_Heading = /^\s*((=+)\s*(\S.*?)\s*[-=]*)\s*$/
-const RE_HR = /^\s*[=-\s]+$/
+const RE_HR = /^\s*[-=_\*\s]+$/
 const RE_ListItem = /^\s*(?:(?:([-*+])|(\d+[\.)]))\s+(\S.*?))\s*$/
 const RE_ListItemTask = /^\s*\[ *([xX]?) *\]\s+(.*?)\s*$/
 const RE_Table = /^\s*(\|(.+?)\|?)\s*$/
@@ -158,6 +158,11 @@ function lineToSqrm(ln) {
 
     let m;
 
+    m = ln.text.match(RE_HR);
+    if (m) {
+        return {type:'hr',indent:ln.indent,line:ln.line, text: ln.text}
+    }
+
     m = ln.text.match(RE_Heading)
     if (m) {
         return {type:'heading',text: ln.text, level:m[2].length,indent:ln.indent,children:textToHast(m[3]),line:ln.line}
@@ -252,11 +257,6 @@ function lineToSqrm(ln) {
     m = ln.text.match(RE_CodeBlock);
     if (m) {
         return {type:'code-block',indent:ln.indent,language: m[1],line:ln.line}
-    }
-
-    m = ln.text.match(RE_HR);
-    if (m) {
-        return {type:'hr',indent:ln.indent,line:ln.line, text: ln.text}
     }
 
     return {type:'text',indent:ln.indent,children:textToHast(ln.text.trim()),line:ln.line, text: ln.text}

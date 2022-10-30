@@ -498,6 +498,14 @@ describe("Sqrm Render", function() {
         // script elements
         
         testFFF("script element tags","tags");
+
+        // multi-docs
+
+        testFFF("multiple docs in a single file","multiple-docs")
+
+        // yaml strings
+        
+        testFFF("yaml strings continueing on multiple lines","yaml-strings")
     });
 });
 
