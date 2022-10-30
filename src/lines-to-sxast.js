@@ -4,8 +4,8 @@ import lineToSxast from './line-to-sxast.js'
 import strToJson from './str-to-json.js'
 
 const RE_BlankLine = /^\s*$/
-const RE_Tag = /^\s*(([a-zA-Z_$][a-zA-Z\d_$]*)\s*:(\s+(.*?))?)\s*$/
-const RE_ListItemTag = /^\s*-\s+([a-zA-Z_$][a-zA-Z\d_$]*)(\s*:(\s+(.*?))?)?\s*$/
+const RE_Tag = /^\s*(([a-zA-Z_$][-a-zA-Z\d_$]*)\s*:(\s+(.*?))?)\s*$/
+const RE_ListItemTag = /^\s*-\s+([a-zA-Z_$][-a-zA-Z\d_$]*)(\s*:(\s+(.*?))?)?\s*$/
 const RE_Script = /^(\s*)<%(.*?)\s*$/
 const RE_Footnote = /^\s*\[ *\^ *(\S+) *\] *: *(.+?) *$/
 const RE_CodeBlock = /^\s*```(([a-zA-Z]+)?)\s*$/

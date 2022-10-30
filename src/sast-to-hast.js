@@ -2,7 +2,6 @@
 import {h} from 'hastscript'
 import {visit} from 'unist-util-visit'
 import {t} from './hastscript-tools.js'
-import util from 'node:util'
 
 function tableOf(rows) {
     let head = []
@@ -400,7 +399,6 @@ export default function sastToHast(sqrm) {
                 case "yaml":
                     return yaml()
                 default:
-                    console.error(util.inspect(ln,false,null,false));
                     throw new Error('un-handled type: ' + ln.type)                
             }
     

@@ -349,6 +349,7 @@ describe("Sqrm Render", function() {
         testFFF(373,"yaml3")
         testFFF(374,"yaml4")
         testFFF(375,"yaml5")
+        testFFF(376,"yaml-example01")
 
     });
 
