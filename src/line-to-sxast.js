@@ -222,7 +222,7 @@ export default function lineToSxast(str) {
                                     a = s.charAt(index++);
                                     break;
                                 } catch (e) {
-                                    console.log('FAILED to parse:' + s.substring(index,k))
+                                    // console.log('FAILED to parse:' + s.substring(index,k))
                                 }
                             }
                         }

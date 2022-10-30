@@ -31,11 +31,11 @@ class TestSqrmCollection {
     doc.src = this.src
    }
 
-   include(args) {
+   include(opts) {
     try {
-        return this.includeCallback(args)
+        return this.includeCallback(opts)
     } catch (e) {
-        return h('span',{class: 'error'},[t(`error occured including: ${args.value}`)])
+        return h('span',{class: 'error'},[t(`error occured including: ${opts.name}`)])
     }
    }
 
@@ -423,7 +423,10 @@ describe("Sqrm Render", function() {
             '<p><a href="/tags/tag">#tag</a></p>',
             {"tag": true})
 
-        test(666, '#image(my_image.png,200,200,alt text)','',{})
+        test(666,
+            '#image("my_image.png",200,200,"alt text")',
+            '<p><a href="/tags/image">#image("my_image.png",200,200,"alt text")</a></p>',
+            { image: ["my_image.png", 200,200, "alt text"]})
         
     });
 
@@ -431,28 +434,27 @@ describe("Sqrm Render", function() {
 
         test('simple hash bang for an image with error',
             'this is an image: #!image(my_image.png,200,200,alt text) inline',
-            '<p>this is an image: <img src="undefined" width="undefined" height="undefined" alt="undefined">(my_image.png,200,200,alt text) inline</p>',
+            '<p>this is an image: <img src="my_image.png,200,200,alt text" width="undefined" height="undefined" alt="undefined">(my_image.png,200,200,alt text) inline</p>',
             {},
-            function includeCallback(args) {
+            function includeCallback(opts) {
                 return h('img',{
-                    src: `${args[0]}`,
-                    width: `${args[1]}`,
-                    height: `${args[2]}`,
-                    alt: `${args[3]}`
+                    src: `${opts.args[0]}`,
+                    width: `${opts.args[1]}`,
+                    height: `${opts.args[2]}`,
+                    alt: `${opts.args[3]}`
                 })
             })
 
         test('simple hash bang for an image',
             'this is an image: #!image("my_image.png",200,200,"alt text") inline',
-            '<p>this is an image: <img src="my_image.png" width="200" height="200" alt="alt text">inline</p>',
+            '<p>this is an image: <img src="my_image.png" width="200" height="200" alt="alt text"> inline</p>',
             {},
-            function includeCallback(args) {
-                console.log(args)
+            function includeCallback(opts) {
                 return h('img',{
-                    src: `${args[0]}`,
-                    width: `${args[1]}`,
-                    height: `${args[2]}`,
-                    alt: `${args[3]}`
+                    src: `${opts.args[0]}`,
+                    width: `${opts.args[1]}`,
+                    height: `${opts.args[2]}`,
+                    alt: `${opts.args[3]}`
                 })
             }
         )
