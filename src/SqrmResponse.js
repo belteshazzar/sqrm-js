@@ -46,7 +46,6 @@ export default class SqrmResponse {
     }
 
     maybeYaml(obj) {
-        
         const yaml = ( obj.type == 'yaml' ? obj : obj.yaml )
         const line = obj
 
@@ -100,7 +99,7 @@ export default class SqrmResponse {
             isArrayElement: false,
             name: obj.name,
             colon: true,
-            value: (obj.value === undefined ? true : obj.value )
+            args: (obj.args === undefined ? true : obj.args )
         })
 
         return h('a',{ href: `/tags/${obj.name}` }, obj.children )
@@ -131,7 +130,11 @@ export default class SqrmResponse {
     //     }
     // }
 
-    jsonTag({indent,isArrayElement,name,colon,value}) {
+    jsonTag({indent,isArrayElement,name,colon,args}) {
+
+        if (args != undefined && args.length == 1) {
+            args = args[0]
+        }
 
         let parent = null
         if (isArrayElement) {
@@ -172,11 +175,11 @@ export default class SqrmResponse {
             parent.childrenIndent = indent
             delete parent.minChildIndent
 
-            if (colon && value === undefined) {
+            if (colon && args === undefined) {
                 let n = { minChildIndent: indent, type: 'unknown', name: name }
                 parent.children = [ n ]
             } else {
-                parent.children = [ { type: 'value', name: name, value: value } ]
+                parent.children = [ { type: 'value', name: name, value: args } ]
             }
 
             this.updateJson()
@@ -190,16 +193,16 @@ export default class SqrmResponse {
             parent.childrenIndent = indent
             delete parent.minChildIndent
 
-            if (colon && value === undefined) {
+            if (colon && args === undefined) {
                 const unknown = { minChildIndent: indent+1, type:'unknown',name:name }
                 const arrayElement = { childrenIndent: indent+1, type: 'object', children: [unknown]}
                 parent.children = [arrayElement]
             } else if (colon) {
-                const v = { childrenIndent: indent+1, type:'value',name:name,value:value}
+                const v = { childrenIndent: indent+1, type:'value', name:name, value:args}
                 const arrayElement = { childrenIndent: indent+1, type: 'object', children: [v]}
                 parent.children = [arrayElement]
             } else if (!colon) {
-                parent.children = [ { type: 'value', value: value }]
+                parent.children = [ { type: 'value', value: args }]
             }
 
             this.updateJson()
@@ -208,11 +211,11 @@ export default class SqrmResponse {
 
         if (parent.type == 'object' && !isArrayElement) {
  
-            if (colon && value === undefined) {
+            if (colon && args === undefined) {
                 let n = { minChildIndent: indent, type: 'unknown', name: name }
                 parent.children.push(n)
             } else {
-                parent.children.push({ type: 'value', name: name, value: value })
+                parent.children.push({ type: 'value', name: name, value: args })
             }
 
             this.updateJson()
@@ -221,16 +224,16 @@ export default class SqrmResponse {
 
         if (parent.type == 'array' && isArrayElement) {
 
-            if (colon && value === undefined) {
+            if (colon && args === undefined) {
                 const unknown = { minChildIndent: indent+1, type:'unknown',name:name }
                 const arrayElement = { childrenIndent: indent+1, type: 'object', children: [unknown]}
                 parent.children.push(arrayElement)
             } else if (colon) {
-                const v = { childrenIndent: indent+1, type:'value',name:name,value:value}
+                const v = { childrenIndent: indent+1, type:'value',name:name,value:args}
                 const arrayElement = { childrenIndent: indent+1, type: 'object', children: [v]}
                 parent.children.push(arrayElement)
             } else if (!colon) {
-                parent.children.push({ type: 'value', value: value })
+                parent.children.push({ type: 'value', value: args })
             }
 
             this.updateJson()

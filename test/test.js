@@ -409,8 +409,7 @@ describe("Sqrm Render", function() {
         
         test(50,'this is a tag #a(1,2,[")"]) in a line',
             '<p>this is a tag <a href="/tags/a">#a(1,2,[")"])</a> in a line</p>',
-            {  "a": "1,2,[\")\"]"})
-//            {  "a": [    1,    2,   [     ")"    ]  ]})
+            {  "a": [    1,    2,   [     ")"    ]  ]})
         test(51,'this is a tag ending a #line("with () text")',
             '<p>this is a tag ending a <a href="/tags/line">#line("with () text")</a></p>',
             { "line": "with () text"})
@@ -423,7 +422,8 @@ describe("Sqrm Render", function() {
         test(54,'#tag',
             '<p><a href="/tags/tag">#tag</a></p>',
             {"tag": true})
-        
+
+        test(666, '#image(my_image.png,200,200,alt text)','',{})
         
     });
 
@@ -468,6 +468,10 @@ describe("Sqrm Render", function() {
         test(56,'menu:\n  - saturday\n  - sunday\n\nand with params ${json.menu[0]} like that',
             '<p>and with params saturday like that</p>',
             {"menu": ["saturday","sunday"]})
+
+        test(701,"obj3: {a:1,b:2}",'',{obj3:{a:1,b:2}})
+        test(702,"#obj2( {a:1,b:2} )",'<p><a href="/tags/obj2">#obj2( {a:1,b:2} )</a></p>',{obj2:{a:1,b:2}})
+        test(703,"- Fred: [1,2,3]",'',[ { Fred: [1,2,3] }] )
     
     });
 

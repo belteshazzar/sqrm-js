@@ -203,28 +203,36 @@ export default function lineToSxast(str) {
                     }
                 }
                 if (tag !== '') {
+
                     index = jj;
                     a = s.charAt(index++);
                     let tagStr = null
+                    let tagValue = null
                     let tagValueStr = null
+
                     if (a=='(') {
                         for (var k = index; k < s.length; k++) {
                             let ch = s.charAt(k)
                             if (ch==')') {
                                 tagValueStr = s.substring(index,k)
-                                if (strToJson(tagValueStr)) {
+                                try {
+                                    tagValue = strToJson(tagValueStr,true)
                                     tagStr = s.substring(tagAt,k+1)
                                     index = k + 1
                                     a = s.charAt(index++);
                                     break;
-                                } else {
-                                    tagValueStr = null
+                                } catch (e) {
                                     console.log('FAILED to parse:' + s.substring(index,k))
                                 }
                             }
                         }
+
+                        if (tagValue == null) {
+                            tagValue = strToJson(tagValueStr,false)
+                        }
                     } else {
                         tagStr = s.substring(tagAt,index-1)
+                        tagValue = strToJson('true',false)
                     }
 
                     if (str != '') {
@@ -233,14 +241,14 @@ export default function lineToSxast(str) {
                     }
 
                     if (bang) {
-                        parent.children.push(i(tag,tagValueStr))
+                        parent.children.push(i(tag,tagValue))
                     } else {
                         parent.children.push({
                             type:'tag',
                             indent: 0,
                             name: tag,
                             colon: true,
-                            value: tagValueStr,
+                            args: tagValue,
                             children: [t(tagStr)] 
                         })
 
@@ -284,6 +292,4 @@ export default function lineToSxast(str) {
     }
 
     return root.children
-
-
 }

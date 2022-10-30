@@ -1,6 +1,7 @@
 
 
 import lineToSxast from './line-to-sxast.js'
+import strToJson from './str-to-json.js'
 
 const RE_BlankLine = /^\s*$/
 const RE_Tag = /^\s*(([a-zA-Z_$][a-zA-Z\d_$]*)\s*:(\s+(.*?))?)\s*$/
@@ -17,10 +18,6 @@ const RE_Table = /^\s*(\|(.+?)\|?)\s*$/
 const RE_TableHeader = /^\s*[-| ]+$/
 
 const RE_ScriptEnd = /%>\s*$/
-
-function escapeValue(str) {
-    return str.replaceAll('`','\\`')
-}
 
 export default function linesToSxast(lines) {
     let doc = []
@@ -182,13 +179,13 @@ function lineToSqrm(ln) {
                     uli.yaml = { indent: ln.indent, isArrayElement: true }
                     if (yaml[4]) {
                         uli.yaml.name = yaml[1]
-                        uli.yaml.value = yaml[4]                            
+                        uli.yaml.args = strToJson(yaml[4],false)
                         uli.yaml.colon = true
                     } else if (yaml[2]) {
                         uli.yaml.name = yaml[1]
                         uli.yaml.colon = true
                     } else {
-                        uli.yaml.value = yaml[1]
+                        uli.yaml.args = strToJson(yaml[1],false)
                         uli.yaml.colon = false
                     }
                 }
@@ -242,7 +239,7 @@ function lineToSqrm(ln) {
     if (m) {
         let tag = {type:'yaml',indent:ln.indent, name:m[2], colon: true, isArrayElement: false, line:ln.line, children: textToHast(m[1]), text: ln.text}
         if (m[4]) {
-            tag.value = escapeValue(m[4])
+            tag.args = strToJson(m[4],false)
         }
         return tag
     }
