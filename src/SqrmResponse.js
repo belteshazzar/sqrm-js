@@ -66,7 +66,30 @@ export default class SqrmResponse {
             }
         }
 
-        this.root.push(obj)
+        let wasAppended = false
+        if (this.appendTextToNode != null && obj.type == 'text') {
+            if (this.appendTextToNode.minIndent !== undefined) {
+                if (this.appendTextToNode.minIndent <= obj.indent) {
+                    delete this.appendTextToNode.minIndent
+                    this.appendTextToNode.indent = obj.indent
+                    this.appendTextToNode.jsonNode.value = obj.text.trim()
+                    wasAppended = true
+                }
+            } else if (this.appendTextToNode.indent == obj.indent) {
+                if (this.appendTextToNode.mode == '|') {
+                    this.appendTextToNode.jsonNode.value += '\n'
+                } else {
+                    this.appendTextToNode.jsonNode.value += ' '
+                }
+                this.appendTextToNode.jsonNode.value += obj.text.trim()
+                wasAppended = true
+            }
+        }
+
+        if (!wasAppended) {
+            this.appendTextToNode = null
+            this.root.push(obj)
+        }
     }
 
     maybeYaml(obj) {
@@ -79,13 +102,32 @@ export default class SqrmResponse {
         const line = obj
 
         if (this.yamlNotAllowedIndent != -1) {
+            this.appendTextToNode = null
             if (obj.type == 'yaml') obj.type = 'text'
             this.root.push( obj )// { type: 'text', line: obj.line, text: obj.text, indent: obj.indent, children: obj.children }
-        } else if (this.jsonTag(yaml)) {
-            this.root.push( { type: 'blank', line: obj.line } )// h('a',{href:`/tags/${obj.name}`},obj.children)
         } else {
-            if (obj.type == 'yaml') obj.type = 'text'
-            this.root.push( obj )// { type: 'text', line: obj.line, text: obj.text, indent: obj.indent, children: obj.children }
+
+            let jsonNode = this.jsonTag(yaml)
+
+            if (jsonNode != null) {
+
+                if (yaml.args && yaml.args.length==1) {
+
+                    if (yaml.args[0]=='|' || yaml.args[0]=='>') {
+                        this.appendTextToNode = { minIndent: yaml.indent+1, mode: yaml.args[0], jsonNode: jsonNode }
+                    } else {
+                        this.appendTextToNode = null
+                    }
+                } else {
+                    this.appendTextToNode = null
+                }
+
+                this.root.push( { type: 'blank', line: obj.line } )// h('a',{href:`/tags/${obj.name}`},obj.children)
+            } else {
+                this.appendTextToNode = null
+                if (obj.type == 'yaml') obj.type = 'text'
+                this.root.push( obj )// { type: 'text', line: obj.line, text: obj.text, indent: obj.indent, children: obj.children }
+            }
         }
     }
 
@@ -197,7 +239,7 @@ export default class SqrmResponse {
         }
 
         if (parent == null) {
-            return false
+            return null
         }
 
         if (parent.type == 'unknown' && !isArrayElement) {
@@ -208,14 +250,13 @@ export default class SqrmResponse {
             delete parent.minChildIndent
 
             if (colon && args === undefined) {
-                let n = { minChildIndent: indent, type: 'unknown', name: name }
-                parent.children = [ n ]
+                parent.children = [ { minChildIndent: indent, type: 'unknown', name: name } ]
             } else {
                 parent.children = [ { type: 'value', name: name, value: args } ]
             }
 
             this.updateJson()
-            return true
+            return parent.children[0]
         }
 
         if (parent.type == 'unknown' && isArrayElement) {
@@ -225,54 +266,57 @@ export default class SqrmResponse {
             parent.childrenIndent = indent
             delete parent.minChildIndent
 
+            let jsonNode = null
             if (colon && args === undefined) {
-                const unknown = { minChildIndent: indent+1, type:'unknown',name:name }
-                const arrayElement = { childrenIndent: indent+1, type: 'object', children: [unknown]}
+                jsonNode = { minChildIndent: indent+1, type:'unknown',name:name }
+                const arrayElement = { childrenIndent: indent+1, type: 'object', children: [jsonNode]}
                 parent.children = [arrayElement]
             } else if (colon) {
-                const v = { childrenIndent: indent+1, type:'value', name:name, value:args}
-                const arrayElement = { childrenIndent: indent+1, type: 'object', children: [v]}
+                jsonNode = { childrenIndent: indent+1, type:'value', name:name, value:args}
+                const arrayElement = { childrenIndent: indent+1, type: 'object', children: [jsonNode]}
                 parent.children = [arrayElement]
             } else if (!colon) {
-                parent.children = [ { type: 'value', value: args }]
+                jsonNode = { type: 'value', value: args }
+                parent.children = [ jsonNode ]
             }
 
             this.updateJson()
-            return true
+            return jsonNode
         }
 
         if (parent.type == 'object' && !isArrayElement) {
  
             if (colon && args === undefined) {
-                let n = { minChildIndent: indent, type: 'unknown', name: name }
-                parent.children.push(n)
+                parent.children.push({ minChildIndent: indent, type: 'unknown', name: name })
             } else {
                 parent.children.push({ type: 'value', name: name, value: args })
             }
 
             this.updateJson()
-            return true
+            return parent.children[parent.children.length-1]
         }
 
         if (parent.type == 'array' && isArrayElement) {
 
+            let jsonNode = null
             if (colon && args === undefined) {
-                const unknown = { minChildIndent: indent+1, type:'unknown',name:name }
-                const arrayElement = { childrenIndent: indent+1, type: 'object', children: [unknown]}
+                jsonNode = { minChildIndent: indent+1, type:'unknown',name:name }
+                const arrayElement = { childrenIndent: indent+1, type: 'object', children: [jsonNode]}
                 parent.children.push(arrayElement)
             } else if (colon) {
-                const v = { childrenIndent: indent+1, type:'value',name:name,value:args}
-                const arrayElement = { childrenIndent: indent+1, type: 'object', children: [v]}
+                jsonNode = { childrenIndent: indent+1, type:'value',name:name,value:args}
+                const arrayElement = { childrenIndent: indent+1, type: 'object', children: [jsonNode]}
                 parent.children.push(arrayElement)
             } else if (!colon) {
-                parent.children.push({ type: 'value', value: args })
+                jsonNode = { type: 'value', value: args }
+                parent.children.push(jsonNode)
             }
 
             this.updateJson()
-            return true
+            return jsonNode
         }
 
-        return false
+        return null
     }
 
     // append(ln) {
