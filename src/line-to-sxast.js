@@ -1,7 +1,6 @@
 
 import {h} from 'hastscript'
 import {t,i} from './hastscript-tools.js'
-import util from 'node:util'
 import linkifyStr from 'linkify-string';
 import strToJson from './str-to-json.js'
 
@@ -14,33 +13,6 @@ export default function lineToSxast(str) {
         process(root,str,0,'')
     } else {
         root.children.push(str);
-    }
-
-    function genCode(children) {
-        let codeStr = '['
-        for (let index=0 ; index<children.length ; index++) {
-            let child = children[index]
-            if (child.type == 'text') {
-                codeStr += `t(\`${child.value}\`)`
-            } else if (child.type == 'element') {
-                codeStr += `h("${child.tagName}",${util.inspect(child.properties,false,null,false)},`
-                codeStr += genCode(child.children)
-                codeStr += ')'
-            } else if (child.type == 'include') {
-                codeStr += `i("${child.value}",${util.inspect(child.args,false,null,false)})`
-            } else if (child.type == 'tag') {
-                codeStr += `j("${child.name}",${util.inspect(child.value,false,null,false)})`
-            } else {
-                throw new Error("child.type: " + child.type);
-            }
-            if (index < children.length - 1) codeStr += ','
-        }
-        codeStr += ']'
-        return codeStr;
-    }
-
-    function code() {
-        return codeStr;
     }
 
     function escapeChar(c) {
@@ -255,14 +227,14 @@ export default function lineToSxast(str) {
                         tagStr = s.substring(tagAt,index-1)
                     }
 
+                    if (str != '') {
+                        parent.children.push(t(str))
+                        str = ''
+                    }
+
                     if (bang) {
                         parent.children.push(i(tag,tagValueStr))
                     } else {
-                        if (str != '') {
-                            parent.children.push(t(str))
-                            str = ''
-                        }
-
                         parent.children.push({
                             type:'tag',
                             indent: 0,

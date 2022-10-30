@@ -15,6 +15,8 @@ import toJson from './../src/jast-to-json.js'
 //import {toHast} from './../src/snast-to-hast.js';
 import {toHtml} from 'hast-util-to-html'
 import util from 'node:util'
+import {h} from 'hastscript'
+import {t,i} from '../src/hastscript-tools.js'
 
 //console.log(acorn.parse("let x = {a:1 , b:2}").body[0].declarations[0].init);
 
@@ -29,13 +31,12 @@ class TestSqrmCollection {
     doc.src = this.src
    }
 
-   include(name,request,response) {
-//    console.log(response);
-    let args = [];
-    for (let i=3 ; i<arguments.length ; i++) args.push(arguments[i])
-//    console.log('include',name,args);
-//    console.log(response.html.out);
-     response.html.out += this.includeCallback(name,args)
+   include(args) {
+    try {
+        return this.includeCallback(args)
+    } catch (e) {
+        return h('span',{class: 'error'},[t(`error occured including: ${args.value}`)])
+    }
    }
 
    call(name,request,response) {
@@ -50,12 +51,12 @@ function test(name,source,expectedHtml,expectedJson={},includeCallback) {
     
     it(name+"", function() {
 
-        const collection = new TestSqrmCollection(source,includeCallback);
-        const doc = new SqrmDocument(collection,'id',1);
+        const docs = new TestSqrmCollection(source,includeCallback);
+        const doc = new SqrmDocument(docs,'id',1);
         doc.load();
         doc.compile();
-        const request = new SqrmRequest(collection,[]);
-        const response = new SqrmResponse();
+        const request = new SqrmRequest([]);
+        const response = new SqrmResponse(docs);
 
 //if (includeCallback) {
 //       console.log(doc.fn.toString());
@@ -432,17 +433,29 @@ describe("Sqrm Render", function() {
             'this is an image: #!image(my_image.png,200,200,alt text) inline',
             '<p>this is an image: <img src="undefined" width="undefined" height="undefined" alt="undefined">(my_image.png,200,200,alt text) inline</p>',
             {},
-            function includeCallback(doc,params) {
-                return `  <img src="${params[0]}" width="${params[1]}" height="${params[2]}" alt="${params[3]}">`
+            function includeCallback(args) {
+                return h('img',{
+                    src: `${args[0]}`,
+                    width: `${args[1]}`,
+                    height: `${args[2]}`,
+                    alt: `${args[3]}`
+                })
             })
 
         test('simple hash bang for an image',
             'this is an image: #!image("my_image.png",200,200,"alt text") inline',
             '<p>this is an image: <img src="my_image.png" width="200" height="200" alt="alt text">inline</p>',
             {},
-            function includeCallback(doc,params) {
-                return `  <img src="${params[0]}" width="${params[1]}" height="${params[2]}" alt="${params[3]}">`
-            })
+            function includeCallback(args) {
+                console.log(args)
+                return h('img',{
+                    src: `${args[0]}`,
+                    width: `${args[1]}`,
+                    height: `${args[2]}`,
+                    alt: `${args[3]}`
+                })
+            }
+        )
     })
 
     describe("template strings", function() {

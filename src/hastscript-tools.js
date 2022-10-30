@@ -7,9 +7,9 @@ export function t(str) {
 }
 
 export function i(str,args) {
-    return {type: 'include', value: str, args: args};
+    return {type: 'include', value: str, args: args}; // TODO: only value is templated
 }
 
-export function j(name,value) {
-    return {type: 'json', name: name, value: value};
-}
+// export function j(name,value) {
+//     return {type: 'json', name: name, value: value};
+// }

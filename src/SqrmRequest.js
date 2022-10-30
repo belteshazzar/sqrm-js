@@ -2,8 +2,7 @@
 
 export default class SqrmRequest {
 
-    constructor(collection, args = []) {
-        this.docs = collection
+    constructor(args = []) {
         this.args = args;
         this.lines = [];
     }

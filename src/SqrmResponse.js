@@ -16,20 +16,21 @@ function iterateLikeStack(tree,cb) {
 }
 
 export default class SqrmResponse {
-    constructor() {
+    constructor(docs) {
+        this.docs = docs
         this.root = [];
         this.json = null
 
         this.libs = {
             h: h,
             t: t,
-            i: this.include,
-            j: this.j.bind(this),
+            include: this.include.bind(this),
+//            j: this.j.bind(this),
             maybeYaml: this.maybeYaml.bind(this),
             addTask: this.addTask.bind(this),
             inlineTag: this.inlineTag.bind(this),
-            set: this.set,
-            append: this.append//.bind(this),
+//            set: this.set,
+//            append: this.append//.bind(this),
         };//, tree: new Tree(), util: util };
 
         this.jsonTree = { minChildIndent: 0, type: 'unknown', name: 'root' }
@@ -40,8 +41,8 @@ export default class SqrmResponse {
     }
 
 
-    include(doc,args) {
-        console.error(arguments)
+    include(args) {
+        return this.docs.include(args)
     }
 
     maybeYaml(obj) {
@@ -105,30 +106,30 @@ export default class SqrmResponse {
         return h('a',{ href: `/tags/${obj.name}` }, obj.children )
     }
 
-    j(name,value) {
-        console.log('j',name,value)
+    // j(name,value) {
+    //     console.log('j',name,value)
 
-        if (typeof name == 'object') {
-            if (this.jsonTag(name)) {
-                // valid yaml, added to json
-                return h('a',{href:`/tags/${name.name}`},name.children)
-            } else {
-                return name.children
-            }
-        } else {
-            if (this.jsonTag({
-                    indent: 0,
-                    isArrayElement: false,
-                    name: name,
-                    colon: true,
-                    value: value})) {
-                // valid yaml, added to json
-                return h('a',{href:`/tags/${name.name}`},name.children)
-            } else {
-                return name.children
-            }
-        }
-    }
+    //     if (typeof name == 'object') {
+    //         if (this.jsonTag(name)) {
+    //             // valid yaml, added to json
+    //             return h('a',{href:`/tags/${name.name}`},name.children)
+    //         } else {
+    //             return name.children
+    //         }
+    //     } else {
+    //         if (this.jsonTag({
+    //                 indent: 0,
+    //                 isArrayElement: false,
+    //                 name: name,
+    //                 colon: true,
+    //                 value: value})) {
+    //             // valid yaml, added to json
+    //             return h('a',{href:`/tags/${name.name}`},name.children)
+    //         } else {
+    //             return name.children
+    //         }
+    //     }
+    // }
 
     jsonTag({indent,isArrayElement,name,colon,value}) {
 
@@ -239,7 +240,7 @@ export default class SqrmResponse {
         return false
     }
 
-    append(ln) {
-        this.lines.push(ln)
-    }
+    // append(ln) {
+    //     this.lines.push(ln)
+    // }
 } 
