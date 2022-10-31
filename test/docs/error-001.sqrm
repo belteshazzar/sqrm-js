@@ -3,11 +3,11 @@
 ``inline code`` no more
 
 ```info
-text in here
-is pre {
-   woot
-}
-```
+  text in here
+  is pre {
+    woot
+  }
+
 
 ```warning
 
@@ -18,7 +18,7 @@ is pre {
 This is plain text. It can be following be a list:
 this is extra text
 - Text had to be on 
-asdfsadf - should be consistent!
+  asdfsadf - should be consistent!
 - fred also
 
 | simple | table |

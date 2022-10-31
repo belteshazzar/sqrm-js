@@ -201,7 +201,7 @@ export default function sastToHast(sqrm) {
                     }
                 default:
                     {
-                        const code = h('code',{class: 'language-' + language})
+                        const code = h('code',{class: 'language-' + (language==""?'text':language)})
                         code.children.push(t('\n'))
                         for (let i=0 ; i<lines.length ; i++) {
                             if (lines[i].type != 'blank') {

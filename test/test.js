@@ -70,34 +70,10 @@ function test(name,source,expectedHtml,expectedJson={},includeCallback) {
 
         expect(json).to.eql(expectedJson)
         expect(html).to.eql(expectedHtml);
-})
+    })
 }
 
-function testFF(name,filename) {
-    test(name+ " - "+filename,
-        fs.readFileSync(`./test/docs/${filename}.1.sqrm`, 'utf-8').toString(),
-        fs.readFileSync(`./test/docs/${filename}.html`, 'utf-8').toString().replaceAll(/\r/g,''),
-        {},
-        null);    
-}
-
-function testFFF(name,filename) {
-    test(name+ " - "+filename,
-        fs.readFileSync(`./test/docs/${filename}.1.sqrm`, 'utf-8').toString(),
-        fs.readFileSync(`./test/docs/${filename}.html`, 'utf-8').toString().replaceAll(/\r/g,''),
-        JSON5.parse(fs.readFileSync(`./test/docs/${filename}.json`, 'utf-8').toString()),
-        null);    
-}
-
-function testFFFMulti(name,filename) {
-    testMulti(name+ " - "+filename,
-        fs.readFileSync(`./test/docs/${filename}.1.sqrm`, 'utf-8').toString(),
-        fs.readFileSync(`./test/docs/${filename}.html`, 'utf-8').toString().replaceAll(/\r/g,''),
-        JSON5.parse(fs.readFileSync(`./test/docs/${filename}.json`, 'utf-8').toString()),
-        null);    
-}
-
-describe("Sqrm Render", function() {
+describe("Non-file based tests", function() {
 
     describe("Escaping", function() {
 
@@ -253,17 +229,10 @@ describe("Sqrm Render", function() {
         
     });
 
-    describe("emoji", function() {
-        
-        testFF("emoji","emoji")
-        
-    });
-
     describe("links", function() {
 
         // links
         
-        testFF("links 26","links");
         test("links 27",'s1df \\[Link back to H2] fred','<p>s1df [Link back to H2] fred</p>')
         test("links 28",'s2df [Link back to H2\\] fred','<p>s2df [Link back to H2] fred</p>')
         test("links 29",'s3df [ Link back to H2 ] fred','<p>s3df <a href="/link_back_to_h2">Link back to H2</a> fred</p>')
@@ -274,70 +243,10 @@ describe("Sqrm Render", function() {
         
     });
 
-    describe("footnotes", function() {
-
-        testFF("footnote links","links-footnotes");
-        
-    });
-
-    describe("lists", function() {
-
-        // lists
-        
-        testFF(34,"list-unordered");
-        testFF(35,"list-ordered");
-        
-    });
-
-    describe("links - task lists - checkboxes", function() {
-        
-        testFFF('task list',"links-tasks")
-
-    })
-
-    describe("tables", function() {
-
-        // tables
-        
-        testFF('tables',"table");
-        testFF('tables-divs',"divs")
-        testFF('tables-divs1',"divs1")
-        testFF('tables-divs2',"divs2")
-        testFF('tables-divs3',"divs3")
-        testFF('table formatting',"table2")
-        testFF('table col alignment',"table3")
-        testFF('table header row',"table4")
-    });
-
-    describe("code blocks", function() {
-
-        testFF('code javascript',"code-js")
-        testFF('code blocks',"code-blocks")
-
-    })
-
-    describe("tags", function() {
-
-        // tags
-        
-        testFFF(371,"yaml")
-        testFFF(372,"yaml2")
-        testFFF(373,"yaml3")
-        testFFF(374,"yaml4")
-        testFFF(375,"yaml5")
-        testFFF(376,"yaml-example01")
-
-    });
-
     describe("divs", function() {
     
-        // divs
-        testFF('divs',"divs5");
-
-        testFF('divs-raw','divs-raw')
-
-        test(38,'fred\n\n< blockquote\n\n  <div id="fred" class="woot" \n woot\n\n','<p>fred</p><blockquote><div id="fred" class="woot"></div></blockquote><p>woot</p>')
-        test(39,'fred\n\n<blockquote\n\n  with more\n\n  <div\n\n    another indented','<p>fred</p><blockquote><p>with more</p><div><p>another indented</p></div></blockquote>')
+        test('divs 1','fred\n\n< blockquote\n\n  <div id="fred" class="woot" \n woot\n\n','<p>fred</p><blockquote><div id="fred" class="woot"></div></blockquote><p>woot</p>')
+        test('divs 2','fred\n\n<blockquote\n\n  with more\n\n  <div\n\n    another indented','<p>fred</p><blockquote><p>with more</p><div><p>another indented</p></div></blockquote>')
         
     });
 
@@ -345,36 +254,36 @@ describe("Sqrm Render", function() {
 
         // inline mentions
         
-        test(40,'twitter style @user mentions',
+        test('mentions 1','twitter style @user mentions',
             '<p>twitter style <a href="/users/user">@user</a> mentions</p>')
         
-        });
+    });
 
     describe("hash tags", function() {
     
         // tags
         
-        test(41,'this is a tag #a in a line',
+        test('tags 1','this is a tag #a in a line',
             '<p>this is a tag <a href="/tags/a">#a</a> in a line</p>',
             {  "a": true})
-        test(42,'this is an invalid tag #- in a line',
+        test('tags 2','this is an invalid tag #- in a line',
             '<p>this is an invalid tag #- in a line</p>')
-        test(43,'this is an invalid tag # in a line',
+        test('tags 3','this is an invalid tag # in a line',
             '<p>this is an invalid tag # in a line</p>')
-        test(44,'this is an escaped tag \\#a in a line',
+        test('tags 4','this is an escaped tag \\#a in a line',
             '<p>this is an escaped tag #a in a line</p>')
-        test(45,'this is a tag ending a #line',
+        test('tags 5','this is a tag ending a #line',
             '<p>this is a tag ending a <a href="/tags/line">#line</a></p>',
             {  "line": true })
-        test(46,'#tag_me is at the start of the line',
+        test('tags 6','#tag_me is at the start of the line',
             '<p><a href="/tags/tag_me">#tag_me</a> is at the start of the line</p>',
             {  "tag_me": true})
-        test(47,'\\#tag_me: this is a line, # is not valid in a prop',
+        test('tags 7','\\#tag_me: this is a line, # is not valid in a prop',
             '<p>#tag_me: this is a line, # is not valid in a prop</p>')
-        test(48,'#tag_me: is at the start of the line',
+        test('tags 8','#tag_me: is at the start of the line',
             '<p><a href="/tags/tag_me">#tag_me</a>: is at the start of the line</p>',
             { "tag_me": true})
-        test(49,'#tag_me\\: is at the start of the line',
+        test('tags 9','#tag_me\\: is at the start of the line',
             '<p><a href="/tags/tag_me">#tag_me</a>\\: is at the start of the line</p>',
             {  "tag_me": true})
         
@@ -384,23 +293,23 @@ describe("Sqrm Render", function() {
     
         // tags with parameters
         
-        test(50,'this is a tag #a(1,2,[")"]) in a line',
+        test('tag params 1','this is a tag #a(1,2,[")"]) in a line',
             '<p>this is a tag <a href="/tags/a">#a(1,2,[")"])</a> in a line</p>',
             {  "a": [    1,    2,   [     ")"    ]  ]})
-        test(51,'this is a tag ending a #line("with () text")',
+        test('tag params 2','this is a tag ending a #line("with () text")',
             '<p>this is a tag ending a <a href="/tags/line">#line("with () text")</a></p>',
             { "line": "with () text"})
-        test(52,'#tag_me(1,2) is at the start of the line',
+        test('tag params 3','#tag_me(1,2) is at the start of the line',
             '<p><a href="/tags/tag_me">#tag_me(1,2)</a> is at the start of the line</p>',
             {  "tag_me": [    1,    2  ]})
-        test(53,'multiple tags #here and #there, also #here',
+        test('tag params 4','multiple tags #here and #there, also #here',
             '<p>multiple tags <a href="/tags/here">#here</a> and <a href="/tags/there">#there</a>, also <a href="/tags/here">#here</a></p>',
             {"here": true, "there": true})
-        test(54,'#tag',
+        test('tag params 5','#tag',
             '<p><a href="/tags/tag">#tag</a></p>',
             {"tag": true})
 
-        test(666,
+        test('tag params 6',
             '#image("my_image.png",200,200,"alt text")',
             '<p><a href="/tags/image">#image("my_image.png",200,200,"alt text")</a></p>',
             { image: ["my_image.png", 200,200, "alt text"]})
@@ -433,24 +342,23 @@ describe("Sqrm Render", function() {
                     height: `${opts.args[2]}`,
                     alt: `${opts.args[3]}`
                 })
-            }
-        )
+            })
     })
 
     describe("template strings", function() {
     
         // inline includes
         
-        test(55,'menu: WOOT \n\nalso supports ${json.menu} tag includes',
+        test('template 1','menu: WOOT \n\nalso supports ${json.menu} tag includes',
             '<p>also supports WOOT tag includes</p>',
             {  "menu": "WOOT" })
-        test(56,'menu:\n  - saturday\n  - sunday\n\nand with params ${json.menu[0]} like that',
+        test('template 2','menu:\n  - saturday\n  - sunday\n\nand with params ${json.menu[0]} like that',
             '<p>and with params saturday like that</p>',
             {"menu": ["saturday","sunday"]})
 
-        test(701,"obj3: {a:1,b:2}",'',{obj3:{a:1,b:2}})
-        test(702,"#obj2( {a:1,b:2} )",'<p><a href="/tags/obj2">#obj2( {a:1,b:2} )</a></p>',{obj2:{a:1,b:2}})
-        test(703,"- Fred: [1,2,3]",'',[ { Fred: [1,2,3] }] )
+        test('template 3',"obj3: {a:1,b:2}",'',{obj3:{a:1,b:2}})
+        test('template 4',"#obj2( {a:1,b:2} )",'<p><a href="/tags/obj2">#obj2( {a:1,b:2} )</a></p>',{obj2:{a:1,b:2}})
+        test('template 5',"- Fred: [1,2,3]",'',[ { Fred: [1,2,3] }] )
     
     });
 
@@ -459,31 +367,47 @@ describe("Sqrm Render", function() {
     describe("misc", function() {
 
         // detect this and make it a list rather than yaml?
-        test(57,'text followed by a list:\n- one\n- two\n',
+        test('is this yaml or a list?','text followed by a list:\n- one\n- two\n',
             '<p>text followed by a list:</p>',["one","two"])
         
         // is this yaml (json) or a list (html)? ... its a json array
-        test(58,'- one\n- two',
+        test('simple list','- one\n- two',
             '',["one","two"])
         
-        // script elements
-        
-        testFFF("scriptlet","scriptlet");
-        testFFF("scriptlet","scriptlet-table");
-            
-        // script elements
-        
-        testFFF("script element tags","tags");
+    })
 
-        // multi-docs
+})
 
-        testFFF("multiple docs in a single file","multiple-docs")
+describe("file based tests", function() {
 
-        // yaml strings
-        
-        testFFF("yaml strings continueing on multiple lines","yaml-strings")
+    function includeCallback(opts) {
+        return h('img',{
+            src: `${opts.args[0]}`,
+            width: `${opts.args[1]}`,
+            height: `${opts.args[2]}`,
+            alt: `${opts.args[3]}`
+        })
+    }
+
+    const pattern = /\.sqrm$/
+    fs.readdirSync('./test/docs/').forEach(file => {
+        if (pattern.test(file)) {
+
+            const name = file.replace(/\.[^/.]+$/, "")
+
+            const src = fs.readFileSync(`./test/docs/${name}.sqrm`, 'utf-8').toString()
+            const expectedHtml = (
+                fs.existsSync(`./test/docs/${name}.html`)
+                ? fs.readFileSync(`./test/docs/${name}.html`, 'utf-8').toString().replaceAll(/\r/g,'')
+                : '' )
+            const expectedJson = (
+                fs.existsSync(`./test/docs/${name}.json`)
+                ? JSON5.parse(fs.readFileSync(`./test/docs/${name}.json`, 'utf-8').toString())
+                : {} )
+
+            test(`file: ${file}`,src,expectedHtml,expectedJson,includeCallback)
+
+        }
     });
+
 });
-
-// line formatting
-
