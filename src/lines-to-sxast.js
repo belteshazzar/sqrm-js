@@ -3,6 +3,8 @@
 import lineToSxast from './line-to-sxast.js'
 import strToJson from './str-to-json.js'
 
+const RE_DocumentSeparator = /^---$/
+
 const RE_BlankLine = /^\s*$/
 const RE_Tag = /^\s*(([a-zA-Z_$][-a-zA-Z\d_$]*)\s*:(\s+(.*?))?)\s*$/
 const RE_ListItemTag = /^\s*-\s+([a-zA-Z_$][-a-zA-Z\d_$]*)(\s*:(\s+(.*?))?)?\s*$/
@@ -20,7 +22,8 @@ const RE_TableHeader = /^\s*[-| ]+$/
 const RE_ScriptEnd = /%>\s*$/
 
 export default function linesToSxast(lines) {
-    let doc = []
+    let docs = [[]]
+    let doc = docs[0]
     let i = 0
 
     function next() {
@@ -49,19 +52,26 @@ export default function linesToSxast(lines) {
     while (peek()!=null) {
         let ln = next()
         const s = lineToSqrm(ln)
-        doc.push(s)
 
-        if (s.type == 'script') {
-            let m = ln.text.match(RE_ScriptEnd)
-            if (m) {
-                s.code = s.code.replace(RE_ScriptEnd,'')
-            } else {
-                script()
+        if (s.type == 'document-separator') {
+            doc = []
+            docs.push(doc)
+        } else {
+
+            doc.push(s)
+
+            if (s.type == 'script') {
+                let m = ln.text.match(RE_ScriptEnd)
+                if (m) {
+                    s.code = s.code.replace(RE_ScriptEnd,'')
+                } else {
+                    script()
+                }
             }
         }
     }
 
-    return doc
+    return docs
 }
 
 function textToCells(text) {
@@ -157,6 +167,11 @@ function lineToSqrm(ln) {
     }
 
     let m;
+
+    m = ln.text.match(RE_DocumentSeparator);
+    if (m) {
+        return {type:'document-separator', line: ln.line}
+    }
 
     m = ln.text.match(RE_HR);
     if (m) {

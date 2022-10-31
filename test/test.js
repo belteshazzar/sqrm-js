@@ -6,29 +6,14 @@ import {expect} from 'chai';
 import * as fs from 'fs'//const fs = require("fs");
 
 import JSON5 from 'json5'
-import SqrmDocument from '../src/SqrmDocument.js';
-import SqrmRequest from '../src/SqrmRequest.js';
-import SqrmResponse from '../src/SqrmResponse.js';
-import * as acorn from 'acorn'
-import sastToHast from './../src/sast-to-hast.js';
-import toJson from './../src/jast-to-json.js'
-//import {toHast} from './../src/snast-to-hast.js';
-import {toHtml} from 'hast-util-to-html'
-import util from 'node:util'
 import {h} from 'hastscript'
-import {t,i} from '../src/hastscript-tools.js'
-
-//console.log(acorn.parse("let x = {a:1 , b:2}").body[0].declarations[0].init);
+import {t} from '../src/hastscript-tools.js'
+import sqrm from '../src/main.js'
 
 class TestSqrmCollection {
 
-   constructor(src,includeCallback) {
-    this.src = src;
-    this.includeCallback = includeCallback;
-   }
-
-   load(doc) {
-    doc.src = this.src
+   constructor(includeCallback) {
+        this.includeCallback = includeCallback;
    }
 
    include(opts) {
@@ -51,58 +36,41 @@ function test(name,source,expectedHtml,expectedJson={},includeCallback) {
     
     it(name+"", function() {
 
-        const docs = new TestSqrmCollection(source,includeCallback);
-        const doc = new SqrmDocument(docs,'id',1);
-        doc.load();
-        doc.compile();
-        const request = new SqrmRequest([]);
-        const response = new SqrmResponse(docs);
+        const result = sqrm(source,{
+            collection: new TestSqrmCollection(includeCallback),
+            
+            log_src: process.env.npm_config_src,
+            log_lines: process.env.npm_config_lines,
+            log_sxast: process.env.npm_config_sxast,
+            log_code: process.env.npm_config_code,
 
-//if (includeCallback) {
-//       console.log(doc.fn.toString());
-//}
+            log_sast: process.env.npm_config_sast,
+            log_hast: process.env.npm_config_hast,
+            log_html: process.env.npm_config_html,
+            log_jast: process.env.npm_config_jast,
+            log_json: process.env.npm_config_json,
+        })
 
-        doc.execute(request,response);
+        let html,json
 
-        const sast = response.root
-        
-        if (process.env.npm_config_sast) {
-            console.log('= sast =================')
-            console.log(util.inspect(sast,false,null,false));
-        }
+        if (Array.isArray(result)) {
 
-        const hast = sastToHast(sast)
+            html = ''
+            json = []
 
-        if (process.env.npm_config_hast) {
-            console.log('= hast =================')
-            console.log(util.inspect(hast,false,null,false));
-        }
+            result.forEach((el) => {
+                html += el.html
+                json.push(el.json)
+            })
 
-        const html = toHtml(hast)
-
-        if (process.env.npm_config_html) {
-            console.log('= html =================')
-            console.log(html)
-        }
-
-        const jast = response.jsonTree
-
-        if (process.env.npm_config_jast) {
-            console.log('= jast =================')
-            console.log(util.inspect(jast,false,null,false));
-        }
-
-        let json = toJson(jast)
-        if (json==null) json = {}
-
-        if (process.env.npm_config_json) {
-            console.log('= json =================')
-            console.log(util.inspect(json,false,null,false));
+        } else {
+            html = result.html
+            json = result.json
         }
 
         expect(json).to.eql(expectedJson)
         expect(html).to.eql(expectedHtml);
-    })
+})
 }
 
 function testFF(name,filename) {
@@ -115,6 +83,14 @@ function testFF(name,filename) {
 
 function testFFF(name,filename) {
     test(name+ " - "+filename,
+        fs.readFileSync(`./test/docs/${filename}.1.sqrm`, 'utf-8').toString(),
+        fs.readFileSync(`./test/docs/${filename}.html`, 'utf-8').toString().replaceAll(/\r/g,''),
+        JSON5.parse(fs.readFileSync(`./test/docs/${filename}.json`, 'utf-8').toString()),
+        null);    
+}
+
+function testFFFMulti(name,filename) {
+    testMulti(name+ " - "+filename,
         fs.readFileSync(`./test/docs/${filename}.1.sqrm`, 'utf-8').toString(),
         fs.readFileSync(`./test/docs/${filename}.html`, 'utf-8').toString().replaceAll(/\r/g,''),
         JSON5.parse(fs.readFileSync(`./test/docs/${filename}.json`, 'utf-8').toString()),
