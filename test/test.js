@@ -8,7 +8,7 @@ import * as fs from 'fs'//const fs = require("fs");
 import JSON5 from 'json5'
 import {h} from 'hastscript'
 import {t} from '../src/hastscript-tools.js'
-import sqrm from '../src/main.js'
+import sqrm from '../src/sqrm.js'
 
 class TestSqrmCollection {
 

@@ -1,56 +1,90 @@
 #!/usr/bin/env node
 
 import fs from 'fs'
-import SqrmCollection from '../src/SqrmCollection.js'
-// import SqrmDocument from '../src/SqrmDocument.js'
-// import HTMLOutputStream from '../src/HTMLOutputStream.js';
-import SqrmRequest from '../src/SqrmRequest.js'
-import SqrmResponse from '../src/SqrmResponse.js'
+import util from 'node:util'
 
-let maxArg = -1
+import sqrm from '../src/sqrm.js'
 
-let _i = process.argv.indexOf('-i')
+process.on('SIGINT', function() {
+    console.log("Caught interrupt signal");
+    process.exit();
+});
 
-if (_i) {
-    maxArg = Math.max(maxArg,_i+1)
-    _i = process.argv[_i+1];
+const _json = process.argv.indexOf('-json') > 0
+const _html = process.argv.indexOf('-html') > 0
+const color = process.argv.indexOf('-color') > 0
+
+function printUsage() {
+    console.log('Usage: node sqrm.js')
+    console.log()
+    console.log("Options:")
+    console.log("  -f filename      Read the file, only in tty mode")
+    console.log("                   Must be provided in tty mode")
+    console.log("  -json            Output JSON")
+    console.log("  -html            Output HTML")
+    console.log("  -color           Display JSON with color")
+    console.log()
+    console.log("Examples:")
+    console.log()
+    console.log("  ./sqrm.js -json -f my-file.sqrm")
+    console.log("  node sqrm.js -json -f my-file.sqrm")
+    console.log("  cat my-file.sqrm | node sqrm.js -json")
+    console.log("  node sqrm.js -json < my-file.sqrm")
+    console.log()
+    process.exit(1)
 }
 
-let _f = process.argv.indexOf('-f')
+function callSqrm(src) {
 
-if (_f) {
-    maxArg = Math.max(maxArg,_f+1)
-    _f = process.argv[_f+1];
+    const res = sqrm(src)
+
+    if ((_json && _html) || (!_json && !_html)) {
+        console.log(util.inspect(res,false,null,true))
+    } else if (Array.isArray(res)) {
+
+        let html = ''
+        let json = []
+
+        res.forEach((el) => {
+            html += '\n' + el.html
+            json.push(el.json)
+        })
+
+        if (_json) {
+            console.log(util.inspect(json,false,null,color))
+        } else {
+            console.log(html)
+        }
+    } else {
+        if (_json) {
+            console.log(util.inspect(res.json,false,null,color))
+        } else {
+            console.log(res.html)
+        }
+    }
+
+    process.exit();
 }
 
-let args = [];
-for (let i=maxArg + 1 ; i< process.argv.length ; i++) {
-    args.push(process.argv[i])
+if (process.stdin.isTTY === true) {
+
+    let _f = process.argv.indexOf('-f')
+    if (_f < 0) printUsage()
+
+    if (process.argv.length <= _f + 1) printUsage()
+
+    _f = process.argv[_f+1]
+
+    if (!fs.existsSync(_f)) {
+        console.log('ERROR: file does not exist')
+        process.exit(2)
+    }
+
+    callSqrm(fs.readFileSync(_f, "utf-8").toString())
+
+} else {
+
+    process.stdin.on('data', data => {
+        callSqrm(data.toString())
+    });
 }
-
-const collection = new SqrmCollection(_f);
-
-
-
-let docs = collection.find((doc) => doc._id == _i)
-if (docs.length == 0) {
-    throw new Error("unable to find doc id=" + _i)
-}
-//console.log('docs found: ', docs)
-let doc = docs[0]
-console.log('sqrm -----------')
-doc.load()
-console.log(doc.src);
-console.log('js -----------')
-doc.compile()
-console.log(doc.fn.toString())
-
-let request = new SqrmRequest(collection,args);
-let response = new SqrmResponse();
-
-doc.execute(request,response);
-
-console.log('json -----------')
-console.log(JSON.stringify(response.json, null, 2));
-console.log('html -----------')
-console.log(response.html.toString());

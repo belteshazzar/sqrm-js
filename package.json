@@ -8,12 +8,10 @@
   },
   "type": "module",
   "scripts": {
-    "test": "mocha",
+    "test": "mocha ./test/test.js",
     "test:mocha": "mocha --grep 'hash bang' ",
     "build": "rollup --config",
-    "postbuild": "copyfiles ./build/** public/.",
-    "watch": "rollup -c --watch --watch.onEnd='npm run postbuild'",
-    "serve": "./node_modules/.bin/http-server"
+    "postbuild": "mocha ./test/test-bundled.js"
   },
   "author": "",
   "license": "ISC",
