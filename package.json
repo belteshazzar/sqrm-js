@@ -1,6 +1,6 @@
 {
   "name": "sqrm",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "sqrm (pronounced squirm) is markdown, but re-imagined from a clean sheet. There are two main differences between sqrm and markdown:",
   "main": "build/main.min.js",
   "bin": {

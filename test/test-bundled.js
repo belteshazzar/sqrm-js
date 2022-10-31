@@ -1,6 +1,7 @@
 
 import sqrm from '../build/sqrm.js'
 import sqrmMin from '../build/sqrm.min.js'
+import {expect} from 'chai';
 
 describe("Bundle Tests", function() {
 
@@ -21,7 +22,7 @@ describe("Bundle Tests", function() {
 
             const{html,json} = sqrmMin('may __fred__ was ~~not~~ actually here :(')
             expect(html).to.eql("<p>may <u>fred</u> was <i>not</i> actually here 😞</p>")
-            expect(json).to.eql({}})
+            expect(json).to.eql({})
 
         })
     });
