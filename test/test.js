@@ -236,7 +236,7 @@ describe("Non-file based tests", function() {
         test("links 27",'s1df \\[Link back to H2] fred','<p>s1df [Link back to H2] fred</p>')
         test("links 28",'s2df [Link back to H2\\] fred','<p>s2df [Link back to H2] fred</p>')
         test("links 29",'s3df [ Link back to H2 ] fred','<p>s3df <a href="/link_back_to_h2">Link back to H2</a> fred</p>')
-        test("links 30",'s4df [ Link | with text ] fred','<p>s4df <a href="/link">with text</a> fred</p>')
+        test("links 30",'s4df [ Link text | url ] fred','<p>s4df <a href="/url">Link text</a> fred</p>')
         test("links 31",'s5df [Link ba\\|ck to H2] fred','<p>s5df <a href="/link_ba%7Cck_to_h2">Link ba|ck to H2</a> fred</p>')
         test("links 32",'s6df [Link ba\\]ck to H2] fred','<p>s6df <a href="/link_ba%5Dck_to_h2">Link ba]ck to H2</a> fred</p>')
         test("links 33",'s7df [Link ba\\ck to H2] fred','<p>s7df <a href="/link_ba%5Cck_to_h2">Link ba\\ck to H2</a> fred</p>')

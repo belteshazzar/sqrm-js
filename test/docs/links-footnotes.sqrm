@@ -2,7 +2,7 @@
 foot notes  can be defined any where
 
 [^a]: this is a footnote, text with
-links [ www.google.com | google ] and anything else
+links [ google | www.google.com ] and anything else
 
 [^c]: this is an unused footnote
 

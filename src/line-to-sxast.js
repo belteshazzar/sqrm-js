@@ -99,8 +99,8 @@ export default function lineToSxast(str) {
                 return h('a',{'href':url(u)},[t(u)])
             }
         } else {
-            const addr = escapeString(parts[0].trim().replace(/\|/g,'|'));
-            const txt = escapeString(parts[1].trim().replace(/\]/g,']'));
+            const txt = escapeString(parts[0].trim().replace(/\|/g,'|'));
+            const addr = parts[1].trim().replace(/\]/g,']');
             return h('a',{'href':url(addr)},[t(txt)])
         }
     }
