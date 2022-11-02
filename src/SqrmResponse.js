@@ -2,6 +2,8 @@
 
 import {h} from 'hastscript'
 import {t} from './hastscript-tools.js'
+import {matches, select, selectAll} from 'hast-util-select'
+
 import toJson from './../src/jast-to-json.js'
 
 function iterateLikeStack(tree,cb) {
@@ -23,9 +25,15 @@ export default class SqrmResponse {
 
         this.yamlNotAllowedIndent = -1
 
+        this.hastCallbacks = []
+
         this.libs = {
             h: h,
             t: t,
+            matches: matches,
+            select: select,
+            selectAll: selectAll,
+            processHast: this.processHast.bind(this),
             include: this.include.bind(this),
 //            j: this.j.bind(this),
             maybeYaml: this.maybeYaml.bind(this),
@@ -37,6 +45,11 @@ export default class SqrmResponse {
         };//, tree: new Tree(), util: util };
 
         this.jsonTree = { minChildIndent: 0, type: 'unknown', name: 'root' }
+    }
+
+
+    processHast(cb) {
+        this.hastCallbacks.push(cb)
     }
 
     updateJson() {

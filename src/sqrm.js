@@ -107,6 +107,9 @@ export default function sqrm(src, _options = {}) {
         }
 
         let hast = sastToHast(sast)
+        response.hastCallbacks.forEach((cb) => {
+            cb.call(null,hast)
+        })
 
         if (options.log_hast) {
             console.log('= hast =================')

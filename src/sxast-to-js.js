@@ -65,6 +65,11 @@ export default function sqrmToJs(sqrm) {
     out += '\n'
     out += 'const h = response.libs.h;\n'
     out += 'const t = response.libs.t;\n'
+    out += 'const matches = response.libs.matches;\n'
+    out += 'const select = response.libs.select;\n'
+    out += 'const selectAll = response.libs.selectAll;\n'
+    out += 'const processHast = response.libs.processHast;\n'
+
     out += 'let json = response.json;\n'
 //    out += 'const root = response.root;\n'
 //    out += 'const j = response.libs.j;\n'
