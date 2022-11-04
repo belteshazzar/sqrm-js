@@ -14,7 +14,23 @@ describe("file system collection tests", function() {
 
         it("file system collection", function() {
 
-            const c = new SqrmFSCollection('./collection')
+
+            const options = {
+                log_src: false,
+                log_lines: false,
+                log_sxast: false,
+                log_code: false,
+        
+                log_sast: false,
+                log_hast: false,
+                log_html: false,
+                log_jast: false,
+                log_json: false
+            };
+
+            const c = new SqrmFSCollection('./test/collection',options)
+
+            expect(c).to.not.be.null
 
             // const result = sqrm(source,{
             //     collection: new SqrmFSCollection('./collection'),

@@ -7,17 +7,14 @@ import SqrmRequest from './SqrmRequest.js';
 import SqrmResponse from './SqrmResponse.js';
 import sastToHast from './sast-to-hast.js';
 import toJson from './jast-to-json.js'
-import sqrmToLines from './sqrm-to-lines.js'
-import linesToSxast from './lines-to-sxast.js'
-import sxastToJs from './sxast-to-js.js'
 import SqrmCollection from './SqrmCollection.js'
+import sxastParser from './sxast-parser.js';
 
 export default function sqrm(src, _options = {}) {
 
     const defaults = {
         collection: new SqrmCollection(),
-        id: 'new-document',
-        rev: 1,
+        id: 'doc',
         log_src: false,
         log_lines: false,
         log_sxast: false,
@@ -31,24 +28,7 @@ export default function sqrm(src, _options = {}) {
     };
     const options = Object.assign({}, defaults, _options);
 
-    if (options.log_src) {
-        console.log('= src ================')
-        console.log(src)
-    }
-
-    const lines = sqrmToLines(src)
-
-    if (options.log_lines) {
-        console.log('= lines =============')
-        console.log(lines);
-    }
-
-    const sxasts = linesToSxast(lines)
-
-    if (options.log_sxast) {
-        console.log('= sxast =============')
-        console.log(sxasts);
-    }
+    const sxasts = sxastParser(src,options)
 
     let result = []
 
@@ -56,24 +36,7 @@ export default function sqrm(src, _options = {}) {
 
         let sxast = sxasts[i]
 
-        let js = sxastToJs(sxast)
-
-        if (options.log_code) {
-            console.log('= js =============')
-            console.log(js)
-        }
-
-        let fn = null
-        try {
-            fn = new Function(js);
-        } catch (e) {
-            throw e
-        }
-
-        let doc = new SqrmDocument(fn,{
-            id: `${options.id}-${i}`,
-            rev: options.rev,
-        });
+        let doc = new SqrmDocument(options.collection,`${options.id}-${i+1}`,sxast,options);
 
         let request = new SqrmRequest([]);
         let response = new SqrmResponse(options.collection);

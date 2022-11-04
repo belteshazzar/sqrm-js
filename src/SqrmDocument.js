@@ -1,16 +1,27 @@
 
+import sxastToJs from './sxast-to-js.js'
 
 export default class SqrmDocument {
     
-    constructor(fn, _options) {
+    // constructor(fn, _options) {
+    constructor(collection,id,sxast,options) {
+        this.collection = collection
+        this.id = id
+        this.options = options;
 
-        const defaults = {
-            id: 'new-document',
-            rev: 1,
-        };
-        const options = Object.assign({}, defaults, _options);
+        let js = sxastToJs(sxast)
+    
+        if (options.log_code) {
+            console.log('= js =============')
+            console.log(js)
+        }
 
-        this.fn = fn
+        this.fn = null
+        try {
+            this.fn = new Function(js);
+        } catch (e) {
+            throw e
+        }
     }
 
     execute(request,response) {

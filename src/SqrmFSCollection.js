@@ -9,40 +9,53 @@ import SqrmDocument from './SqrmDocument.js'
 import SqrmRequest from './SqrmRequest.js'
 import SqrmResponse from './SqrmResponse.js'
 import SqrmCollection from './SqrmCollection.js'
+import sxastParser from './sxast-parser.js';
 
 export default class SqrmFSCollection extends SqrmCollection {
 
-     constructor(folder = '.') {
+     constructor(folder = '.',options) {
+        super()
         this.folder = folder;
-        console.log("loading folder: " + folder);
+        this.docs = new Map()
 
-        let x = fs.readdirSync(folder).map((f) => f.split('.'))
+        const docNames = fs.readdirSync(folder).map((f) => f.split('.'))
             .filter((el) => {
-                return el[2] == "sqrm"
+                return el[1] == "sqrm"
+            })
+            .map((el) => {
+                return el[0]
             })
             .sort((a,b) => {
-                a[0].localeCompare(b[0]) || a[1] - b[1]
+                a[0].localeCompare(b[0])
             });
-        console.log("loading " + x.length + " docs")
-        this.docs = new Map();
-        let prevDoc = null;
-        x.forEach((el) => {
-            if (prevDoc != null && prevDoc.id != el[0]) {
-                this.docs.set(prevDoc.id, prevDoc);
-            }
-            prevDoc = new SqrmDocument(this,el[0],el[1]*1)
-        });
-        if (prevDoc != null) this.docs.set(prevDoc.id,prevDoc)
 
-        this.docs.forEach((doc) => {
-            try {
-                doc.load();
-                doc.compile();
-            } catch (e) {
-                console.log(`failed to compile: ${doc.id}`)
-                console.log(e);
+        docNames.forEach((name) => {
+            console.log(`loading doc ${name}`)
+            const src = fs.readFileSync(`${this.folder}/${name}.sqrm`).toString()
+            const sxasts = sxastParser(src,options)
+        
+            if (sxasts.length==0) {
+                try {
+                    let doc = new SqrmDocument(this,name,sxasts[0],options)
+                    this.docs.set(name,doc)
+                } catch (e) {
+                    console.log(e)
+                }
+            } else {
+                for (let i=0 ; i<sxasts.length ; i++) {
+                    let sxast = sxasts[i]
+        
+                    try {
+                        let doc = new SqrmDocument(this,`${name}-${i+1}`,sxast,options)
+                        this.docs.set(name,doc)
+                    } catch (e) {
+                        console.log(e)
+                    }
+                }
             }
-        })
+        });
+
+        console.log(Array.from(this.docs.keys()))
 
         this.docs.forEach((doc) => {
 
