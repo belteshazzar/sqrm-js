@@ -1,40 +1,21 @@
 
 
 import {toHtml} from 'hast-util-to-html'
-import {h} from 'hastscript'
 
 import SqrmDocument from './SqrmDocument.js';
 import SqrmRequest from './SqrmRequest.js';
 import SqrmResponse from './SqrmResponse.js';
 import sastToHast from './sast-to-hast.js';
 import toJson from './jast-to-json.js'
-import {t} from './hastscript-tools.js'
 import sqrmToLines from './sqrm-to-lines.js'
 import linesToSxast from './lines-to-sxast.js'
 import sxastToJs from './sxast-to-js.js'
-
-class BaseSqrmCollection {
-
-    constructor() {
-    }
-  
-    include(opts) {
-        return h('span',{class: 'error'},[t(`error: includes not supported on this platform`)])
-    }
- 
-    call(name,request,response) {
-    }
- 
-    find(select,filter,skip,count) {
-   }
- 
-}
-
+import SqrmCollection from './SqrmCollection.js'
 
 export default function sqrm(src, _options = {}) {
 
     const defaults = {
-        collection: new BaseSqrmCollection(),
+        collection: new SqrmCollection(),
         id: 'new-document',
         rev: 1,
         log_src: false,

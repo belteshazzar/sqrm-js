@@ -8,7 +8,7 @@
   },
   "type": "module",
   "scripts": {
-    "test": "mocha ./test/test.js",
+    "test": "mocha ./test/test.js ./test/test-file-collection.js",
     "test:mocha": "mocha --grep 'hash bang' ",
     "build": "rollup --config",
     "postbuild": "mocha ./test/test-bundled.js"
