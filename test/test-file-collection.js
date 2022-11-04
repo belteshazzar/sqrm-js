@@ -32,6 +32,8 @@ describe("file system collection tests", function() {
 
             expect(c).to.not.be.null
 
+            throw new Error('not working')
+
             // const result = sqrm(source,{
             //     collection: new SqrmFSCollection('./collection'),
                 

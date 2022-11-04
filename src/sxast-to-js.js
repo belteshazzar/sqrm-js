@@ -61,7 +61,7 @@ export default function sqrmToJs(sqrm) {
     out += 'const request = arguments[0];\n'
     out += 'const response = arguments[1];\n'
     out += '\n'
-    out += 'const docs = request.docs;\n';
+    out += 'const docs = response.docs;\n';
     out += '\n'
     out += 'const h = response.libs.h;\n'
     out += 'const t = response.libs.t;\n'

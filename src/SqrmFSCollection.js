@@ -30,7 +30,7 @@ export default class SqrmFSCollection extends SqrmCollection {
             });
 
         docNames.forEach((name) => {
-            console.log(`loading doc ${name}`)
+
             const src = fs.readFileSync(`${this.folder}/${name}.sqrm`).toString()
             const sxasts = sxastParser(src,options)
         
@@ -62,13 +62,14 @@ export default class SqrmFSCollection extends SqrmCollection {
             console.log("|")
             console.log('------ ' + doc.id + ' ---------------------------------')
             console.log("|")
-            let request = new SqrmRequest(this);
-            let response = new SqrmResponse();
+            let request = new SqrmRequest();
+            let response = new SqrmResponse(this);
             try {
                 doc.execute(request,response);
-                doc.json = response.json
-                doc.json._id = doc.id;
-                doc.json._rev = doc.rev;
+                // console
+                // doc.json = response.json
+                // doc.json._id = doc.id;
+                // doc.json._rev = doc.rev;
             } catch (e) {
                 console.log(`failed to execute: ${doc.id} --------`)
                 console.log(doc.fn.toString());
@@ -80,14 +81,15 @@ export default class SqrmFSCollection extends SqrmCollection {
         })
     }
 
-    load(doc) {
-        if (doc.src!=null) return;
-        doc.src = fs.readFileSync(`${this.folder}/${doc.id}.${doc.rev}.sqrm`, 'utf-8').toString();
-    }
+    // load(doc) {
+    //     if (doc.src!=null) return;
+    //     doc.src = fs.readFileSync(`${this.folder}/${doc.id}.${doc.rev}.sqrm`, 'utf-8').toString();
+    // }
 
     include(name,request,response) {
+        console.log('include',arguments)
         if (!this.docs.has(name)) {
-            response.html.out += `<!-- failed to find document: ${name} -->`
+            response.appendToHtml({type:'div',tag:'!--',properties:`failed to find document: ${name}`})
             return;
         }
 
@@ -100,6 +102,7 @@ export default class SqrmFSCollection extends SqrmCollection {
     }
 
     call(name,request,response) {
+        console.log('call',arguments)
         if (!this.docs.has(name)) {
             response.html.out += `<!-- failed to find document: ${name} -->`
             return;
@@ -114,6 +117,7 @@ export default class SqrmFSCollection extends SqrmCollection {
     }
 
     find(select,filter,skip,count) {
+        console.log('find',arguments)
 
         console.log(select.toString())
         try {

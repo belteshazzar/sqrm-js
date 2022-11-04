@@ -21,7 +21,6 @@ export default class SqrmResponse {
     constructor(docs) {
         this.docs = docs
         this.root = [];
-        this.json = null
 
         this.yamlNotAllowedIndent = -1
 
@@ -44,17 +43,63 @@ export default class SqrmResponse {
 //            append: this.append//.bind(this),
         };//, tree: new Tree(), util: util };
 
-        this.jsonTree = { minChildIndent: 0, type: 'unknown', name: 'root' }
-    }
+        let handler = {
+            has(target, property) {
+                // console.log('has',target.type,property)
+                throw new Error('json.has not-implemented')
+                // return key in target;
+            },
+            get(target, property, receiver) {
+                switch (target.type) {
+                    case 'object': {
+                        for (let i=0 ; i<target.children.length ; i++) {
+                            let child = target.children[i]
+                            if (child.name == property) {
+                                if (child.type == 'value') {
+                                    return child.value
+                                } else {
+                                    return new Proxy(child,handler)
+                                }
+                            }
+                        }
+                        return null;
+                    }
+                    case 'array': {
+                        const v = target.children[property]
+                        if (v==null) return null
+                        else if (v.type == 'value') return v.value
+                        return new Proxy(v,handler)
+                    }
+                    case 'unknown': {
+                        return null;
+                    }
+                    case 'value': {
+                        return target.value[property]
+                    }
+                    default: {
+                        throw new Error(target.type)
+                    }
+                }
+            },
+            set(target, property, value, receiver) {
+                // console.log('set',target.type,property,value)
+                throw new Error('set not-implemented')
+                // target[property] = value
+                // return true
+            }
+        }
 
+        this.jsonTree = { minChildIndent: 0, type: 'unknown', name: 'root' }
+        this.json = new Proxy(this.jsonTree,handler)
+    }
 
     processHast(cb) {
         this.hastCallbacks.push(cb)
     }
 
-    updateJson() {
-        this.json = toJson(this.jsonTree)
-    }
+    // updateJson() {
+    //     this.json = toJson(this.jsonTree)
+    // }
 
 
     include(args) {
@@ -177,7 +222,7 @@ export default class SqrmResponse {
         taskNode.children.push({ type: 'value', name: 'done', value: done })
         tasksNode.children.push(taskNode)
 
-        this.updateJson()
+        // this.updateJson()
     }
 
     inlineTag(obj) {
@@ -268,7 +313,7 @@ export default class SqrmResponse {
                 parent.children = [ { type: 'value', name: name, value: args } ]
             }
 
-            this.updateJson()
+            // this.updateJson()
             return parent.children[0]
         }
 
@@ -293,7 +338,7 @@ export default class SqrmResponse {
                 parent.children = [ jsonNode ]
             }
 
-            this.updateJson()
+            // this.updateJson()
             return jsonNode
         }
 
@@ -305,7 +350,7 @@ export default class SqrmResponse {
                 parent.children.push({ type: 'value', name: name, value: args })
             }
 
-            this.updateJson()
+            // this.updateJson()
             return parent.children[parent.children.length-1]
         }
 
@@ -325,7 +370,7 @@ export default class SqrmResponse {
                 parent.children.push(jsonNode)
             }
 
-            this.updateJson()
+            // this.updateJson()
             return jsonNode
         }
 
