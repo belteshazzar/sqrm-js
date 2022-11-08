@@ -78,7 +78,7 @@ export default function sqrmToJs(sqrm) {
     out += 'const inlineTag = function(params) { let r = response.libs.inlineTag(params); json = response.json; return r }\n'
     out += 'const addTask = function(params) { let r = response.libs.addTask(params); json = response.json; return r }\n'
     out += 'const appendToHtml = response.libs.appendToHtml\n'
-    out += 'const include = response.libs.include\n'
+    out += 'const include = response.libs.include;\n'
 //    out += 'const append = response.libs.append;\n'
     out += '\n'
 

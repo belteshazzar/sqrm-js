@@ -71,9 +71,9 @@ export default class SqrmFSCollection extends SqrmCollection {
                 // doc.json._id = doc.id;
                 // doc.json._rev = doc.rev;
             } catch (e) {
-                console.log(`failed to execute: ${doc.id} --------`)
-                console.log(doc.fn.toString());
-                console.log('---------------------------------------')
+                console.log(`------ failed to execute: ${doc.id} --------`)
+                // console.log(doc.fn.toString());
+                // console.log('---------------------------------------')
                 console.log(e);
                 console.log('---------------------------------------')
             }
@@ -98,6 +98,8 @@ export default class SqrmFSCollection extends SqrmCollection {
         for (let i=3 ; i<arguments.length ; i++) args.push(arguments[i])
         let newRequest = Object.assign({},request);
         newRequest.args= args;
+
+        
         fn(newRequest,response)
     }
 
@@ -114,6 +116,15 @@ export default class SqrmFSCollection extends SqrmCollection {
             let newRequest = Object.assign({},request);
             newRequest.args= args;
             fn(newRequest,response)  
+    }
+
+    get(name) {
+        // console.log('get',name,this.docs.get(name))
+        if (!this.docs.has(name)) {
+            // response.html.out += `<!-- failed to find document: ${name} -->`
+            return null;
+        }
+        return this.docs.get(name)
     }
 
     find(select,filter,skip,count) {

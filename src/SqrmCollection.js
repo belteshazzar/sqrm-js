@@ -6,11 +6,11 @@ export default class SqrmCollection {
     constructor() {
     }
   
-    include(opts) {
-        return h('span',{class: 'error'},[t(`error: includes not supported on this platform`)])
-    }
+    // include(opts) {
+    //     return h('span',{class: 'error'},[t(`error: includes not supported on this platform`)])
+    // }
  
-    call(name,request,response) {
+    get(name) {
     }
  
     find(select,filter,skip,count) {

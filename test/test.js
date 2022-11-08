@@ -12,19 +12,29 @@ import sqrm from '../src/sqrm.js'
 
 class TestSqrmCollection {
 
-   constructor(includeCallback) {
-        this.includeCallback = includeCallback;
-   }
+  constructor(includeCallback) {
+    this.includeCallback = includeCallback;
+  }
 
-   include(opts) {
-    try {
-        return this.includeCallback(opts)
-    } catch (e) {
-        return h('span',{class: 'error'},[t(`error occured including: ${opts.name}`)])
-    }
-   }
+//    include(opts) {
+//     try {
+//         return this.includeCallback(opts)
+//     } catch (e) {
+//         return h('span',{class: 'error'},[t(`error occured including: ${opts.name}`)])
+//     }
+//    }
 
-   call(name,request,response) {
+//    call(name,request,response) {
+//    }
+
+   get(name) {
+        console.log('TestSqrmCollection.get',name)
+        return {
+            execute : (req,res) => {
+                console.log(req)
+                res.libs.appendToHtml({type: 'div', children: [this.includeCallback(req.args)] })
+            }
+        }
    }
 
    find(select,filter,skip,count) {
@@ -322,12 +332,12 @@ describe("Non-file based tests", function() {
             'this is an image: #!image(my_image.png,200,200,alt text) inline',
             '<p>this is an image: <img src="my_image.png,200,200,alt text" width="undefined" height="undefined" alt="undefined">(my_image.png,200,200,alt text) inline</p>',
             {},
-            function includeCallback(opts) {
+            function includeCallback(args) {
                 return h('img',{
-                    src: `${opts.args[0]}`,
-                    width: `${opts.args[1]}`,
-                    height: `${opts.args[2]}`,
-                    alt: `${opts.args[3]}`
+                    src: `${args[0]}`,
+                    width: `${args[1]}`,
+                    height: `${args[2]}`,
+                    alt: `${args[3]}`
                 })
             })
 
@@ -335,12 +345,12 @@ describe("Non-file based tests", function() {
             'this is an image: #!image("my_image.png",200,200,"alt text") inline',
             '<p>this is an image: <img src="my_image.png" width="200" height="200" alt="alt text"> inline</p>',
             {},
-            function includeCallback(opts) {
+            function includeCallback(args) {
                 return h('img',{
-                    src: `${opts.args[0]}`,
-                    width: `${opts.args[1]}`,
-                    height: `${opts.args[2]}`,
-                    alt: `${opts.args[3]}`
+                    src: `${args[0]}`,
+                    width: `${args[1]}`,
+                    height: `${args[2]}`,
+                    alt: `${args[3]}`
                 })
             })
     })
@@ -380,12 +390,12 @@ describe("Non-file based tests", function() {
 
 describe("file based tests", function() {
 
-    function includeCallback(opts) {
+    function includeCallback(args) {
         return h('img',{
-            src: `${opts.args[0]}`,
-            width: `${opts.args[1]}`,
-            height: `${opts.args[2]}`,
-            alt: `${opts.args[3]}`
+            src: `${args[0]}`,
+            width: `${args[1]}`,
+            height: `${args[2]}`,
+            alt: `${args[3]}`
         })
     }
 

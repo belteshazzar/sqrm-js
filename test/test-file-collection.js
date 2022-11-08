@@ -16,16 +16,17 @@ describe("file system collection tests", function() {
 
 
             const options = {
-                log_src: false,
-                log_lines: false,
-                log_sxast: false,
-                log_code: false,
-        
-                log_sast: false,
-                log_hast: false,
-                log_html: false,
-                log_jast: false,
-                log_json: false
+                log_src: process.env.npm_config_src == 'true',
+                log_lines: process.env.npm_config_lines == 'true',
+                log_sxast: process.env.npm_config_sxast == 'true',
+                log_code: process.env.npm_config_code == 'true',
+    
+                log_sast: process.env.npm_config_sast == 'true',
+                log_hast: process.env.npm_config_hast == 'true',
+                log_html: process.env.npm_config_html == 'true',
+                log_jast: process.env.npm_config_jast == 'true',
+                log_json: process.env.npm_config_json == 'true'
+ 
             };
 
             const c = new SqrmFSCollection('./test/collection',options)

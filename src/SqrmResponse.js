@@ -3,19 +3,11 @@
 import {h} from 'hastscript'
 import {t} from './hastscript-tools.js'
 import {matches, select, selectAll} from 'hast-util-select'
+import SqrmDocument from './SqrmDocument.js'
+import SqrmRequest from './SqrmRequest.js'
+import SqrmCollection from './SqrmCollection.js'
 
-import toJson from './../src/jast-to-json.js'
-
-function iterateLikeStack(tree,cb) {
-    let el = tree
-    while (el != null) {
-        if (cb.call(null,el) === false) return
-        el = (el.children ? el.children[el.children.length-1] : null)
-        if (el!=null && el.type == 'value') {
-            el = null
-        }
-    }
-}
+import JsonTree from './jast.js'
 
 export default class SqrmResponse {
     constructor(docs) {
@@ -25,6 +17,9 @@ export default class SqrmResponse {
         this.yamlNotAllowedIndent = -1
 
         this.hastCallbacks = []
+
+        this.jsonTree = new JsonTree()
+        this.json = this.jsonTree.json
 
         this.libs = {
             h: h,
@@ -43,54 +38,7 @@ export default class SqrmResponse {
 //            append: this.append//.bind(this),
         };//, tree: new Tree(), util: util };
 
-        let handler = {
-            has(target, property) {
-                // console.log('has',target.type,property)
-                throw new Error('json.has not-implemented')
-                // return key in target;
-            },
-            get(target, property, receiver) {
-                switch (target.type) {
-                    case 'object': {
-                        for (let i=0 ; i<target.children.length ; i++) {
-                            let child = target.children[i]
-                            if (child.name == property) {
-                                if (child.type == 'value') {
-                                    return child.value
-                                } else {
-                                    return new Proxy(child,handler)
-                                }
-                            }
-                        }
-                        return null;
-                    }
-                    case 'array': {
-                        const v = target.children[property]
-                        if (v==null) return null
-                        else if (v.type == 'value') return v.value
-                        return new Proxy(v,handler)
-                    }
-                    case 'unknown': {
-                        return null;
-                    }
-                    case 'value': {
-                        return target.value[property]
-                    }
-                    default: {
-                        throw new Error(target.type)
-                    }
-                }
-            },
-            set(target, property, value, receiver) {
-                // console.log('set',target.type,property,value)
-                throw new Error('set not-implemented')
-                // target[property] = value
-                // return true
-            }
-        }
 
-        this.jsonTree = { minChildIndent: 0, type: 'unknown', name: 'root' }
-        this.json = new Proxy(this.jsonTree,handler)
     }
 
     processHast(cb) {
@@ -102,12 +50,45 @@ export default class SqrmResponse {
     // }
 
 
-    include(args) {
-        return this.docs.include(args)
+    include({name,args}) {
+        console.log('SqrmResponse.include',name,args)
+        let doc = this.docs.get(name)
+        if (doc == null) {
+            return { type: 'comment', value: `failed to include doc: ${name}( ${JSON.stringify(args)} )` }
+        }
+
+        let request = new SqrmRequest(args);
+        let response = new SqrmResponse(this.docs);
+        try {
+            doc.execute(request,response)
+        } catch (e) {
+            console.log(`error executing doc ${name}`)
+            console.log(e)
+        }
+
+        console.log('include response: ',response)
+
+        return response.root[0].children[0]
+        // let doc = 
+        // try {
+        //     doc.execute(request,response);
+        //     // console
+        //     // doc.json = response.json
+        //     // doc.json._id = doc.id;
+        //     // doc.json._rev = doc.rev;
+        // } catch (e) {
+        //     console.log(`------ failed to execute: ${doc.id} --------`)
+        //     // console.log(doc.fn.toString());
+        //     // console.log('---------------------------------------')
+        //     console.log(e);
+        //     console.log('---------------------------------------')
+        // }
+
+        // return this.docs.include(args, new IncludeResponse(this))
     }
 
     appendToHtml(obj) {
-
+console.log('appendToHtml',obj)
         if (this.yamlNotAllowedIndent != -1 && obj.type != 'blank') {
             if (obj.indent < this.yamlNotAllowedIndent) {
                 this.yamlNotAllowedIndent = -1
@@ -192,15 +173,15 @@ export default class SqrmResponse {
     addTask({line,done,text}) {
         let tasksNode = null
 
-        if (this.jsonTree.type == 'unknown') {
-            this.jsonTree.type = 'object'
-            this.jsonTree.childrenIndent = 0
-            delete this.jsonTree.minChildIndent
+        if (this.jsonTree.root.type == 'unknown') {
+            this.jsonTree.root.type = 'object'
+            this.jsonTree.root.childrenIndent = 0
+            delete this.jsonTree.root.minChildIndent
             tasksNode = { type: 'array', name: 'tasks', childrenIndent: 1, children: [] }
-            this.jsonTree.children = [tasksNode]
-        } else if (this.jsonTree.type == 'object') {
-            for (let i=0 ; i<this.jsonTree.children.length ; i++) {
-                const child = this.jsonTree.children[i]
+            this.jsonTree.root.children = [tasksNode]
+        } else if (this.jsonTree.root.type == 'object') {
+            for (let i=0 ; i<this.jsonTree.root.children.length ; i++) {
+                const child = this.jsonTree.root.children[i]
                 if (child.name == 'tasks') {
                     tasksNode = child
                     break
@@ -209,7 +190,7 @@ export default class SqrmResponse {
 
             if (tasksNode == null) {
                 tasksNode = { type: 'array', name: 'tasks', childrenIndent: 1, children: [] }
-                this.jsonTree.children.push(tasksNode)
+                this.jsonTree.root.children.push(tasksNode)
             }
         } else {
             // silently not supported if the root is an array
@@ -272,7 +253,7 @@ export default class SqrmResponse {
         if (isArrayElement) {
             // if this is an array element: look for unknown or array
 
-            iterateLikeStack(this.jsonTree, (el) => {
+            this.jsonTree.iterateLikeStack((el) => {
                 if (el.type=='unknown' && el.minChildIndent<=indent) {
                     parent = el
                     return false
@@ -285,7 +266,7 @@ export default class SqrmResponse {
         } else {
             // if this is not an array element: look fo unknown or object
 
-            iterateLikeStack(this.jsonTree, (el) => {
+            this.jsonTree.iterateLikeStack((el) => {
                 if (el.type=='unknown' && el.minChildIndent<=indent) {
                     parent = el
                     return false
