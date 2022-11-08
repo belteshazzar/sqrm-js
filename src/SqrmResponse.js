@@ -6,7 +6,9 @@ import {matches, select, selectAll} from 'hast-util-select'
 import SqrmDocument from './SqrmDocument.js'
 import SqrmRequest from './SqrmRequest.js'
 import SqrmCollection from './SqrmCollection.js'
-
+import responseToResult from './response-to-result.js';
+import sastToHast from './sast-to-hast.js';
+import util from 'node:util'
 import JsonTree from './jast.js'
 
 export default class SqrmResponse {
@@ -67,8 +69,12 @@ export default class SqrmResponse {
         }
 
         console.log('include response: ',response)
+        console.log('response.root',util.inspect(response.root,false,null,true))
+        let hast = sastToHast(response.root)
 
-        return response.root[0].children[0]
+        console.log('hast',util.inspect(hast,false,null,true))
+
+        return h('div',{class: name},hast.children)
         // let doc = 
         // try {
         //     doc.execute(request,response);
@@ -88,7 +94,6 @@ export default class SqrmResponse {
     }
 
     appendToHtml(obj) {
-console.log('appendToHtml',obj)
         if (this.yamlNotAllowedIndent != -1 && obj.type != 'blank') {
             if (obj.indent < this.yamlNotAllowedIndent) {
                 this.yamlNotAllowedIndent = -1

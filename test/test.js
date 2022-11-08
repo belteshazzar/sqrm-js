@@ -32,7 +32,7 @@ class TestSqrmCollection {
         return {
             execute : (req,res) => {
                 console.log(req)
-                res.libs.appendToHtml({type: 'div', children: [this.includeCallback(req.args)] })
+                res.libs.appendToHtml({type: 'text', indent: 0, children: [this.includeCallback(req.args)] })
             }
         }
    }
@@ -89,7 +89,7 @@ describe("Non-file based tests", function() {
 
         test("escape characters",
             'fred & barry ( 1 < 3 || 4 > 4 \\ woot)',
-            '<p>fred &#x26; barry ( 1 &#x3C; 3 || 4 > 4 \\ woot)</p>',
+            '<div class="p">fred &#x26; barry ( 1 &#x3C; 3 || 4 > 4 \\ woot)</div>',
             {});
     });
 
@@ -112,17 +112,17 @@ describe("Non-file based tests", function() {
 
         test("heading 4",
             '= head\r\ning',
-            '<h1>head</h1><p>ing</p>',
+            '<h1>head</h1><div class="p">ing</div>',
             {})
 
         test("heading 5",
             '= head\r\ning\nand some more\n',
-            '<h1>head</h1><p>ing\nand some more</p>',
+            '<h1>head</h1><div class="p">ing\nand some more</div>',
             {})
 
         test("heading 6", 
             '= head\r\n\r\ning',
-            '<h1>head</h1><p>ing</p>',
+            '<h1>head</h1><div class="p">ing</div>',
             {})
 
         test("heading 7",
@@ -137,7 +137,7 @@ describe("Non-file based tests", function() {
 
         test("heading 9",
             '= head\ning',
-            '<h1>head</h1><p>ing</p>',
+            '<h1>head</h1><div class="p">ing</div>',
             {})
 
         test("heading 10", 
@@ -147,22 +147,22 @@ describe("Non-file based tests", function() {
 
         test("heading 11",
             '\n  == heading ============================ \ntext',
-            '<div><h2>heading</h2></div><p>text</p>',
+            '<div><h2>heading</h2></div><div class="p">text</div>',
             {})
 
         test("heading 11a", 
             '\n  == heading ---------------------------- \ntext',
-            '<div><h2>heading</h2></div><p>text</p>',
+            '<div><h2>heading</h2></div><div class="p">text</div>',
             {})
 
         test("heading 12",
             '\n  == heading ============================ \n\ntext',
-            '<div><h2>heading</h2></div><p>text</p>',
+            '<div><h2>heading</h2></div><div class="p">text</div>',
             {})
 
         test("heading 13", 
             '\n  = heading\n\ntext',
-            '<div><h1>heading</h1></div><p>text</p>',
+            '<div><h1>heading</h1></div><div class="p">text</div>',
             {})
 
         test("heading 14", 
@@ -172,12 +172,12 @@ describe("Non-file based tests", function() {
 
         test("heading 15",
             '= heading \ncontinued =======',
-            '<h1>heading</h1><p>continued =======</p>',
+            '<h1>heading</h1><div class="p">continued =======</div>',
             {})
 
         test("heading 16",
             '= heading \n  indented',
-            '<h1>heading</h1><div><p>indented</p></div>',
+            '<h1>heading</h1><div><div class="p">indented</div></div>',
             {})
     });
 
@@ -185,57 +185,57 @@ describe("Non-file based tests", function() {
 
         test("paragraphs 1",
             'a',
-            '<p>a</p>',
+            '<div class="p">a</div>',
             {})
 
         test("paragraphs 2",
             'a\nb\n',
-            '<p>a\nb</p>',
+            '<div class="p">a\nb</div>',
             {})
 
         test("paragraphs 3",
             'a\nb\n',
-            '<p>a\nb</p>',
+            '<div class="p">a\nb</div>',
             {})
 
         test("paragraphs 4",
             'a\nb\n\nc\n',
-            '<p>a\nb</p><p>c</p>',
+            '<div class="p">a\nb</div><div class="p">c</div>',
             {})
 
     });
 
     describe("formatting", function() {
 
-        test('formatting 1','a !! b !! c','<p>a <b> b </b> c</p>')
-        test('formatting 1a','a!!b!!c','<p>a<b>b</b>c</p>')
-        test('formatting 2','a ** b ** c','<p>a <b> b </b> c</p>')
-        test('formatting 3','a ~~ b ~~ c','<p>a <i> b </i> c</p>')
-        test('formatting 4','a // b // c','<p>a <i> b </i> c</p>')
-        test('formatting 5','a -- b -- c','<p>a <del> b </del> c</p>')
-        test('formatting 6','a __ b __ c','<p>a <u> b </u> c</p>')
-        test('formatting 7','a `` b `` c','<p>a <code> b </code> c</p>')
-        test('formatting 8','a ^^ b ^^ c','<p>a <sup> b </sup> c</p>')
+        test('formatting 1','a !! b !! c','<div class="p">a <b> b </b> c</div>')
+        test('formatting 1a','a!!b!!c','<div class="p">a<b>b</b>c</div>')
+        test('formatting 2','a ** b ** c','<div class="p">a <b> b </b> c</div>')
+        test('formatting 3','a ~~ b ~~ c','<div class="p">a <i> b </i> c</div>')
+        test('formatting 4','a // b // c','<div class="p">a <i> b </i> c</div>')
+        test('formatting 5','a -- b -- c','<div class="p">a <del> b </del> c</div>')
+        test('formatting 6','a __ b __ c','<div class="p">a <u> b </u> c</div>')
+        test('formatting 7','a `` b `` c','<div class="p">a <code> b </code> c</div>')
+        test('formatting 8','a ^^ b ^^ c','<div class="p">a <sup> b </sup> c</div>')
         
-        test('formatting 9','a !! b c','<p>a <b> b c</b></p>')
-        test('formatting 10','a ** b c','<p>a <b> b c</b></p>')
-        test('formatting 11','a ~~ b c','<p>a <i> b c</i></p>')
-        test('formatting 12','a // b c','<p>a <i> b c</i></p>')
-        test('formatting 13','a -- b c','<p>a <del> b c</del></p>')
-        test('formatting 14','a __ b c','<p>a <u> b c</u></p>')
-        test('formatting 15','a `` b c','<p>a <code> b c</code></p>')
-        test('formatting 16','a ^^ b c','<p>a <sup> b c</sup></p>')
+        test('formatting 9','a !! b c','<div class="p">a <b> b c</b></div>')
+        test('formatting 10','a ** b c','<div class="p">a <b> b c</b></div>')
+        test('formatting 11','a ~~ b c','<div class="p">a <i> b c</i></div>')
+        test('formatting 12','a // b c','<div class="p">a <i> b c</i></div>')
+        test('formatting 13','a -- b c','<div class="p">a <del> b c</del></div>')
+        test('formatting 14','a __ b c','<div class="p">a <u> b c</u></div>')
+        test('formatting 15','a `` b c','<div class="p">a <code> b c</code></div>')
+        test('formatting 16','a ^^ b c','<div class="p">a <sup> b c</sup></div>')
 
-        test('formatting 17','a \\!! b c','<p>a !! b c</p>')
-        test('formatting 18','a \\** b c','<p>a ** b c</p>')
-        test('formatting 19','a \\~~ b c','<p>a ~~ b c</p>')
-        test('formatting 20','a \\// b c','<p>a // b c</p>')
-        test('formatting 21','a \\-- b c','<p>a -- b c</p>')
-        test('formatting 22','a \\__ b c','<p>a __ b c</p>')
-        test('formatting 23','a \\`` b c','<p>a `` b c</p>')
-        test('formatting 24','a \\^^ b c','<p>a 😊 b c</p>')
+        test('formatting 17','a \\!! b c','<div class="p">a !! b c</div>')
+        test('formatting 18','a \\** b c','<div class="p">a ** b c</div>')
+        test('formatting 19','a \\~~ b c','<div class="p">a ~~ b c</div>')
+        test('formatting 20','a \\// b c','<div class="p">a // b c</div>')
+        test('formatting 21','a \\-- b c','<div class="p">a -- b c</div>')
+        test('formatting 22','a \\__ b c','<div class="p">a __ b c</div>')
+        test('formatting 23','a \\`` b c','<div class="p">a `` b c</div>')
+        test('formatting 24','a \\^^ b c','<div class="p">a 😊 b c</div>')
         
-        test('formatting 25','a ^^ b __ c -- !! d !! e','<p>a <sup> b <u> c <del> <b> d </b> e</del></u></sup></p>')
+        test('formatting 25','a ^^ b __ c -- !! d !! e','<div class="p">a <sup> b <u> c <del> <b> d </b> e</del></u></sup></div>')
         
     });
 
@@ -243,20 +243,20 @@ describe("Non-file based tests", function() {
 
         // links
         
-        test("links 27",'s1df \\[Link back to H2] fred','<p>s1df [Link back to H2] fred</p>')
-        test("links 28",'s2df [Link back to H2\\] fred','<p>s2df [Link back to H2] fred</p>')
-        test("links 29",'s3df [ Link back to H2 ] fred','<p>s3df <a href="/link_back_to_h2">Link back to H2</a> fred</p>')
-        test("links 30",'s4df [ Link text | url ] fred','<p>s4df <a href="/url">Link text</a> fred</p>')
-        test("links 31",'s5df [Link ba\\|ck to H2] fred','<p>s5df <a href="/link_ba%7Cck_to_h2">Link ba|ck to H2</a> fred</p>')
-        test("links 32",'s6df [Link ba\\]ck to H2] fred','<p>s6df <a href="/link_ba%5Dck_to_h2">Link ba]ck to H2</a> fred</p>')
-        test("links 33",'s7df [Link ba\\ck to H2] fred','<p>s7df <a href="/link_ba%5Cck_to_h2">Link ba\\ck to H2</a> fred</p>')
+        test("links 27",'s1df \\[Link back to H2] fred','<div class="p">s1df [Link back to H2] fred</div>')
+        test("links 28",'s2df [Link back to H2\\] fred','<div class="p">s2df [Link back to H2] fred</div>')
+        test("links 29",'s3df [ Link back to H2 ] fred','<div class="p">s3df <a href="/link_back_to_h2">Link back to H2</a> fred</div>')
+        test("links 30",'s4df [ Link text | url ] fred','<div class="p">s4df <a href="/url">Link text</a> fred</div>')
+        test("links 31",'s5df [Link ba\\|ck to H2] fred','<div class="p">s5df <a href="/link_ba%7Cck_to_h2">Link ba|ck to H2</a> fred</div>')
+        test("links 32",'s6df [Link ba\\]ck to H2] fred','<div class="p">s6df <a href="/link_ba%5Dck_to_h2">Link ba]ck to H2</a> fred</div>')
+        test("links 33",'s7df [Link ba\\ck to H2] fred','<div class="p">s7df <a href="/link_ba%5Cck_to_h2">Link ba\\ck to H2</a> fred</div>')
         
     });
 
     describe("divs", function() {
     
-        test('divs 1','fred\n\n< blockquote\n\n  <div id="fred" class="woot" \n woot\n\n','<p>fred</p><blockquote><div id="fred" class="woot"></div></blockquote><p>woot</p>')
-        test('divs 2','fred\n\n<blockquote\n\n  with more\n\n  <div\n\n    another indented','<p>fred</p><blockquote><p>with more</p><div><p>another indented</p></div></blockquote>')
+        test('divs 1','fred\n\n< blockquote\n\n  <div id="fred" class="woot" \n woot\n\n','<div class="p">fred</div><blockquote><div id="fred" class="woot"></div></blockquote><div class="p">woot</div>')
+        test('divs 2','fred\n\n<blockquote\n\n  with more\n\n  <div\n\n    another indented','<div class="p">fred</div><blockquote><div class="p">with more</div><div><div class="p">another indented</div></div></blockquote>')
         
     });
 
@@ -265,7 +265,7 @@ describe("Non-file based tests", function() {
         // inline mentions
         
         test('mentions 1','twitter style @user mentions',
-            '<p>twitter style <a href="/users/user">@user</a> mentions</p>')
+            '<div class="p">twitter style <a href="/users/user">@user</a> mentions</div>')
         
     });
 
@@ -274,27 +274,27 @@ describe("Non-file based tests", function() {
         // tags
         
         test('tags 1','this is a tag #a in a line',
-            '<p>this is a tag <a href="/tags/a">#a</a> in a line</p>',
+            '<div class="p">this is a tag <a href="/tags/a">#a</a> in a line</div>',
             {  "a": true})
         test('tags 2','this is an invalid tag #- in a line',
-            '<p>this is an invalid tag #- in a line</p>')
+            '<div class="p">this is an invalid tag #- in a line</div>')
         test('tags 3','this is an invalid tag # in a line',
-            '<p>this is an invalid tag # in a line</p>')
+            '<div class="p">this is an invalid tag # in a line</div>')
         test('tags 4','this is an escaped tag \\#a in a line',
-            '<p>this is an escaped tag #a in a line</p>')
+            '<div class="p">this is an escaped tag #a in a line</div>')
         test('tags 5','this is a tag ending a #line',
-            '<p>this is a tag ending a <a href="/tags/line">#line</a></p>',
+            '<div class="p">this is a tag ending a <a href="/tags/line">#line</a></div>',
             {  "line": true })
         test('tags 6','#tag_me is at the start of the line',
-            '<p><a href="/tags/tag_me">#tag_me</a> is at the start of the line</p>',
+            '<div class="p"><a href="/tags/tag_me">#tag_me</a> is at the start of the line</div>',
             {  "tag_me": true})
         test('tags 7','\\#tag_me: this is a line, # is not valid in a prop',
-            '<p>#tag_me: this is a line, # is not valid in a prop</p>')
+            '<div class="p">#tag_me: this is a line, # is not valid in a prop</div>')
         test('tags 8','#tag_me: is at the start of the line',
-            '<p><a href="/tags/tag_me">#tag_me</a>: is at the start of the line</p>',
+            '<div class="p"><a href="/tags/tag_me">#tag_me</a>: is at the start of the line</div>',
             { "tag_me": true})
         test('tags 9','#tag_me\\: is at the start of the line',
-            '<p><a href="/tags/tag_me">#tag_me</a>\\: is at the start of the line</p>',
+            '<div class="p"><a href="/tags/tag_me">#tag_me</a>\\: is at the start of the line</div>',
             {  "tag_me": true})
         
     });
@@ -304,24 +304,24 @@ describe("Non-file based tests", function() {
         // tags with parameters
         
         test('tag params 1','this is a tag #a(1,2,[")"]) in a line',
-            '<p>this is a tag <a href="/tags/a">#a(1,2,[")"])</a> in a line</p>',
+            '<div class="p">this is a tag <a href="/tags/a">#a(1,2,[")"])</a> in a line</div>',
             {  "a": [    1,    2,   [     ")"    ]  ]})
         test('tag params 2','this is a tag ending a #line("with () text")',
-            '<p>this is a tag ending a <a href="/tags/line">#line("with () text")</a></p>',
+            '<div class="p">this is a tag ending a <a href="/tags/line">#line("with () text")</a></div>',
             { "line": "with () text"})
         test('tag params 3','#tag_me(1,2) is at the start of the line',
-            '<p><a href="/tags/tag_me">#tag_me(1,2)</a> is at the start of the line</p>',
+            '<div class="p"><a href="/tags/tag_me">#tag_me(1,2)</a> is at the start of the line</div>',
             {  "tag_me": [    1,    2  ]})
         test('tag params 4','multiple tags #here and #there, also #here',
-            '<p>multiple tags <a href="/tags/here">#here</a> and <a href="/tags/there">#there</a>, also <a href="/tags/here">#here</a></p>',
+            '<div class="p">multiple tags <a href="/tags/here">#here</a> and <a href="/tags/there">#there</a>, also <a href="/tags/here">#here</a></div>',
             {"here": true, "there": true})
         test('tag params 5','#tag',
-            '<p><a href="/tags/tag">#tag</a></p>',
+            '<div class="p"><a href="/tags/tag">#tag</a></div>',
             {"tag": true})
 
         test('tag params 6',
             '#image("my_image.png",200,200,"alt text")',
-            '<p><a href="/tags/image">#image("my_image.png",200,200,"alt text")</a></p>',
+            '<div class="p"><a href="/tags/image">#image("my_image.png",200,200,"alt text")</a></div>',
             { image: ["my_image.png", 200,200, "alt text"]})
         
     });
@@ -330,7 +330,7 @@ describe("Non-file based tests", function() {
 
         test('simple hash bang for an image with error',
             'this is an image: #!image(my_image.png,200,200,alt text) inline',
-            '<p>this is an image: <img src="my_image.png,200,200,alt text" width="undefined" height="undefined" alt="undefined">(my_image.png,200,200,alt text) inline</p>',
+            '<div class="p">this is an image: <div class="image"><div class="p"><img src="my_image.png,200,200,alt text" width="undefined" height="undefined" alt="undefined"></div></div>(my_image.png,200,200,alt text) inline</div>',
             {},
             function includeCallback(args) {
                 return h('img',{
@@ -343,7 +343,7 @@ describe("Non-file based tests", function() {
 
         test('simple hash bang for an image',
             'this is an image: #!image("my_image.png",200,200,"alt text") inline',
-            '<p>this is an image: <img src="my_image.png" width="200" height="200" alt="alt text"> inline</p>',
+            '<div class="p">this is an image: <div class="image"><div class="p"><img src="my_image.png" width="200" height="200" alt="alt text"></div></div> inline</div>',
             {},
             function includeCallback(args) {
                 return h('img',{
@@ -360,14 +360,14 @@ describe("Non-file based tests", function() {
         // inline includes
         
         test('template 1','menu: WOOT \n\nalso supports ${json.menu} tag includes',
-            '<p>also supports WOOT tag includes</p>',
+            '<div class="p">also supports WOOT tag includes</div>',
             {  "menu": "WOOT" })
         test('template 2','menu:\n  - saturday\n  - sunday\n\nand with params ${json.menu[0]} like that',
-            '<p>and with params saturday like that</p>',
+            '<div class="p">and with params saturday like that</div>',
             {"menu": ["saturday","sunday"]})
 
         test('template 3',"obj3: {a:1,b:2}",'',{obj3:{a:1,b:2}})
-        test('template 4',"#obj2( {a:1,b:2} )",'<p><a href="/tags/obj2">#obj2( {a:1,b:2} )</a></p>',{obj2:{a:1,b:2}})
+        test('template 4',"#obj2( {a:1,b:2} )",'<div class="p"><a href="/tags/obj2">#obj2( {a:1,b:2} )</a></div>',{obj2:{a:1,b:2}})
         test('template 5',"- Fred: [1,2,3]",'',[ { Fred: [1,2,3] }] )
     
     });
@@ -378,7 +378,7 @@ describe("Non-file based tests", function() {
 
         // detect this and make it a list rather than yaml?
         test('is this yaml or a list?','text followed by a list:\n- one\n- two\n',
-            '<p>text followed by a list:</p>',["one","two"])
+            '<div class="p">text followed by a list:</div>',["one","two"])
         
         // is this yaml (json) or a list (html)? ... its a json array
         test('simple list','- one\n- two',

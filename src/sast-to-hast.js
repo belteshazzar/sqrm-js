@@ -308,7 +308,7 @@ export default function sastToHast(sqrm) {
         
         function paragraph() {
             let n = next()
-            const p = h('p',{}, n.children)
+            const p = h('div',{ class: 'p' }, n.children)
             n = peek()
             while (n != null && n.type == 'text' && n.indent == indent) {
                 n = next()

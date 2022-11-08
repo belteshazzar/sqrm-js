@@ -3,7 +3,7 @@ import {toHtml} from 'hast-util-to-html'
 import sastToHast from './sast-to-hast.js';
 import toJson from './jast-to-json.js'
 
-export default function responseToResult(response,options) {
+export default function responseToResult(response,options = {}) {
     let sast = response.root
         
     if (options.log_sast) {
