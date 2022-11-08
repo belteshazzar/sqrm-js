@@ -16,30 +16,16 @@ class TestSqrmCollection {
     this.includeCallback = includeCallback;
   }
 
-//    include(opts) {
-//     try {
-//         return this.includeCallback(opts)
-//     } catch (e) {
-//         return h('span',{class: 'error'},[t(`error occured including: ${opts.name}`)])
-//     }
-//    }
-
-//    call(name,request,response) {
-//    }
-
-   get(name) {
-        console.log('TestSqrmCollection.get',name)
-        return {
-            execute : (req,res) => {
-                console.log(req)
-                res.libs.appendToHtml({type: 'text', indent: 0, children: [this.includeCallback(req.args)] })
-            }
-        }
-   }
-
-   find(select,filter,skip,count) {
+  get(name) {
+    return {
+      execute : (req,res) => {
+        res.libs.appendToHtml({type: 'text', indent: 0, children: [this.includeCallback(req.args)] })
+      }
+    }
   }
 
+  find(select,filter,skip,count) {
+  }
 }
 
 function test(name,source,expectedHtml,expectedJson={},includeCallback) {
