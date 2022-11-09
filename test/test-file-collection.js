@@ -30,8 +30,44 @@ describe("file system collection tests", function() {
             };
 
             const c = new SqrmFSCollection('./test/collection',options)
-
             expect(c).to.not.be.null
+            expect(c.get('info_box')).to.not.be.null
+            expect(c.get('london')).to.not.be.null
+            expect(c.get('map')).to.not.be.null
+            expect(c.get('page')).to.not.be.null
+            expect(c.get('page2')).to.not.be.null
+            expect(c.get('paris')).to.not.be.null
+
+            const lat = 4.5
+            const lon = 7.2
+
+            const map = c.call('map',[{lat:lat,lon:lon}])
+            expect(map).to.not.be.null
+            expect(map.html).to.not.be.null
+            expect(map.json).to.not.be.null
+            expect(map.html).to.equal(`<map latitude="${lat}" longitude="${lon}"></map>`)
+            expect(map.json).to.deep.equal({})
+
+            const paris = c.call('paris')
+            expect(paris).to.not.be.null
+            expect(paris.html).to.not.be.null
+            expect(paris.json).to.not.be.null
+            expect(paris.html).to.equal('')
+            expect(paris.json).to.deep.equal({city: 'Paris', country: 'France', coordinates: { lat: 48.856613, lon: 2.352222}})
+
+            const london = c.call('london')
+            expect(london).to.not.be.null
+            expect(london.html).to.not.be.null
+            expect(london.json).to.not.be.null
+            expect(london.html).to.equal('')
+            expect(london.json).to.deep.equal({city: 'London', country: 'England', coordinates: { lat: 51.507222, lon: -0.1275}})
+
+            const page = c.call('page')
+            expect(page).to.not.be.null
+            expect(page.html).to.not.be.null
+            expect(page.json).to.not.be.null
+            expect(page.html).to.equal('<div class="p">This is page.</div><div class="p"><div class="paris"></div></div>')
+            expect(page.json).to.deep.equal({city: 'Paris', country: 'France', coordinates: { lat: 48.856613, lon: 2.352222}})
 
             throw new Error('not working')
 

@@ -16,6 +16,8 @@ export default function lineToSxast(str) {
     }
 
     function escapeChar(c) {
+        return c
+        
         if (c=='`') {
             return '\\`' // '&#96;'
         // } else if (c==':') {

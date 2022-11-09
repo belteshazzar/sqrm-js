@@ -2,4 +2,4 @@
 
 city: Paris
 country: France
-coordinates: [48.856613, 2.352222]
+coordinates: { lat: 48.856613, lon: 2.352222 }

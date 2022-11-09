@@ -235,9 +235,9 @@ function lineToSqrm(ln) {
             let props =  [... m[5].matchAll(/([^\s=]+)(=["]([^"]*)["])?/g) ]
             for (let prop of props) {
                 if (prop[3]) {
-                    properties[prop[1]] = prop[3]
+                    properties[prop[1]] = { value: prop[3] }
                 } else {
-                    properties[prop[1]] = true
+                    properties[prop[1]] = { value: true }
                 }
             }
         }

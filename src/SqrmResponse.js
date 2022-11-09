@@ -12,7 +12,7 @@ import util from 'node:util'
 import JsonTree from './jast.js'
 
 export default class SqrmResponse {
-    constructor(docs) {
+    constructor(docs,jsonTree) {
         this.docs = docs
         this.root = [];
 
@@ -20,7 +20,7 @@ export default class SqrmResponse {
 
         this.hastCallbacks = []
 
-        this.jsonTree = new JsonTree()
+        this.jsonTree = jsonTree || new JsonTree()
         this.json = this.jsonTree.json
 
         this.libs = {
@@ -53,13 +53,14 @@ export default class SqrmResponse {
 
 
     include({name,args}) {
+//        console.log(`SqrmResponse.include(${name},${args})`)
         let doc = this.docs.get(name)
         if (doc == null) {
             return { type: 'comment', value: `failed to include doc: ${name}( ${JSON.stringify(args)} )` }
         }
 
         let request = new SqrmRequest(args);
-        let response = new SqrmResponse(this.docs);
+        let response = new SqrmResponse(this.docs,this.jsonTree);
         try {
             doc.execute(request,response)
         } catch (e) {
@@ -69,25 +70,7 @@ export default class SqrmResponse {
 
         let hast = sastToHast(response.root)
 
-//        console.log('hast',util.inspect(hast,false,null,true))
-
         return h('div',{class: name},hast.children)
-        // let doc = 
-        // try {
-        //     doc.execute(request,response);
-        //     // console
-        //     // doc.json = response.json
-        //     // doc.json._id = doc.id;
-        //     // doc.json._rev = doc.rev;
-        // } catch (e) {
-        //     console.log(`------ failed to execute: ${doc.id} --------`)
-        //     // console.log(doc.fn.toString());
-        //     // console.log('---------------------------------------')
-        //     console.log(e);
-        //     console.log('---------------------------------------')
-        // }
-
-        // return this.docs.include(args, new IncludeResponse(this))
     }
 
     appendToHtml(obj) {

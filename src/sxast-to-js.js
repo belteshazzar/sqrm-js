@@ -2,9 +2,20 @@
 
 export default function sqrmToJs(sqrm) {
 
+    function escape(s) {
+        return s.replaceAll('\\','\\\\').replaceAll('\`','\\\`').replaceAll('\\\\$','\\$')
+    }
+
     let out = ''
 
     function stringify(obj) {
+
+        if (obj === undefined) {
+            return 'undefined'
+        } else if (obj == null) {
+            return 'null'
+        }
+
         if (obj.type !== undefined) {
             if (obj.type == 'tag') {
                 delete obj.type
@@ -14,10 +25,22 @@ export default function sqrmToJs(sqrm) {
                 return `include(${stringifyO(obj)})`
             }
         }
-        return stringifyO(obj)
+        // return stringifyO(obj)
+
+        if (Array.isArray(obj)) {
+            return stringifyA(obj)
+        } else if (typeof obj === 'object') {
+            return stringifyO(obj)
+        } else if (typeof obj === 'string') {
+            return `\`${escape(obj)}\``
+        } else {
+            return JSON.stringify(obj)
+        }
+
     }
 
     function stringifyO(obj) {
+
         let s = '{'
         let first = true
         for (const [key, value] of Object.entries(obj)) {
@@ -26,14 +49,17 @@ export default function sqrmToJs(sqrm) {
             } else {
                 s += ','
             }
-            if (key=='value') {
-                if (value==undefined) {
-                    s += `"${key}":undefined`
-                } else {
-                    s += `"${key}": \`${value}\``
-                }
-            } else if (key=='children' || key=='cells') {
+
+            if (value === undefined) {
+                s += `"${key}":undefined`
+            } else if (value == null) {
+                s += `"${key}":null`
+            } else if (Array.isArray(value)) {
                 s += `"${key}":${stringifyA(value)}`
+            } else if (typeof value === 'object') {
+                s += `"${key}":${stringifyO(value)}`
+            } else if (typeof value === 'string') {
+                s += `"${key}":\`${escape(value)}\``
             } else {
                 s += `"${key}":${JSON.stringify(value)}`
             }
@@ -43,6 +69,7 @@ export default function sqrmToJs(sqrm) {
     }
     
     function stringifyA(arr) {
+
         let s = '['
         for (let i=0 ; i<arr.length ; i++) {
             if (i>0) {

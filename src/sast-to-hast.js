@@ -165,7 +165,13 @@ export default function sastToHast(sqrm) {
                 } else if (peek().indent > indent) {
                     let n = next()
                     if (n.type == 'div') {
-                        let div = h(`${n.tag}`,n.properties)
+
+                        let props = {}
+                        Object.keys(n.properties).forEach(k => {
+                            props[k] = n.properties[k].value
+                        })
+            
+                        let div = h(`${n.tag}`,props)
                         div.children = div.children.concat(pre(n.indent))
                         lines.push(div)
                         lines.push(t('\n'))
@@ -218,8 +224,13 @@ export default function sastToHast(sqrm) {
         function div() {
             let n = next()
 
+            let props = {}
+            Object.keys(n.properties).forEach(k => {
+                props[k] = n.properties[k].value
+            })
+
             if (n.tag == '!DOCTYPE') {
-                let doctype = { type: 'doctype', properties: n.properties }
+                let doctype = { type: 'doctype', properties: props }
                 doctype.children = processIndentation(indent+1)
                 return doctype
             } else if (n.tag == '!--') {
@@ -235,7 +246,10 @@ export default function sastToHast(sqrm) {
                 el.children = pre(n.indent)
                 return el
             } else {
-                let div = h(`${n.tag}`,n.properties)
+                // n.properties.forEach(p => {
+                //     props[p.name] = p.value
+                // })
+                let div = h(`${n.tag}`,props)
                 div.children = processIndentation(indent+1)
                 return div
             }

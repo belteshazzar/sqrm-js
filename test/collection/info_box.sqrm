@@ -1,8 +1,8 @@
 
 
 <%
-    console.log('--- info box -----');
-    %>
+//    console.log('--- info box -----');
+%>
 
 The city of ${json.city} is in the country of ${json.country}.
 
