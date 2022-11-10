@@ -242,8 +242,14 @@ export default function lineToSxast(str) {
                         str = ''
                     }
 
+                    console.log('tag',tag,tagValue)
+
                     if (bang) {
-                        parent.children.push(i(tag,tagValue))
+                        parent.children.push({
+                            type: 'include', 
+                            name: tag, 
+                            args: tagValue
+                        })
                     } else {
                         parent.children.push({
                             type:'tag',

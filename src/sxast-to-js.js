@@ -1,4 +1,5 @@
 
+import util from 'node:util'
 
 export default function sqrmToJs(sqrm) {
 
@@ -55,7 +56,13 @@ export default function sqrmToJs(sqrm) {
             } else if (value == null) {
                 s += `"${key}":null`
             } else if (Array.isArray(value)) {
-                s += `"${key}":${stringifyA(value)}`
+
+                if (key == 'args') {
+                    console.log(key,util.inspect(value,false,null,true))
+                    s += `"${key}":${stringifyA(value)}`
+                } else {
+                    s += `"${key}":${stringifyA(value)}`
+                }
             } else if (typeof value === 'object') {
                 s += `"${key}":${stringifyO(value)}`
             } else if (typeof value === 'string') {

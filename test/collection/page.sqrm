@@ -1,9 +1,0 @@
-
-This is page.
-
-<%
-//    let cities = docs.find((doc) => doc.city !== undefined)
-//    console.log(cities);
-%>
-
-#!paris
