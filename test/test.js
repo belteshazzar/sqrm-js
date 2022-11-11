@@ -201,7 +201,7 @@ describe("Non-file based tests", function() {
 
         test("paragraphs 7",
             'a #tag(1,\n"b") c\nd\n\nc\n',
-            '<div class="p">a<b>\nb</b>c\nd</div><div class="p">c</div>',
+            '<div class="p">a <a href="/tags/tag">#tag(1,\n"b")</a> c\nd</div><div class="p">c</div>',
             {tag: [1,'b']})
     });
 

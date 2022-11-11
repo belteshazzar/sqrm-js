@@ -19,7 +19,7 @@ export default function sqrmToJs(sqrm) {
                 s += ','
             }
 
-            console.log('args',arr)
+            // console.log('args',arr)
             switch (arr[i].type) {
                 case 'literal': {
                     s += `${arr[i].value}`
@@ -43,9 +43,13 @@ export default function sqrmToJs(sqrm) {
     }
 
     function stringifyInclude(obj) {
-
-        console.log('stringifyInclude',obj)
+        // console.log('stringifyInclude',obj)
         return `include(${catchMeTemplate('`'+obj.name+'`')},${args(obj.args)})`
+    }
+
+    function stringifyInlineTag(obj) {
+        // console.log('stringifyInlineTag',obj)
+        return `inlineTag(${catchMeTemplate('`'+obj.name+'`')},${args(obj.args)},${stringifyA(obj.children)})`
     }
 
     let out = ''
@@ -61,7 +65,8 @@ export default function sqrmToJs(sqrm) {
         if (obj.type !== undefined) {
             if (obj.type == 'tag') {
                 delete obj.type
-                return `inlineTag(${stringifyO(obj)})`
+                // console.log('stringifyInlineTag',obj)
+                return stringifyInlineTag(obj)
             } else if (obj.type == 'include') {
                 delete obj.type
                 // console.log('stringify',obj)
@@ -146,9 +151,9 @@ export default function sqrmToJs(sqrm) {
 //    out += 'const root = response.root;\n'
 //    out += 'const j = response.libs.j;\n'
 
-    out += 'const maybeYaml = function(params) { let r = response.libs.maybeYaml(params); json = response.json; return r }\n'
-    out += 'const inlineTag = function(params) { let r = response.libs.inlineTag(params); json = response.json; return r }\n'
-    out += 'const addTask = function(params) { let r = response.libs.addTask(params); json = response.json; return r }\n'
+    out += 'const maybeYaml = response.libs.maybeYaml\n'
+    out += 'const inlineTag = response.libs.inlineTag\n'
+    out += 'const addTask = response.libs.addTask\n'
     out += 'const appendToHtml = response.libs.appendToHtml\n'
     out += 'const include = response.libs.include;\n'
 

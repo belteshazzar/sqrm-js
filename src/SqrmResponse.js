@@ -191,16 +191,16 @@ export default class SqrmResponse {
         // this.updateJson()
     }
 
-    inlineTag(obj) {
+    inlineTag(name,args,children) {
         this.jsonTag({
             indent: 0,
             isArrayElement: false,
-            name: obj.name,
+            name: name,
             colon: true,
-            args: (obj.args === undefined ? true : obj.args )
+            args: (args === undefined ? true : args )
         })
 
-        return h('a',{ href: `/tags/${obj.name}` }, obj.children )
+        return h('a',{ href: `/tags/${name}` }, children )
     }
 
     // j(name,value) {
