@@ -1,7 +1,7 @@
 
 import sqrmToLines from './sqrm-to-lines.js'
 import linesToSxast from './lines-to-sxast.js'
-import util from 'node:util'
+
 export default function sxastParser(src,options) {
 
     if (options.log_src) {
@@ -13,14 +13,14 @@ export default function sxastParser(src,options) {
     
     if (options.log_lines) {
         console.log('= lines =============')
-        console.log(lines);
+        console.log(JSON.stringify(lines,null,'\t'));
     }
     
     const sxasts = linesToSxast(lines)
     
     if (options.log_sxast) {
         console.log('= sxast =============')
-        console.log(util.inspect(sxasts,false,null,true));
+        console.log(JSON.stringify(sxasts,null,'\t'));
     }
     
     return sxasts
