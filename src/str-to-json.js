@@ -25,28 +25,43 @@ export default function strToJson(str,throwOnInvalid) {
             throw new Error('no expression statement node')
         }
         const es = program.body[0]
-        if (es.expression.type != 'SequenceExpression') {
-            console.log('strToJson',str,util.inspect(node,false,null,true))
-            throw new Error('no sequence expression')
-        }
-        const se = es.expression
 
-        se.expressions.forEach((n,i) => {
-            if (n.type == 'Literal') {
-                args.push({ type: 'literal', value: `${n.raw}` })
-            } else if (n.type == 'TemplateLiteral') {
-                args.push({ type: 'template-literal', value: str.substr(n.start,n.end - n.start) })
-            } else {
-                args.push({ type: 'non-literal', value: str.substr(n.start,n.end - n.start) })
+        switch (es.expression.type) {
+            case 'SequenceExpression': {
+
+                const se = es.expression
+
+                se.expressions.forEach((n,i) => {
+                    if (n.type == 'Literal') {
+                        args.push({ type: 'literal', value: `${n.raw}` })
+                    } else if (n.type == 'TemplateLiteral') {
+                        args.push({ type: 'template-literal', value: str.substr(n.start,n.end - n.start) })
+                    } else {
+                        args.push({ type: 'non-literal', value: str.substr(n.start,n.end - n.start) })
+                    }
+                })
+
+                break
             }
-        })
+            case 'Literal': {
+                const n = es.expression
+                // console.log('Literal',str,util.inspect(n,false,null,true))
+                args.push({type: 'literal', value: n.raw })
+                break
+            }
+            default: {
+                console.log('strToJson',str,util.inspect(node,false,null,true))
+                throw new Error(`expected sequence expression, found: ${es.expression.type}`)
+            }
+        }
 
+        console.log(args)
         return args
     } catch (e) {
         if (throwOnInvalid) {
             throw e
         } else {
-            return [ str ]
+            return [ { type: 'literal', value: `"${str}"` }]
         }
     }
 }

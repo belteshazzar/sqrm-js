@@ -6,7 +6,7 @@ export default function sqrmToJs(sqrm) {
     }
 
     function catchMe(str) {
-        return `(()=>{try{return ${str}}catch(e){return "${str}"}})()`
+        return `(()=>{try{return ${str}}catch(e){return "${str.replaceAll('"','\\"').replaceAll('\n','\\n')}"}})()`
     }
     function catchMeTemplate(str) {
         return `(()=>{try{return ${str}}catch(e){return "${str.substring(1,str.length-1).replaceAll('"','\\"').replaceAll('\n','\\n')}"}})()`
@@ -19,7 +19,8 @@ export default function sqrmToJs(sqrm) {
                 s += ','
             }
 
-            // console.log('args',arr)
+            console.log('args',arr)
+
             switch (arr[i].type) {
                 case 'literal': {
                     s += `${arr[i].value}`
