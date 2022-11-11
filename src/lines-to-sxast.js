@@ -51,7 +51,27 @@ export default function linesToSxast(lines) {
 
     while (peek()!=null) {
         let ln = next()
+
         const s = lineToSqrm(ln)
+        
+    // list item
+    // if (n==null || (n.type != 'unordered-list-item' && n.type != 'ordered-list-item')) {
+
+            // n = peek()
+            // while (n != null && n.indent == indent + 1 && n.type == 'text') {
+            //     n = next()
+            //     el.children = el.children.concat(t('\n')).concat(n.children)
+            //     n = peek()
+            // }
+
+
+    // text
+                // n = peek()
+            // while (n != null && n.type == 'text' && n.indent == indent) {
+            //     n = next()
+            //     p.children = p.children.concat(t('\n')).concat(n.children)
+            //     n = peek()
+            // }
 
         if (s.type == 'document-separator') {
             doc = []
@@ -71,7 +91,44 @@ export default function linesToSxast(lines) {
         }
     }
 
-    return docs
+    // TODO: put this logic inline rather than post
+    // at this point text lines and unordered/ordered-list-item lines 
+    // do NOT have children
+
+    const docsX = []
+    for (const doc of docs) {
+        const docX = []
+        docsX.push(docX)
+        for (let i=0 ; i<doc.length ; i++) {
+            const line = doc[i]
+            if (line.type == 'text') {
+                console.log('at line',line)
+
+                for (let j=i+1 ; j<doc.length ; j++) {
+                    const lineX = doc[j]
+                    console.log(' +? ',lineX)
+                    if (lineX.type == 'text' && lineX.indent == line.indent) {
+                        line.text += '\n' + lineX.text
+                        console.log('  append line',lineX)
+                        i++
+                    } else {
+                        break
+                    }
+                }
+
+                line.children = textToHast(line.text.trim())
+            }
+            docX.push(line)
+        }
+    }
+
+    console.log('--------------')
+    console.log(docs[0])
+    console.log('--------------')
+    console.log(docsX[0])
+    console.log('--------------')
+
+    return docsX
 }
 
 function textToCells(text) {
@@ -274,6 +331,6 @@ function lineToSqrm(ln) {
         return {type:'code-block',indent:ln.indent,language: m[1],line:ln.line}
     }
 
-    return {type:'text',indent:ln.indent,children:textToHast(ln.text.trim()),line:ln.line, text: ln.text}
+    return {type:'text',indent:ln.indent,line:ln.line, text: ln.text}
 
 }

@@ -1,22 +1,22 @@
 
-this is an image: #!image("my_image.png",200,200,"alt text") inline
+this is an image: #!image("first_image.png",1,200,"alt text") inline
 
 
-this is an image: #!image("my_image.png",200
+this is an image: #!image("second_image.png",2
 ,200,"alt text") inline
 
 a list:
-- my image #!image("my_image.png",200,200,"alt text")
-- also my image #!image("my_image.png",200,
+- my image #!image("third_image.png",3,200,"alt text")
+- also my image #!image("forth_image.png",4,
 200,"alt text") on this line
 
 in a table
 
 | my image in a table                                            |
-| text on #!image("my_image.png",200,200,"alt text") either side |
+| text on #!image("fifth_image.png",5,200,"alt text") either side |
 
 in code
 
-<% include('image', 'my_image.png', 200, 200, 'alt text') %>
+<% include('image', 'sixth_image.png', 6, 200, 'alt text') %>
 
 in yaml ???

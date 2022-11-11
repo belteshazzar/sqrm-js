@@ -1,6 +1,4 @@
 
-import util from 'node:util'
-
 export default function sqrmToJs(sqrm) {
 
     function escape(s) {
@@ -11,7 +9,7 @@ export default function sqrmToJs(sqrm) {
         return `(()=>{try{return ${str}}catch(e){return "${str}"}})()`
     }
     function catchMeTemplate(str) {
-        return `(()=>{try{return ${str}}catch(e){return "${str.substring(1,str.length-1).replaceAll('"','\\"')}"}})()`
+        return `(()=>{try{return ${str}}catch(e){return "${str.substring(1,str.length-1).replaceAll('"','\\"').replaceAll('\n','\\n')}"}})()`
     }
 
     function args(arr) {
@@ -20,6 +18,8 @@ export default function sqrmToJs(sqrm) {
             if (i>0) {
                 s += ','
             }
+
+            console.log('args',arr)
             switch (arr[i].type) {
                 case 'literal': {
                     s += `${arr[i].value}`
@@ -100,17 +100,11 @@ export default function sqrmToJs(sqrm) {
             } else if (value == null) {
                 s += `"${key}":null`
             } else if (Array.isArray(value)) {
-
-                // if (key == 'args') {
-                //     console.log(key,util.inspect(value,false,null,true))
-                //     s += `"${key}":${stringifyA(value)}`
-                // } else {
-                    s += `"${key}":${stringifyA(value)}`
-                // }
+                s += `"${key}":${stringifyA(value)}`
             } else if (typeof value === 'object') {
                 s += `"${key}":${stringifyO(value)}`
             } else if (typeof value === 'string') {
-                s += `"${key}":${catchMeTemplate('`'+value.replaceAll('`','\\`')+'`')}`
+                s += `"${key}":${catchMeTemplate('`'+escape(value)+'`')}`
             } else {
                 s += `"${key}":${JSON.stringify(value)}`
             }

@@ -189,6 +189,20 @@ describe("Non-file based tests", function() {
             '<div class="p">a\nb</div><div class="p">c</div>',
             {})
 
+        test("paragraphs 5",
+            '!!a\nb\n\nc\n',
+            '<div class="p"><b>a\nb</b></div><div class="p">c</div>',
+            {})
+
+        test("paragraphs 6",
+            'a!!\nb!!c\nd\n\nc\n',
+            '<div class="p">a<b>\nb</b>c\nd</div><div class="p">c</div>',
+            {})
+
+        test("paragraphs 7",
+            'a #tag(1,\nb) c\nd\n\nc\n',
+            '<div class="p">a<b>\nb</b>c\nd</div><div class="p">c</div>',
+            {tag: [1,'b']})
     });
 
     describe("formatting", function() {

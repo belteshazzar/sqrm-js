@@ -16,17 +16,17 @@ export default function strToJson(str,throwOnInvalid) {
         const node = acorn.parse(str, {ecmaVersion: 2020, locations: true})
 
         if (node.type != 'Program') {
-            console.log('strToJson',str,node)
+            console.log('strToJson',str,util.inspect(node,false,null,true))
             throw new Error('no program node')
         }
         const program = node
         if (program.body[0].type != 'ExpressionStatement') {
-            console.log('strToJson',str,node)
+            console.log('strToJson',str,util.inspect(node,false,null,true))
             throw new Error('no expression statement node')
         }
         const es = program.body[0]
         if (es.expression.type != 'SequenceExpression') {
-            console.log('strToJson',str,node)
+            console.log('strToJson',str,util.inspect(node,false,null,true))
             throw new Error('no sequence expression')
         }
         const se = es.expression
