@@ -7,6 +7,47 @@ export default function sqrmToJs(sqrm) {
         return s.replaceAll('\\','\\\\').replaceAll('\`','\\\`').replaceAll('\\\\$','\\$')
     }
 
+    function catchMe(str) {
+        return `(()=>{try{return ${str}}catch(e){return "${str}"}})()`
+    }
+    function catchMeTemplate(str) {
+        return `(()=>{try{return ${str}}catch(e){return "${str.substring(1,str.length-1).replaceAll('"','\\"')}"}})()`
+    }
+
+    function args(arr) {
+        let s = '['
+        for (let i=0 ; i<arr.length ; i++) {
+            if (i>0) {
+                s += ','
+            }
+            switch (arr[i].type) {
+                case 'literal': {
+                    s += `${arr[i].value}`
+                    break
+                }
+                case 'non-literal': {
+                    s += `${catchMe(arr[i].value)}`
+                    break
+                }
+                case 'template-literal': {
+                    s += `${catchMeTemplate(arr[i].value)}`
+                    break
+                }
+                default: {
+                    throw new Error(`unknown arg type ${arr[i].type}`)
+                }
+            }
+        }
+        s += ']'
+        return s
+    }
+
+    function stringifyInclude(obj) {
+
+        console.log('stringifyInclude',obj)
+        return `include(${catchMeTemplate('`'+obj.name+'`')},${args(obj.args)})`
+    }
+
     let out = ''
 
     function stringify(obj) {
@@ -23,7 +64,10 @@ export default function sqrmToJs(sqrm) {
                 return `inlineTag(${stringifyO(obj)})`
             } else if (obj.type == 'include') {
                 delete obj.type
-                return `include(${stringifyO(obj)})`
+                // console.log('stringify',obj)
+                return stringifyInclude(obj)
+                // console.log(` = ${r}`)
+                // return r
             }
         }
         // return stringifyO(obj)
@@ -57,16 +101,16 @@ export default function sqrmToJs(sqrm) {
                 s += `"${key}":null`
             } else if (Array.isArray(value)) {
 
-                if (key == 'args') {
-                    console.log(key,util.inspect(value,false,null,true))
+                // if (key == 'args') {
+                //     console.log(key,util.inspect(value,false,null,true))
+                //     s += `"${key}":${stringifyA(value)}`
+                // } else {
                     s += `"${key}":${stringifyA(value)}`
-                } else {
-                    s += `"${key}":${stringifyA(value)}`
-                }
+                // }
             } else if (typeof value === 'object') {
                 s += `"${key}":${stringifyO(value)}`
             } else if (typeof value === 'string') {
-                s += `"${key}":\`${escape(value)}\``
+                s += `"${key}":${catchMeTemplate('`'+value.replaceAll('`','\\`')+'`')}`
             } else {
                 s += `"${key}":${JSON.stringify(value)}`
             }
@@ -113,6 +157,7 @@ export default function sqrmToJs(sqrm) {
     out += 'const addTask = function(params) { let r = response.libs.addTask(params); json = response.json; return r }\n'
     out += 'const appendToHtml = response.libs.appendToHtml\n'
     out += 'const include = response.libs.include;\n'
+
 //    out += 'const append = response.libs.append;\n'
     out += '\n'
 

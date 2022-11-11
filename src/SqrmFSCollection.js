@@ -41,7 +41,7 @@ export default class SqrmFSCollection extends SqrmCollection {
                     let doc = new SqrmDocument(this,name,sxasts[0],options)
                     this.docs.set(name,doc)
                 } catch (e) {
-                    console.log(e)
+                    console.log('failed to create doc',e)
                 }
             } else {
                 for (let i=0 ; i<sxasts.length ; i++) {
@@ -51,7 +51,7 @@ export default class SqrmFSCollection extends SqrmCollection {
                         let doc = new SqrmDocument(this,`${name}-${i+1}`,sxast,options)
                         this.docs.set(name,doc)
                     } catch (e) {
-                        console.log(e)
+                        console.log('failed to create multi doc',e)
                     }
                 }
             }

@@ -224,7 +224,7 @@ export default function lineToSxast(str) {
                                     a = s.charAt(index++);
                                     break;
                                 } catch (e) {
-                                    // console.log('FAILED to parse:' + s.substring(index,k))
+                                    // find next end bracket and try again
                                 }
                             }
                         }
@@ -241,8 +241,6 @@ export default function lineToSxast(str) {
                         parent.children.push(t(str))
                         str = ''
                     }
-
-                    console.log('tag',tag,tagValue)
 
                     if (bang) {
                         parent.children.push({

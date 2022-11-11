@@ -3,9 +3,7 @@
 
 let handler = {
     has(target, property) {
-        // console.log('has',target.type,property)
         throw new Error('json.has not-implemented')
-        // return key in target;
     },
     get(target, property, receiver) {
         switch (target.type) {
@@ -40,10 +38,7 @@ let handler = {
         }
     },
     set(target, property, value, receiver) {
-        // console.log('set',target.type,property,value)
         throw new Error('set not-implemented')
-        // target[property] = value
-        // return true
     }
 }
 

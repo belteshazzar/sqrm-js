@@ -339,6 +339,34 @@ describe("Non-file based tests", function() {
                     alt: `${args[3]}`
                 })
             })
+
+        test('hash bang param testing',
+            'this is an image: #!image("my_image.png",200,400,"alt text",request.args,`-${i}-`,true,null, 5 * 3, Math.max(4,5)) inline',
+            '<div class="p">this is an image: <div class="image"><div class="p"><img src="my_image.png" width="200" height="400" alt="alt text"></div></div> inline</div>',
+            {},
+            function includeCallback(args) {
+                // console.log(args)
+                expect(args).to.not.be.null
+                expect(args.length).to.eql(10)
+                expect(args[0]).to.eql('my_image.png')
+                expect(args[1]).to.eql(200)
+                expect(args[2]).to.eql(400)
+                expect(args[3]).to.eql('alt text')
+                expect(args[4]).to.eql([])
+                expect(args[5]).to.eql('-${i}-')
+                expect(args[6]).to.eql(true)
+                expect(args[7]).to.eql(null)
+                expect(args[8]).to.eql(15)
+                expect(args[9]).to.eql(5)
+
+                return h('img',{
+                    src: `${args[0]}`,
+                    width: `${args[1]}`,
+                    height: `${args[2]}`,
+                    alt: `${args[3]}`
+                })
+            })
+
     })
 
     describe("template strings", function() {

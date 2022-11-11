@@ -52,8 +52,9 @@ export default class SqrmResponse {
     // }
 
 
-    include({name,args}) {
-//        console.log(`SqrmResponse.include(${name},${args})`)
+    include(name,args) {
+        console.log(arguments)
+       console.log(`SqrmResponse.include(${name},${args})`)
         let doc = this.docs.get(name)
         if (doc == null) {
             return { type: 'comment', value: `failed to include doc: ${name}( ${JSON.stringify(args)} )` }
@@ -64,8 +65,7 @@ export default class SqrmResponse {
         try {
             doc.execute(request,response)
         } catch (e) {
-            console.log(`error executing doc ${name}`)
-            console.log(e)
+            console.log(`error executing doc ${name}`,e)
         }
 
         let hast = sastToHast(response.root)
