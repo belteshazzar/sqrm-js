@@ -53,25 +53,6 @@ export default function linesToSxast(lines) {
         let ln = next()
 
         const s = lineToSqrm(ln)
-        
-    // list item
-    // if (n==null || (n.type != 'unordered-list-item' && n.type != 'ordered-list-item')) {
-
-            // n = peek()
-            // while (n != null && n.indent == indent + 1 && n.type == 'text') {
-            //     n = next()
-            //     el.children = el.children.concat(t('\n')).concat(n.children)
-            //     n = peek()
-            // }
-
-
-    // text
-                // n = peek()
-            // while (n != null && n.type == 'text' && n.indent == indent) {
-            //     n = next()
-            //     p.children = p.children.concat(t('\n')).concat(n.children)
-            //     n = peek()
-            // }
 
         if (s.type == 'document-separator') {
             doc = []
@@ -93,7 +74,7 @@ export default function linesToSxast(lines) {
 
     // TODO: put this logic inline rather than post
     // at this point text lines and unordered/ordered-list-item lines 
-    // do NOT have children
+    // have children = text
 
     const docsX = []
     for (const doc of docs) {
@@ -102,31 +83,40 @@ export default function linesToSxast(lines) {
         for (let i=0 ; i<doc.length ; i++) {
             const line = doc[i]
             if (line.type == 'text') {
-                console.log('at line',line)
-
+                let text = line.children
                 for (let j=i+1 ; j<doc.length ; j++) {
                     const lineX = doc[j]
-                    console.log(' +? ',lineX)
                     if (lineX.type == 'text' && lineX.indent == line.indent) {
-                        line.text += '\n' + lineX.text
-                        console.log('  append line',lineX)
+                        text += '\n' + lineX.children.trim()
                         i++
                     } else {
                         break
                     }
                 }
-
-                line.children = textToHast(line.text.trim())
+                line.children = textToHast(text)
+            } else if (line.type == 'unordered-list-item' || line.type == 'ordered-list-item') {
+                let text = line.children
+                for (let j=i+1 ; j<doc.length ; j++) {
+                    const lineX = doc[j]
+                    if (lineX.type == 'text' && lineX.indent == line.indent + 1) {
+                        text += '\n' + lineX.children.trim()
+                        i++
+                    } else {
+                        break
+                    }
+                }
+                line.children = textToHast(text)
             }
+
             docX.push(line)
         }
     }
 
-    console.log('--------------')
-    console.log(docs[0])
-    console.log('--------------')
-    console.log(docsX[0])
-    console.log('--------------')
+    // console.log('--------------')
+    // console.log(docs[0])
+    // console.log('--------------')
+    // console.log(docsX[0])
+    // console.log('--------------')
 
     return docsX
 }
@@ -247,9 +237,11 @@ function lineToSqrm(ln) {
             let t = m[3].match(RE_ListItemTask)
             if (t) {
                 let task = { line: ln.line, done: t[1]!='', text: t[2] }
-                return {type:'unordered-list-item',text: ln.text, indent:ln.indent,marker:m[1],children:textToHast(t[2]),line:ln.line, task: task}
+                // children = text and is converted to hast in post-process
+                return {type:'unordered-list-item',text: ln.text, indent:ln.indent,marker:m[1],children:t[2],line:ln.line, task: task}
             } else {
-                let uli = {type:'unordered-list-item',text: ln.text, indent:ln.indent,marker:m[1],children:textToHast(m[3]),line:ln.line}
+                // children = text and is converted to hast in post-process
+                let uli = {type:'unordered-list-item',text: ln.text, indent:ln.indent,marker:m[1],children:m[3],line:ln.line}
 
                 let yaml = ln.text.match(RE_ListItemTag)
                 if (yaml) {
@@ -273,9 +265,11 @@ function lineToSqrm(ln) {
             let t = m[3].match(RE_ListItemTask)
             if (t) {
                 let task = { line: ln.line, done: t[1]!='', text: t[2] }
-                return {type:'ordered-list-item',text: ln.text, indent:ln.indent,number:m[2],children:textToHast(t[2]),line:ln.line, task : task}
+                // children = text and is converted to hast in post-process
+                return {type:'ordered-list-item',text: ln.text, indent:ln.indent,number:m[2],children:t[2],line:ln.line, task : task}
             } else {
-                return {type:'ordered-list-item',text: ln.text, indent:ln.indent,number:m[2],children:textToHast(m[3]),line:ln.line}
+                // children = text and is converted to hast in post-process
+                return {type:'ordered-list-item',text: ln.text, indent:ln.indent,number:m[2],children:m[3],line:ln.line}
             }
         }
     }
@@ -331,6 +325,7 @@ function lineToSqrm(ln) {
         return {type:'code-block',indent:ln.indent,language: m[1],line:ln.line}
     }
 
-    return {type:'text',indent:ln.indent,line:ln.line, text: ln.text}
+    // children = text and is converted to hast in post-process
+    return {type:'text',indent:ln.indent,line:ln.line, children:ln.text.trim(),text: ln.text}
 
 }

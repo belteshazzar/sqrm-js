@@ -200,10 +200,19 @@ describe("Non-file based tests", function() {
             {})
 
         test("paragraphs 7",
-            'a #tag(1,\nb) c\nd\n\nc\n',
+            'a #tag(1,\n"b") c\nd\n\nc\n',
             '<div class="p">a<b>\nb</b>c\nd</div><div class="p">c</div>',
             {tag: [1,'b']})
     });
+
+    describe("lists", function() {
+
+        test("lists 1",
+            '- a b\n  c d\n- e f\n\n',
+            '<ul><li>a b\nc d</li><li>e f</li></ul>',
+            {})
+
+    })
 
     describe("formatting", function() {
 

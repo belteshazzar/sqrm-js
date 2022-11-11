@@ -104,7 +104,7 @@ export default function sqrmToJs(sqrm) {
             } else if (typeof value === 'object') {
                 s += `"${key}":${stringifyO(value)}`
             } else if (typeof value === 'string') {
-                s += `"${key}":${catchMeTemplate('`'+escape(value)+'`')}`
+                s += `"${key}":${'`'+escape(value)+'`'}`
             } else {
                 s += `"${key}":${JSON.stringify(value)}`
             }
