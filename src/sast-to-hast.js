@@ -303,12 +303,12 @@ export default function sastToHast(sqrm) {
                 form.children.push(checkbox)
                 el = checkbox
             }
-            n = peek()
-            while (n != null && n.indent == indent + 1 && n.type == 'text') {
-                n = next()
-                el.children = el.children.concat(t('\n')).concat(n.children)
-                n = peek()
-            }
+            // n = peek()
+            // while (n != null && n.indent == indent + 1 && n.type == 'text') {
+            //     n = next()
+            //     el.children = el.children.concat(t('\n')).concat(n.children)
+            //     n = peek()
+            // }
             return li
         }
 
@@ -323,12 +323,12 @@ export default function sastToHast(sqrm) {
         function paragraph() {
             let n = next()
             const p = h('div',{ class: 'p' }, n.children)
-            n = peek()
-            while (n != null && n.type == 'text' && n.indent == indent) {
-                n = next()
-                p.children = p.children.concat(t('\n')).concat(n.children)
-                n = peek()
-            }
+            // n = peek()
+            // while (n != null && n.type == 'text' && n.indent == indent) {
+            //     n = next()
+            //     p.children = p.children.concat(t('\n')).concat(n.children)
+            //     n = peek()
+            // }
             return p
         }
 
