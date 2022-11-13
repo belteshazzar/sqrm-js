@@ -2,7 +2,7 @@
 import {h} from 'hastscript'
 import {t,i} from './hastscript-tools.js'
 import linkifyStr from 'linkify-string';
-import strToJson from './str-to-json.js'
+import strToJs from './str-to-js.js'
 
 export default function lineToSxast(str) {
 
@@ -218,7 +218,7 @@ export default function lineToSxast(str) {
                             if (ch==')') {
                                 tagValueStr = s.substring(index,k)
                                 try {
-                                    tagValue = strToJson(tagValueStr,true)
+                                    tagValue = strToJs(tagValueStr,true)
                                     tagStr = s.substring(tagAt,k+1)
                                     index = k + 1
                                     a = s.charAt(index++);
@@ -230,11 +230,11 @@ export default function lineToSxast(str) {
                         }
 
                         if (tagValue == null) {
-                            tagValue = strToJson(tagValueStr,false)
+                            tagValue = strToJs(tagValueStr,false)
                         }
                     } else {
                         tagStr = s.substring(tagAt,index-1)
-                        tagValue = strToJson('true',false)
+                        tagValue = strToJs('true',false)
                     }
 
                     if (str != '') {

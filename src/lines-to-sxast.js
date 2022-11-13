@@ -1,7 +1,7 @@
 
 
 import lineToSxast from './line-to-sxast.js'
-import strToJson from './str-to-json.js'
+import strToJs from './str-to-js.js'
 
 const RE_DocumentSeparator = /^---$/
 
@@ -111,12 +111,6 @@ export default function linesToSxast(lines) {
             docX.push(line)
         }
     }
-
-    // console.log('--------------')
-    // console.log(docs[0])
-    // console.log('--------------')
-    // console.log(docsX[0])
-    // console.log('--------------')
 
     return docsX
 }
@@ -248,13 +242,13 @@ function lineToSqrm(ln) {
                     uli.yaml = { indent: ln.indent, isArrayElement: true }
                     if (yaml[4]) {
                         uli.yaml.name = yaml[1]
-                        uli.yaml.args = strToJson(yaml[4],false)
+                        uli.yaml.args = strToJs(yaml[4],false)
                         uli.yaml.colon = true
                     } else if (yaml[2]) {
                         uli.yaml.name = yaml[1]
                         uli.yaml.colon = true
                     } else {
-                        uli.yaml.args = strToJson(yaml[1],false)
+                        uli.yaml.args = strToJs(yaml[1],false)
                         uli.yaml.colon = false
                     }
                 }
@@ -310,7 +304,7 @@ function lineToSqrm(ln) {
     if (m) {
         let tag = {type:'yaml',indent:ln.indent, name:m[2], colon: true, isArrayElement: false, line:ln.line, children: textToHast(m[1]), text: ln.text}
         if (m[4]) {
-            tag.args = strToJson(m[4],false)
+            tag.args = strToJs(m[4],false)
         }
         return tag
     }

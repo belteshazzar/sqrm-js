@@ -19,11 +19,9 @@ export default function sqrmToJs(sqrm) {
                 s += ','
             }
 
-            console.log('args',arr)
-
             switch (arr[i].type) {
                 case 'literal': {
-                    s += `${arr[i].value}`
+                    s += `${catchMe(arr[i].value)}`
                     break
                 }
                 case 'non-literal': {
@@ -44,13 +42,17 @@ export default function sqrmToJs(sqrm) {
     }
 
     function stringifyInclude(obj) {
-        // console.log('stringifyInclude',obj)
         return `include(${catchMeTemplate('`'+obj.name+'`')},${args(obj.args)})`
     }
 
     function stringifyInlineTag(obj) {
-        // console.log('stringifyInlineTag',obj)
         return `inlineTag(${catchMeTemplate('`'+obj.name+'`')},${args(obj.args)},${stringifyA(obj.children)})`
+    }
+
+    function stringifyMaybeYaml(obj) {
+        obj.args = args(obj.args)
+        const r = `maybeYaml(${stringifyO(obj)})`
+        return r
     }
 
     let out = ''
@@ -66,17 +68,12 @@ export default function sqrmToJs(sqrm) {
         if (obj.type !== undefined) {
             if (obj.type == 'tag') {
                 delete obj.type
-                // console.log('stringifyInlineTag',obj)
                 return stringifyInlineTag(obj)
             } else if (obj.type == 'include') {
                 delete obj.type
-                // console.log('stringify',obj)
                 return stringifyInclude(obj)
-                // console.log(` = ${r}`)
-                // return r
             }
         }
-        // return stringifyO(obj)
 
         if (Array.isArray(obj)) {
             return stringifyA(obj)
@@ -95,6 +92,7 @@ export default function sqrmToJs(sqrm) {
         let s = '{'
         let first = true
         for (const [key, value] of Object.entries(obj)) {
+
             if (first) {
                 first = false
             } else {
@@ -109,7 +107,7 @@ export default function sqrmToJs(sqrm) {
                 s += `"${key}":${stringifyA(value)}`
             } else if (typeof value === 'object') {
                 s += `"${key}":${stringifyO(value)}`
-            } else if (typeof value === 'string') {
+            } else if (typeof value === 'string' && key == 'value') {
                 s += `"${key}":${'`'+escape(value)+'`'}`
             } else {
                 s += `"${key}":${JSON.stringify(value)}`
@@ -167,9 +165,9 @@ export default function sqrmToJs(sqrm) {
         if (ln.type == 'script') {
             out += ln.code + '\n'
         } else if (ln.type == 'yaml') {
-            out += `maybeYaml(${ stringify(ln) })\n`
+            out += stringifyMaybeYaml(ln) // `maybeYaml(${ stringify(ln) })\n`
         } else if (ln.type == 'unordered-list-item' && ln.yaml !== undefined) {
-            out += `maybeYaml(${ stringify(ln) })\n`
+            out += stringifyMaybeYaml(ln) // `maybeYaml(${ stringify(ln) })\n`
         } else {
             out += `appendToHtml(${ stringify(ln) })\n`
 

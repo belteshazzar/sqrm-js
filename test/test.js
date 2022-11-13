@@ -368,7 +368,7 @@ describe("Non-file based tests", function() {
             '<div class="p">this is an image: <div class="image"><div class="p"><img src="my_image.png" width="200" height="400" alt="alt text"></div></div> inline</div>',
             {},
             function includeCallback(args) {
-                // console.log(args)
+
                 expect(args).to.not.be.null
                 expect(args.length).to.eql(10)
                 expect(args[0]).to.eql('my_image.png')

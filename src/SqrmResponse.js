@@ -53,8 +53,6 @@ export default class SqrmResponse {
 
 
     include(name,args) {
-        console.log(arguments)
-       console.log(`SqrmResponse.include(${name},${args})`)
         let doc = this.docs.get(name)
         if (doc == null) {
             return { type: 'comment', value: `failed to include doc: ${name}( ${JSON.stringify(args)} )` }
@@ -117,7 +115,6 @@ export default class SqrmResponse {
     }
 
     maybeYaml(obj) {
-
         if (this.yamlNotAllowedIndent != -1 && obj.indent < this.yamlNotAllowedIndent) {
             this.yamlNotAllowedIndent = -1
         }
@@ -192,6 +189,7 @@ export default class SqrmResponse {
     }
 
     inlineTag(name,args,children) {
+console.log('inlineTag',arguments)
         this.jsonTag({
             indent: 0,
             isArrayElement: false,

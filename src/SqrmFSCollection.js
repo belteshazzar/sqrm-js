@@ -156,14 +156,14 @@ export default class SqrmFSCollection extends SqrmCollection {
     find(select,filter,skip,count) {
         console.log('find',arguments)
 
-        console.log(select.toString())
+        console.log('find',select.toString())
         try {
             let tree = acorn.parse(select.toString(), {ecmaVersion: 2020})
             let param = tree.body[0].expression.params[0].name;
             walk.simple(tree, {
                 MemberExpression(node) {
                     if (node.object.name == param) {     
-                        console.log(node.property.name);
+                        console.log('find',node.property.name);
                     }
                 }
               })
