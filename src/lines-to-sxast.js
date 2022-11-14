@@ -93,7 +93,9 @@ export default function linesToSxast(lines) {
                         break
                     }
                 }
+                line.type = 'paragraph'
                 line.children = textToHast(text)
+                line.text = text
             } else if (line.type == 'unordered-list-item' || line.type == 'ordered-list-item') {
                 let text = line.children
                 for (let j=i+1 ; j<doc.length ; j++) {
@@ -106,6 +108,7 @@ export default function linesToSxast(lines) {
                     }
                 }
                 line.children = textToHast(text)
+                line.text = text
             }
 
             docX.push(line)

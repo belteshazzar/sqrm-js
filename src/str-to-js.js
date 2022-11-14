@@ -26,6 +26,8 @@ export default function strToJs(str,throwOnInvalid) {
     }
 
     const args = parse()
-    const escapedArgs = args.replaceAll('`','\\`').replaceAll('${','\\${')
-    return '(()=>{try{return ['+args+']}catch(e){return [\`'+escapedArgs+'\`]}})()'
+    // Could be in ticks so that we can have \n's but we dont want template
+    // replacements so using double quotes (escape double quotes and new lines)
+    const escapedArgs = args.replaceAll('"','\\"').replaceAll('\n','\\n')
+    return '(()=>{try{return ['+args+']}catch(e){return ["'+escapedArgs+'"]}})()'
 }

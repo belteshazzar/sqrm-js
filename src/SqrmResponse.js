@@ -9,6 +9,7 @@ import SqrmCollection from './SqrmCollection.js'
 import responseToResult from './response-to-result.js';
 import sastToHast from './sast-to-hast.js';
 import JsonTree from './jast.js'
+import util from 'node:util'
 
 export default class SqrmResponse {
     constructor(docs,jsonTree) {
@@ -61,18 +62,21 @@ export default class SqrmResponse {
 
         let request = new SqrmRequest(args);
         let response = new SqrmResponse(this.docs,this.jsonTree);
+        console.log('include response.root',util.inspect(response.root,false,null,true))
         try {
             doc.execute(request,response)
         } catch (e) {
             console.log(`error executing doc ${name}`,e)
         }
-
+console.log('include response.root',util.inspect(response.root,false,null,true))
         let hast = sastToHast(response.root)
 
         return h('div',{class: name},hast.children)
     }
 
     appendToHtml(obj) {
+
+console.log('appendToHtml',obj)
         if (this.yamlNotAllowedIndent != -1 && obj.type != 'blank') {
             if (obj.indent < this.yamlNotAllowedIndent) {
                 this.yamlNotAllowedIndent = -1
@@ -90,7 +94,7 @@ export default class SqrmResponse {
         }
 
         let wasAppended = false
-        if (this.appendTextToNode != null && obj.type == 'text') {
+        if (this.appendTextToNode != null && obj.type == 'paragraph') {
             if (this.appendTextToNode.minIndent !== undefined) {
                 if (this.appendTextToNode.minIndent <= obj.indent) {
                     delete this.appendTextToNode.minIndent
@@ -126,7 +130,7 @@ export default class SqrmResponse {
 
         if (this.yamlNotAllowedIndent != -1) {
             this.appendTextToNode = null
-            if (obj.type == 'yaml') obj.type = 'text'
+            if (obj.type == 'yaml') obj.type = 'paragraph'
             this.root.push( obj )// { type: 'text', line: obj.line, text: obj.text, indent: obj.indent, children: obj.children }
         } else {
 
@@ -148,7 +152,7 @@ export default class SqrmResponse {
                 this.root.push( { type: 'blank', line: obj.line } )// h('a',{href:`/tags/${obj.name}`},obj.children)
             } else {
                 this.appendTextToNode = null
-                if (obj.type == 'yaml') obj.type = 'text'
+                if (obj.type == 'yaml') obj.type = 'paragraph'
                 this.root.push( obj )// { type: 'text', line: obj.line, text: obj.text, indent: obj.indent, children: obj.children }
             }
         }

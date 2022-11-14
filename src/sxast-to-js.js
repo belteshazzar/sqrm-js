@@ -83,8 +83,7 @@ export default function sqrmToJs(sqrm) {
         return `inlineTag(${stringifyArgsObj(obj)})`
     }
 
-    function stringifyYamlLine(obj) {
-
+    function stringifyYaml(obj) {
         let s = '{'
         let first = true
         for (const [key, value] of Object.entries(obj)) {
@@ -115,7 +114,42 @@ export default function sqrmToJs(sqrm) {
         return s
     }
 
+    function stringifyYamlLine(obj) {
+
+        let s = '{'
+        let first = true
+        for (const [key, value] of Object.entries(obj)) {
+
+            if (first) {
+                first = false
+            } else {
+                s += ','
+            }
+
+            if (key == 'yaml') {
+                s += `"${key}":${stringifyYaml(value)}`
+            } else if (key == 'value') {
+                s += `"${key}":${value}`
+            } else if (value === undefined) {
+                s += `"${key}":undefined`
+            } else if (value == null) {
+                s += `"${key}":null`
+            } else if (Array.isArray(value)) {
+                s += `"${key}":${stringifyA(value)}`
+            } else if (typeof value === 'object') {
+                s += `"${key}":${stringifyO(value)}`
+            } else if (typeof value === 'string') {
+                s += `"${key}":${'`'+escape(value)+'`'}`
+            } else {
+                s += `"${key}":${JSON.stringify(value)}`
+            }
+        }
+        s += '}'
+        return s
+    }
+
     function stringifyMaybeYaml(obj) {
+        console.log('stringifyMaybeYaml',obj)
         const r = `maybeYaml(${stringifyYamlLine(obj)})\n`
         return r
     }

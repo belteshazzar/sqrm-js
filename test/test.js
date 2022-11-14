@@ -19,7 +19,7 @@ class TestSqrmCollection {
   get(name) {
     return {
       execute : (req,res) => {
-        res.libs.appendToHtml({type: 'text', indent: 0, children: [this.includeCallback(req.args)] })
+        res.libs.appendToHtml({type: 'paragraph', indent: 0, children: [this.includeCallback(req.args)] })
       }
     }
   }

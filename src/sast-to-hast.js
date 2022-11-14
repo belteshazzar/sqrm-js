@@ -2,6 +2,7 @@
 import {h} from 'hastscript'
 import {visit} from 'unist-util-visit'
 import {t} from './hastscript-tools.js'
+import util from 'node:util'
 
 function tableOf(rows) {
     let head = []
@@ -188,6 +189,14 @@ export default function sastToHast(sqrm) {
     
         }
 
+        function spaces(i) {
+            let s = ''
+            for (let j=0 ; j<i ; j++) {
+                s += '  '
+            }
+            return s
+        }
+
         function blockOf(language,lines) {
             switch(language) {
                 case "info":
@@ -210,10 +219,16 @@ export default function sastToHast(sqrm) {
                         const code = h('code',{class: 'language-' + (language==""?'text':language)})
                         code.children.push(t('\n'))
                         for (let i=0 ; i<lines.length ; i++) {
-                            if (lines[i].type != 'blank') {
-                                code.children.push(t(lines[i].text.substring((indent+1)*2))) // TODO: hard coded
+                            if (lines[i].type == 'blank') {
+                                code.children.push(t('\n'))
+                            } else {
+                                const ss = lines[i].text.split('\n')
+                                for (let j=0 ; j<ss.length ; j++) {
+                                    code.children.push(t(spaces(lines[i].indent-indent-1)+ss[j]))
+                                    code.children.push(t('\n'))
+                                }
+                                // code.children.push(t(lines[i].text.substring((indent+1)*2))) // TODO: hard coded
                             }
-                            code.children.push(t('\n'))
                         }
                         return h('pre',{},[code])
             
@@ -406,13 +421,14 @@ export default function sastToHast(sqrm) {
                     return orderedList()
                 case "unordered-list-item":
                     return unorderedList()
-                case "text":
+                case "paragraph":
                     return paragraph()
                 case "table-row":
                     return table()
                 case "yaml":
                     return yaml()
                 default:
+                    console.log('unhandled',util.inspect(ln,false,null,true))
                     throw new Error('un-handled type: ' + ln.type)                
             }
     
