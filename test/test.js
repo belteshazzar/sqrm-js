@@ -308,6 +308,17 @@ describe("Non-file based tests", function() {
         
     });
 
+    describe("yaml", function() {
+
+        test('yaml str double qoute','v : "woot"','',{ v: "woot" })
+        test('yaml str single quote','v : \'woot\'','',{ v: "woot" })
+        test('yaml str tick','v : `woot`','',{ v: "woot" })
+
+        test('yaml number','v : 8','',{ v: 8 })
+        test('yaml array','v : [1,2,3]','',{ v: [1,2,3] })
+        test('yaml object','v : { a: 4, b: "bee", c: [1,2,3] }','',{ v: { a: 4, b: "bee", c: [1,2,3] } })
+    })
+
     describe("hash tags with parameters", function() {
     
         // tags with parameters

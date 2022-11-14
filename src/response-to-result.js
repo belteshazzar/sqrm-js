@@ -35,7 +35,7 @@ export default function responseToResult(response,options = {}) {
         console.log(jast);
     }
 
-    let json = toJson(jast.root)
+    let json = toJson(jast.root)    
     if (json==null) json = {}
 
     if (options.log_json) {

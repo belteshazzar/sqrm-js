@@ -8,7 +8,6 @@ import SqrmRequest from './SqrmRequest.js'
 import SqrmCollection from './SqrmCollection.js'
 import responseToResult from './response-to-result.js';
 import sastToHast from './sast-to-hast.js';
-import util from 'node:util'
 import JsonTree from './jast.js'
 
 export default class SqrmResponse {
@@ -52,13 +51,13 @@ export default class SqrmResponse {
     // }
 
 
-    include(name,args) {
+    include(name,value) {
         let doc = this.docs.get(name)
         if (doc == null) {
-            return { type: 'comment', value: `failed to include doc: ${name}( ${JSON.stringify(args)} )` }
+            return { type: 'comment', value: `failed to include doc: ${name}( ${JSON.stringify(value)} )` }
         }
 
-        let request = new SqrmRequest(args);
+        let request = new SqrmRequest(value);
         let response = new SqrmResponse(this.docs,this.jsonTree);
         try {
             doc.execute(request,response)
@@ -115,6 +114,7 @@ export default class SqrmResponse {
     }
 
     maybeYaml(obj) {
+
         if (this.yamlNotAllowedIndent != -1 && obj.indent < this.yamlNotAllowedIndent) {
             this.yamlNotAllowedIndent = -1
         }
@@ -132,10 +132,10 @@ export default class SqrmResponse {
 
             if (jsonNode != null) {
 
-                if (yaml.args && yaml.args.length==1) {
+                if (yaml.value && yaml.value.length==1 && typeof yaml.value[0] == "string") {
 
-                    if (yaml.args[0]=='|' || yaml.args[0]=='>') {
-                        this.appendTextToNode = { minIndent: yaml.indent+1, mode: yaml.args[0], jsonNode: jsonNode }
+                    if (yaml.value[0]=='|' || yaml.value[0]=='>') {
+                        this.appendTextToNode = { minIndent: yaml.indent+1, mode: yaml.value[0], jsonNode: jsonNode }
                     } else {
                         this.appendTextToNode = null
                     }
@@ -188,14 +188,14 @@ export default class SqrmResponse {
         // this.updateJson()
     }
 
-    inlineTag(name,args,children) {
-console.log('inlineTag',arguments)
+    inlineTag(name,value,children) {
+
         this.jsonTag({
             indent: 0,
             isArrayElement: false,
             name: name,
             colon: true,
-            args: (args === undefined ? true : args )
+            value: (value === undefined ? true : value )
         })
 
         return h('a',{ href: `/tags/${name}` }, children )
@@ -226,10 +226,10 @@ console.log('inlineTag',arguments)
     //     }
     // }
 
-    jsonTag({indent,isArrayElement,name,colon,args}) {
+    jsonTag({indent,isArrayElement,name,colon,value}) {
 
-        if (args != undefined && args.length == 1) {
-            args = args[0]
+        if (value != undefined && value.length == 1) {
+            value = value[0]
         }
 
         let parent = null
@@ -271,10 +271,10 @@ console.log('inlineTag',arguments)
             parent.childrenIndent = indent
             delete parent.minChildIndent
 
-            if (colon && args === undefined) {
+            if (colon && value === undefined) {
                 parent.children = [ { minChildIndent: indent, type: 'unknown', name: name } ]
             } else {
-                parent.children = [ { type: 'value', name: name, value: args } ]
+                parent.children = [ { type: 'value', name: name, value: value } ]
             }
 
             // this.updateJson()
@@ -289,16 +289,16 @@ console.log('inlineTag',arguments)
             delete parent.minChildIndent
 
             let jsonNode = null
-            if (colon && args === undefined) {
+            if (colon && value === undefined) {
                 jsonNode = { minChildIndent: indent+1, type:'unknown',name:name }
                 const arrayElement = { childrenIndent: indent+1, type: 'object', children: [jsonNode]}
                 parent.children = [arrayElement]
             } else if (colon) {
-                jsonNode = { childrenIndent: indent+1, type:'value', name:name, value:args}
+                jsonNode = { childrenIndent: indent+1, type:'value', name:name, value:value}
                 const arrayElement = { childrenIndent: indent+1, type: 'object', children: [jsonNode]}
                 parent.children = [arrayElement]
             } else if (!colon) {
-                jsonNode = { type: 'value', value: args }
+                jsonNode = { type: 'value', value: value }
                 parent.children = [ jsonNode ]
             }
 
@@ -308,10 +308,10 @@ console.log('inlineTag',arguments)
 
         if (parent.type == 'object' && !isArrayElement) {
  
-            if (colon && args === undefined) {
+            if (colon && value === undefined) {
                 parent.children.push({ minChildIndent: indent, type: 'unknown', name: name })
             } else {
-                parent.children.push({ type: 'value', name: name, value: args })
+                parent.children.push({ type: 'value', name: name, value: value })
             }
 
             // this.updateJson()
@@ -321,16 +321,16 @@ console.log('inlineTag',arguments)
         if (parent.type == 'array' && isArrayElement) {
 
             let jsonNode = null
-            if (colon && args === undefined) {
+            if (colon && value === undefined) {
                 jsonNode = { minChildIndent: indent+1, type:'unknown',name:name }
                 const arrayElement = { childrenIndent: indent+1, type: 'object', children: [jsonNode]}
                 parent.children.push(arrayElement)
             } else if (colon) {
-                jsonNode = { childrenIndent: indent+1, type:'value',name:name,value:args}
+                jsonNode = { childrenIndent: indent+1, type:'value',name:name,value:value}
                 const arrayElement = { childrenIndent: indent+1, type: 'object', children: [jsonNode]}
                 parent.children.push(arrayElement)
             } else if (!colon) {
-                jsonNode = { type: 'value', value: args }
+                jsonNode = { type: 'value', value: value }
                 parent.children.push(jsonNode)
             }
 

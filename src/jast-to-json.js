@@ -7,16 +7,20 @@ export default function toJson(jast) {
 
     if (jast.type == 'array') {
         let a = []
+
         for (let i=0 ; i<jast.children.length ; i++) {
             a.push(toJson(jast.children[i]))
         }
+
         return a
     }
     if (jast.type == 'object') {
         let o = {}
+
         for (let i=0 ; i<jast.children.length ; i++) {
             o[jast.children[i].name] = toJson(jast.children[i])
         }
+
         return o
     }
 
