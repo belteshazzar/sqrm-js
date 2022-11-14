@@ -26,6 +26,6 @@ export default function strToJs(str,throwOnInvalid) {
     }
 
     const args = parse()
-    const escapedArgs = args.replaceAll('"','\\"')
-    return '(()=>{try{return ['+args+']}catch(e){return [\"'+escapedArgs+'\"]}})()'
+    const escapedArgs = args.replaceAll('`','\\`').replaceAll('${','\\${')
+    return '(()=>{try{return ['+args+']}catch(e){return [\`'+escapedArgs+'\`]}})()'
 }

@@ -51,13 +51,15 @@ export default class SqrmResponse {
     // }
 
 
-    include(name,value) {
+    include({name,args}) {
+        console.log('include',arguments)
+
         let doc = this.docs.get(name)
         if (doc == null) {
             return { type: 'comment', value: `failed to include doc: ${name}( ${JSON.stringify(value)} )` }
         }
 
-        let request = new SqrmRequest(value);
+        let request = new SqrmRequest(args);
         let response = new SqrmResponse(this.docs,this.jsonTree);
         try {
             doc.execute(request,response)
@@ -188,14 +190,15 @@ export default class SqrmResponse {
         // this.updateJson()
     }
 
-    inlineTag(name,value,children) {
+    inlineTag({name,args,children}) {
+        console.log('inlineTag',arguments)
 
         this.jsonTag({
             indent: 0,
             isArrayElement: false,
             name: name,
             colon: true,
-            value: (value === undefined ? true : value )
+            value: (args === undefined ? true : args )
         })
 
         return h('a',{ href: `/tags/${name}` }, children )

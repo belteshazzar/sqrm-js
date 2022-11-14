@@ -41,12 +41,46 @@ export default function sqrmToJs(sqrm) {
         return s
     }
 
+    function stringifyArgsObj(obj) {
+
+        let s = '{'
+        let first = true
+        for (const [key, value] of Object.entries(obj)) {
+
+            if (first) {
+                first = false
+            } else {
+                s += ','
+            }
+
+            if (key == 'args') {
+                s += `"${key}":${value}`
+            } else if (value === undefined) {
+                s += `"${key}":undefined`
+            } else if (value == null) {
+                s += `"${key}":null`
+            } else if (Array.isArray(value)) {
+                s += `"${key}":${stringifyA(value)}`
+            } else if (typeof value === 'object') {
+                s += `"${key}":${stringifyO(value)}`
+            } else if (typeof value === 'string') {
+                s += `"${key}":${'`'+escape(value)+'`'}`
+            } else {
+                s += `"${key}":${JSON.stringify(value)}`
+            }
+        }
+        s += '}'
+        return s
+    }
+
     function stringifyInclude(obj) {
-        return `include(${catchMeTemplate('`'+obj.name+'`')},${args(obj.value)})`
+        console.log('stringifyInclude',obj)
+        return `include(${stringifyArgsObj(obj)})`
     }
 
     function stringifyInlineTag(obj) {
-        return `inlineTag(${catchMeTemplate('`'+obj.name+'`')},${args(obj.value)},${stringifyA(obj.children)})`
+        console.log('stingifyInlineTag',obj)
+        return `inlineTag(${stringifyArgsObj(obj)})`
     }
 
     function stringifyYamlLine(obj) {
@@ -82,7 +116,7 @@ export default function sqrmToJs(sqrm) {
     }
 
     function stringifyMaybeYaml(obj) {
-        const r = `maybeYaml(${stringifyYamlLine(obj)})`
+        const r = `maybeYaml(${stringifyYamlLine(obj)})\n`
         return r
     }
 
