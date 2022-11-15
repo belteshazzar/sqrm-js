@@ -70,11 +70,41 @@ describe("file system collection tests", function() {
             expect(info_box).to.not.be.null
             expect(info_box.html).to.not.be.null
             expect(info_box.json).to.not.be.null
-            expect(info_box.html).to.equal(`<map latitude="${london.json.coordinates.lat}" longitude="${london.json.coordinates.lon}"></map>`)
+            expect(info_box.html).to.equal(`<div class="p">The city of ${london.json.city} is in the country of ${london.json.country}.</div><div class="p"><div class="map"><map latitude="${london.json.coordinates.lat}" longitude="${london.json.coordinates.lon}"></map></div></div>`)
             expect(info_box.json).to.deep.equal({})
 
 
-            // expect(c.get('page-include-direct')).to.not.be.null
+            expect(c.get('page-find')).to.not.be.null
+            const page_find = c.call('page-find')
+            expect(page_find).to.not.be.null
+            expect(page_find.html).to.not.be.null
+            expect(page_find.json).to.not.be.null
+            expect(page_find.html).to.equal(``)
+            expect(page_find.json).to.deep.equal({})
+
+            expect(c.get('page-include-chained')).to.not.be.null
+            const page_include_chained = c.call('page-include-chained')
+            expect(page_include_chained).to.not.be.null
+            expect(page_include_chained.html).to.not.be.null
+            expect(page_include_chained.json).to.not.be.null
+            expect(page_include_chained.html).to.equal(``)
+            expect(page_include_chained.json).to.deep.equal({})
+
+            expect(c.get('page-include-direct')).to.not.be.null
+            const page_include_direct = c.call('page-include-direct')
+            expect(page_include_direct).to.not.be.null
+            expect(page_include_direct.html).to.not.be.null
+            expect(page_include_direct.json).to.not.be.null
+            expect(page_include_direct.html).to.equal(``)
+            expect(page_include_direct.json).to.deep.equal({})
+
+            expect(c.get('page-include-multiple-json')).to.not.be.null
+            const page_include_multiple_json = c.call('page-include-multiple-json')
+            expect(page_include_multiple_json).to.not.be.null
+            expect(page_include_multiple_json.html).to.not.be.null
+            expect(page_include_multiple_json.json).to.not.be.null
+            expect(page_include_multiple_json.html).to.equal(``)
+            expect(page_include_multiple_json.json).to.deep.equal({})
 
             // expect(c.get('page-include-chained')).to.not.be.null
 

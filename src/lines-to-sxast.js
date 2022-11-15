@@ -10,7 +10,7 @@ const RE_Tag = /^\s*(([a-zA-Z_$][-a-zA-Z\d_$]*)\s*:(\s+(.*?))?)\s*$/
 const RE_ListItemTag = /^\s*-\s+([a-zA-Z_$][-a-zA-Z\d_$]*)(\s*:(\s+(.*?))?)?\s*$/
 const RE_Script = /^(\s*)<%(.*?)\s*$/
 const RE_Footnote = /^\s*\[ *\^ *(\S+) *\] *: *(.+?) *$/
-const RE_CodeBlock = /^\s*```(([a-zA-Z]+)?)\s*$/
+const RE_CodeBlock = /^\s*``` *(([a-zA-Z]+)?)\s*$/
 const RE_Div = /^\s*(<\s*((\!doctype)|([a-z]+))((?:\s+[a-z]+(="[^"]*")?)*)\s*>?\s*)$/i
 const RE_Heading = /^\s*((=+)\s*(\S.*?)\s*[-=]*)\s*$/
 const RE_HR = /^\s*[-=_\*\s]+$/
@@ -41,10 +41,10 @@ export default function linesToSxast(lines) {
             let ln = next()
             let m = ln.text.match(RE_ScriptEnd)
             if (m) {
-                doc.push({ type: 'script', code: ln.text.replace(RE_ScriptEnd,'') })
+                doc.push({ type: 'script', line: ln.line, code: ln.text.replace(RE_ScriptEnd,''), text: ln.text})
                 break
             } else {
-                doc.push({ type: 'script', code: ln.text })
+                doc.push({ type: 'script', line: ln.line, code: ln.text,text: ln.text })
             }
         }
     }
@@ -74,7 +74,7 @@ export default function linesToSxast(lines) {
 
     // TODO: put this logic inline rather than post
     // at this point text lines and unordered/ordered-list-item lines 
-    // have children = text
+    // do not have have .children set
 
     const docsX = []
     for (const doc of docs) {
@@ -83,31 +83,38 @@ export default function linesToSxast(lines) {
         for (let i=0 ; i<doc.length ; i++) {
             const line = doc[i]
             if (line.type == 'text') {
-                let text = line.children
+                let text = line.text
+                let trimmed = line.text.trim()
                 for (let j=i+1 ; j<doc.length ; j++) {
                     const lineX = doc[j]
                     if (lineX.type == 'text' && lineX.indent == line.indent) {
-                        text += '\n' + lineX.children.trim()
+                        text += '\n' + lineX.text
+                        trimmed += '\n' + lineX.text.trim()
                         i++
                     } else {
                         break
                     }
                 }
                 line.type = 'paragraph'
-                line.children = textToHast(text)
+                line.children = textToHast(trimmed)
                 line.text = text
             } else if (line.type == 'unordered-list-item' || line.type == 'ordered-list-item') {
-                let text = line.children
+                let text = line.text
+                let trimmed = line.item.trim()
+
                 for (let j=i+1 ; j<doc.length ; j++) {
                     const lineX = doc[j]
                     if (lineX.type == 'text' && lineX.indent == line.indent + 1) {
-                        text += '\n' + lineX.children.trim()
+                        text += '\n' + lineX.text
+                        trimmed += '\n' + lineX.text.trim()
                         i++
                     } else {
                         break
                     }
                 }
-                line.children = textToHast(text)
+
+                line.item = trimmed
+                line.children = textToHast(trimmed)
                 line.text = text
             }
 
@@ -235,10 +242,10 @@ function lineToSqrm(ln) {
             if (t) {
                 let task = { line: ln.line, done: t[1]!='', text: t[2] }
                 // children = text and is converted to hast in post-process
-                return {type:'unordered-list-item',text: ln.text, indent:ln.indent,marker:m[1],children:t[2],line:ln.line, task: task}
+                return {type:'unordered-list-item',text: ln.text, indent:ln.indent,marker:m[1],item:t[2],line:ln.line, task: task}
             } else {
                 // children = text and is converted to hast in post-process
-                let uli = {type:'unordered-list-item',text: ln.text, indent:ln.indent,marker:m[1],children:m[3],line:ln.line}
+                let uli = {type:'unordered-list-item',text: ln.text, indent:ln.indent,marker:m[1],item:m[3],line:ln.line}
 
                 let yaml = ln.text.match(RE_ListItemTag)
                 if (yaml) {
@@ -263,10 +270,10 @@ function lineToSqrm(ln) {
             if (t) {
                 let task = { line: ln.line, done: t[1]!='', text: t[2] }
                 // children = text and is converted to hast in post-process
-                return {type:'ordered-list-item',text: ln.text, indent:ln.indent,number:m[2],children:t[2],line:ln.line, task : task}
+                return {type:'ordered-list-item',text: ln.text, indent:ln.indent,number:m[2],item:t[2],line:ln.line, task : task}
             } else {
                 // children = text and is converted to hast in post-process
-                return {type:'ordered-list-item',text: ln.text, indent:ln.indent,number:m[2],children:m[3],line:ln.line}
+                return {type:'ordered-list-item',text: ln.text, indent:ln.indent,number:m[2],item:m[3],line:ln.line}
             }
         }
     }

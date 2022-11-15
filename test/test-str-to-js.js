@@ -6,7 +6,8 @@ describe("unit-test", function() {
 
     function testParams(str,res,pre = '') {
         const code = strToJson(str)
-        const fn = new Function((pre != '' ? pre+';' : '')+'return (function() { return Array.from(arguments); }).apply(null,'+code+')' )
+        const src = (pre != '' ? pre+';' : '')+'return (function() { return Array.from(arguments); }).apply(null,'+code+')'
+        const fn = new Function(src)
         expect(fn).to.not.be.null
         const r = fn()
         expect(r).to.deep.equal(res)
@@ -14,11 +15,11 @@ describe("unit-test", function() {
     
     describe("str-to-js args", function() {
 
-        it('number', () => testParams('4.3',[4.3]))
+        it('str-to-js number', () => testParams('4.3',[4.3]))
 
         it('numbers', () => testParams(`4.2,1.2`,[4.2,1.2]))
 
-        it('string', () => testParams(`"fred"`,["fred"]))
+        it('str-to-js string', () => testParams(`"fred"`,["fred"]))
 
         it('strings', () => testParams(`"fred",'steve'`,["fred",'steve']))
 
@@ -70,6 +71,8 @@ describe("unit-test", function() {
         it('single quoted string', () => testProp("'fred'","fred"))
         it('func call', () => testProp('Math.PI',Math.PI))
         it('funcion', () => testProp('(()=> { return { pi: Math.PI } })()',{pi:Math.PI}))
+
+        it('number', () => testProp('b * "stev',"b * \"stev"))
 
     })
 })

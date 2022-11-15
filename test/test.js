@@ -205,6 +205,39 @@ describe("Non-file based tests", function() {
             {tag: [1,'b']})
     });
 
+    describe('indenting',function() {
+
+        test("pre indenting",
+            '<pre\n   | leading space',
+            '<pre>\n | leading space\n</pre>',
+            {})
+
+        test("pre code indenting",
+            '<pre\n  <code\n     | leading space',
+            '<pre>\n<code>\n | leading space\n</code>\n</pre>',
+            {})
+
+        test("script indenting",
+            '<script\n    2 leading spaces',
+            '<script>\n  2 leading spaces\n</script>',
+            {})
+
+        test("style indenting",
+            '<style\n    2 leading spaces',
+            '<style>\n  2 leading spaces\n</style>',
+            {})
+
+        test("alert indenting",
+            '```warning\n    2 leading spaces',
+            '<div class="alert-warning">  2 leading spaces</div>',
+            {})
+
+        test("code block indenting",
+            '```javascript\n    2 leading spaces',
+            '<pre><code class="language-javascript">\n  2 leading spaces\n</code></pre>',
+            {})
+    });
+
     describe("lists", function() {
 
         test("lists 1",
@@ -317,6 +350,11 @@ describe("Non-file based tests", function() {
         test('yaml number','v : 8','',{ v: 8 })
         test('yaml array','v : [1,2,3]','',{ v: [1,2,3] })
         test('yaml object','v : { a: 4, b: "bee", c: [1,2,3] }','',{ v: { a: 4, b: "bee", c: [1,2,3] } })
+
+
+        test('yaml number octal','v : 011','',{ v: 9 })
+
+        test('yaml invalid quoting','g : b * "stev','',{g: "b * \"stev"})
     })
 
     describe("hash tags with parameters", function() {
@@ -353,7 +391,6 @@ describe("Non-file based tests", function() {
             '<div class="p">this is an image: <div class="image"><div class="p"><img src="my_image.png,200,200,alt text" width="undefined" height="undefined" alt="undefined"></div></div>(my_image.png,200,200,alt text) inline</div>',
             {},
             function includeCallback(args) {
-                console.log('includeCallback',args)
                 return h('img',{
                     src: `${args[0]}`,
                     width: `${args[1]}`,
@@ -367,7 +404,6 @@ describe("Non-file based tests", function() {
             '<div class="p">this is an image: <div class="image"><div class="p"><img src="my_image.png" width="200" height="200" alt="alt text"></div></div> inline</div>',
             {},
             function includeCallback(args) {
-                console.log('includeCallback',args)
                 return h('img',{
                     src: `${args[0]}`,
                     width: `${args[1]}`,
@@ -382,7 +418,6 @@ describe("Non-file based tests", function() {
             '<div class="p">this is an image: <div class="image"><div class="p"><img src="my_image.png" width="200" height="400" alt="alt text"></div></div> inline</div>',
             {},
             function includeCallback(args) {
-                console.log('includeCallback',args)
 
                 expect(args).to.not.be.null
                 expect(args.length).to.eql(10)
@@ -411,7 +446,6 @@ describe("Non-file based tests", function() {
             '<div class="p">this is an image: <div class="image"><div class="p"><img src="my_image.png" width="200" height="400" alt="alt text"></div></div> inline</div>',
             {i:3},
             function includeCallback(args) {
-                console.log('includeCallback',args)
 
                 expect(args).to.not.be.null
                 expect(args.length).to.eql(10)

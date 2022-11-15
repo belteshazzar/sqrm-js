@@ -53,22 +53,22 @@ export default class SqrmResponse {
 
 
     include({name,args}) {
-        console.log('include',arguments)
+        // console.log('include',arguments)
 
-        let doc = this.docs.get(name)
+        let doc = this.docs.find(name)
         if (doc == null) {
             return { type: 'comment', value: `failed to include doc: ${name}( ${JSON.stringify(value)} )` }
         }
 
         let request = new SqrmRequest(args);
         let response = new SqrmResponse(this.docs,this.jsonTree);
-        console.log('include response.root',util.inspect(response.root,false,null,true))
+        // console.log('include response.root',util.inspect(response.root,false,null,true))
         try {
             doc.execute(request,response)
         } catch (e) {
             console.log(`error executing doc ${name}`,e)
         }
-console.log('include response.root',util.inspect(response.root,false,null,true))
+// console.log('include response.root',util.inspect(response.root,false,null,true))
         let hast = sastToHast(response.root)
 
         return h('div',{class: name},hast.children)
@@ -76,7 +76,7 @@ console.log('include response.root',util.inspect(response.root,false,null,true))
 
     appendToHtml(obj) {
 
-console.log('appendToHtml',obj)
+// console.log('appendToHtml',obj)
         if (this.yamlNotAllowedIndent != -1 && obj.type != 'blank') {
             if (obj.indent < this.yamlNotAllowedIndent) {
                 this.yamlNotAllowedIndent = -1
@@ -99,16 +99,31 @@ console.log('appendToHtml',obj)
                 if (this.appendTextToNode.minIndent <= obj.indent) {
                     delete this.appendTextToNode.minIndent
                     this.appendTextToNode.indent = obj.indent
-                    this.appendTextToNode.jsonNode.value = obj.text.trim()
+                    const ls = obj.text.split('\n')
+                    for (let i=0 ; i<ls.length ; i++) {
+                        if (this.appendTextToNode.jsonNode.value != '') {
+                            if (this.appendTextToNode.mode == '|') {
+                                this.appendTextToNode.jsonNode.value += '\n'
+                            } else {
+                                this.appendTextToNode.jsonNode.value += ' '
+                            }
+                        }
+                        this.appendTextToNode.jsonNode.value += ls[i].trim() // obj.text.trim()
+                    }
                     wasAppended = true
                 }
             } else if (this.appendTextToNode.indent == obj.indent) {
-                if (this.appendTextToNode.mode == '|') {
-                    this.appendTextToNode.jsonNode.value += '\n'
-                } else {
-                    this.appendTextToNode.jsonNode.value += ' '
+                const ls = obj.text.split('\n')
+                for (let i=0 ; i<ls.length ; i++) {
+                    if (this.appendTextToNode.jsonNode.value != '') {
+                        if (this.appendTextToNode.mode == '|') {
+                            this.appendTextToNode.jsonNode.value += '\n'
+                        } else {
+                            this.appendTextToNode.jsonNode.value += ' '
+                        }
+                    }
+                    this.appendTextToNode.jsonNode.value += ls[i].trim() // obj.text.trim()
                 }
-                this.appendTextToNode.jsonNode.value += obj.text.trim()
                 wasAppended = true
             }
         }
@@ -126,6 +141,7 @@ console.log('appendToHtml',obj)
         }
 
         const yaml = ( obj.type == 'yaml' ? obj : obj.yaml )
+
         const line = obj
 
         if (this.yamlNotAllowedIndent != -1) {
@@ -137,10 +153,11 @@ console.log('appendToHtml',obj)
             let jsonNode = this.jsonTag(yaml)
 
             if (jsonNode != null) {
-
                 if (yaml.value && yaml.value.length==1 && typeof yaml.value[0] == "string") {
 
                     if (yaml.value[0]=='|' || yaml.value[0]=='>') {
+                        // remove the | or > from the value of this node
+                        jsonNode.value = ''
                         this.appendTextToNode = { minIndent: yaml.indent+1, mode: yaml.value[0], jsonNode: jsonNode }
                     } else {
                         this.appendTextToNode = null
@@ -195,7 +212,7 @@ console.log('appendToHtml',obj)
     }
 
     inlineTag({name,args,children}) {
-        console.log('inlineTag',arguments)
+        // console.log('inlineTag',arguments)
 
         this.jsonTag({
             indent: 0,

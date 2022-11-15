@@ -9,7 +9,7 @@ export default class SqrmDocument {
         this.id = id
         this.options = options;
 
-        let js = sxastToJs(sxast)
+        this.js = sxastToJs(sxast)
     
         if (options.log_code) {
             console.log('= js =============')
@@ -18,8 +18,10 @@ export default class SqrmDocument {
 
         this.fn = null
         try {
-            this.fn = new Function(js);
+            this.fn = new Function(this.js);
         } catch (e) {
+            console.log(`failed to create doc ${id}`)
+            console.log(this.js.split('\n')[37])
             throw e
         }
     }

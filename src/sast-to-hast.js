@@ -2,7 +2,7 @@
 import {h} from 'hastscript'
 import {visit} from 'unist-util-visit'
 import {t} from './hastscript-tools.js'
-import util from 'node:util'
+import lineToSxast from './line-to-sxast.js'
 
 function tableOf(rows) {
     let head = []
@@ -145,7 +145,7 @@ export default function sastToHast(sqrm) {
                     lines.push(t('\n'))
                 } else if (peek().indent > indent) {
                     let n = next()
-                    lines.push(t(n.text))
+                    lines.push(t(n.text.substring((indent+1)*2))) // TODO: hard coded indenting
                     lines.push(t('\n'))
                 } else {
                     break;
@@ -156,15 +156,16 @@ export default function sastToHast(sqrm) {
     
         }
 
-        function pre(indent) {
+        function pre(preIndent) {
             const lines = [t('\n')];
     
             while (peek()!=null) {
                 if (peek().type == 'blank') {
                     next()
                     lines.push(t('\n'))
-                } else if (peek().indent > indent) {
+                } else if (peek().indent > preIndent) {
                     let n = next()
+
                     if (n.type == 'div') {
 
                         let props = {}
@@ -177,8 +178,13 @@ export default function sastToHast(sqrm) {
                         lines.push(div)
                         lines.push(t('\n'))
                     } else {
-                        lines.push(t(n.text))
-                        lines.push(t('\n'))
+                        // lines.push(t(n.text))
+                        // lines.push(t('\n'))
+                        const ss = n.text.split('\n')
+                        for (let j=0 ; j<ss.length ; j++) {
+                            lines.push(t(ss[j].substring((preIndent+1)*2))) // TODO: hard coded indenting
+                            lines.push(t('\n'))
+                        }
                     }
                 } else {
                     break;
@@ -189,14 +195,6 @@ export default function sastToHast(sqrm) {
     
         }
 
-        function spaces(i) {
-            let s = ''
-            for (let j=0 ; j<i ; j++) {
-                s += '  '
-            }
-            return s
-        }
-
         function blockOf(language,lines) {
             switch(language) {
                 case "info":
@@ -204,32 +202,47 @@ export default function sastToHast(sqrm) {
                 case "note":
                 case "warning":
                     {
-                        const div = h('div',{class: 'alert-' + language})
+                        const div = h('div',{class: 'alert-' + language},[])
+                        let text = ""
                         for (let i=0 ; i<lines.length ; i++) {
-                            if (lines[i].type != 'blank') {
-                                if (div.children.length > 0) div.children.push(t('\n'))
-                                div.children.push(t(lines[i].text.substring((indent+1)*2))) // TODO: hard coded
+                            // if (lines[i].type != 'blank') {
+                            //     if (div.children.length > 0) div.children.push(t('\n'))
+                            //     div.children.push(t(lines[i].text.substring((indent+1)*2)))
+                            // }
+                            if (lines[i].type == 'blank') {
+                                if (text!="") {
+                                    div.children.push(...lineToSxast(text))
+                                    text = ""
+                                }
+                            } else {
+                                const ss = lines[i].text.split('\n')
+                                for (let j=0 ; j<ss.length ; j++) {
+                                    if (text != "") text += '\n'
+                                    text += ss[j].substring((indent+1)*2) // TODO: hard coded indenting
+                                }
                             }
                         }
-                        return div
-            
+                        if (text!="") {
+                            div.children.push(...lineToSxast(text))
+                        }
+
+                        return div            
                     }
                 default:
                     {
                         const code = h('code',{class: 'language-' + (language==""?'text':language)})
-                        code.children.push(t('\n'))
+                        let text = '\n'
                         for (let i=0 ; i<lines.length ; i++) {
                             if (lines[i].type == 'blank') {
-                                code.children.push(t('\n'))
+                                text += '\n'
                             } else {
                                 const ss = lines[i].text.split('\n')
                                 for (let j=0 ; j<ss.length ; j++) {
-                                    code.children.push(t(spaces(lines[i].indent-indent-1)+ss[j]))
-                                    code.children.push(t('\n'))
+                                    text += ss[j].substring((indent+1)*2) + '\n' // TODO: hard coded indenting
                                 }
-                                // code.children.push(t(lines[i].text.substring((indent+1)*2))) // TODO: hard coded
                             }
                         }
+                        code.children = [t(text)]
                         return h('pre',{},[code])
             
                     }
@@ -428,7 +441,6 @@ export default function sastToHast(sqrm) {
                 case "yaml":
                     return yaml()
                 default:
-                    console.log('unhandled',util.inspect(ln,false,null,true))
                     throw new Error('un-handled type: ' + ln.type)                
             }
     

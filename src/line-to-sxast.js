@@ -228,8 +228,12 @@ export default function lineToSxast(str) {
                                 }
                             }
                         }
-
+                        
                         if (tagValue == null) {
+                            // if ')' was never found tagValueStr == null
+                            if (tagValueStr == null) {
+                                tagValueStr = s.substring(index)
+                            }
                             tagValue = strToJs(tagValueStr,false)
                         }
                     } else {

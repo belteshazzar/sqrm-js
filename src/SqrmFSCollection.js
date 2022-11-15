@@ -59,24 +59,23 @@ export default class SqrmFSCollection extends SqrmCollection {
 
         // console.log(Array.from(this.docs.keys()))
 
-        this.docs.forEach((doc) => {
+        this.docs.forEach((doc,name) => {
 
-            // console.log("|")
-            // console.log('------ ' + doc.id + ' ---------------------------------')
-            // console.log("|")
+            console.log("|")
+            console.log('------ ' + name + ' ---------------------------------')
+            console.log("|")
             let request = new SqrmRequest();
             let response = new SqrmResponse(this);
             try {
                 doc.execute(request,response);
-                // console
-                // doc.json = response.json
-                // doc.json._id = doc.id;
-                // doc.json._rev = doc.rev;
+                const res = responseToResult(response,this.options)
+                console.log(res)
             } catch (e) {
-                console.log(`------ failed to execute: ${doc.id} --------`)
+                console.log(`------ failed to execute: ${name} --------`)
                 // console.log(doc.fn.toString());
                 // console.log('---------------------------------------')
-                console.log(e);
+                console.log(e.lineNum,e.lineStr)
+                console.log('e',e);
                 console.log('---------------------------------------')
             }
 
@@ -123,7 +122,7 @@ export default class SqrmFSCollection extends SqrmCollection {
     call(name,args) {
         let request = new SqrmRequest(args);
         let response = new SqrmResponse(this);
-        let doc = this.get(name)
+        let doc = this.find(name)
         if (doc == null) {
             console.log(`-- failed to call ${name}(${args}) : not found --`)
             return
@@ -144,43 +143,44 @@ export default class SqrmFSCollection extends SqrmCollection {
 
     }
 
-    get(name) {
-        // console.log('get',name,this.docs.get(name))
-        if (!this.docs.has(name)) {
-            // response.html.out += `<!-- failed to find document: ${name} -->`
-            return null;
-        }
-        return this.docs.get(name)
-    }
+    // get(name) {
+    //     // console.log('get',name,this.docs.get(name))
+    //     if (!this.docs.has(name)) {
+    //         // response.html.out += `<!-- failed to find document: ${name} -->`
+    //         return null;
+    //     }
+    //     return this.docs.get(name)
+    // }
 
     find(select,filter,skip,count) {
         console.log('find',arguments)
 
-        console.log('find',select.toString())
-        try {
-            let tree = acorn.parse(select.toString(), {ecmaVersion: 2020})
-            let param = tree.body[0].expression.params[0].name;
-            walk.simple(tree, {
-                MemberExpression(node) {
-                    if (node.object.name == param) {     
-                        console.log('find',node.property.name);
-                    }
-                }
-              })
+        // console.log('find',select.toString())
+        // try {
+        //     let tree = acorn.parse(select.toString(), {ecmaVersion: 2020})
+        //     let param = tree.body[0].expression.params[0].name;
+        //     walk.simple(tree, {
+        //         MemberExpression(node) {
+        //             if (node.object.name == param) {     
+        //                 console.log('find',node.property.name);
+        //             }
+        //         }
+        //       })
 
-        } catch (e) {
-            console.log('acorn parse error',e)
-        }
+        // } catch (e) {
+        //     console.log('acorn parse error',e)
+        // }
 
 
         let res = [];
 
         if (typeof select == "string") {
-            res.push(this.docs[select])
+            return this.docs.get(select)
         } else if (typeof select == "function") {
             let it = this.docs.values();
             let el = it.next();
             while (!el.done) {
+//                console.log(el.value)
                 if (el.value.json !== undefined
                         && select(el.value.json)) {
                     res.push(el.value)

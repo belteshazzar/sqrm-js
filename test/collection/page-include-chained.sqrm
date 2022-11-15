@@ -1,5 +1,5 @@
 
-This is page2.
+This is page-include-chained.
 <%
 
     let cities = docs.find((doc) => doc.city !== undefined)

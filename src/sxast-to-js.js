@@ -5,41 +5,44 @@ export default function sqrmToJs(sqrm) {
         return s.replaceAll('\\','\\\\').replaceAll('\`','\\\`').replaceAll('\\\\$','\\$')
     }
 
-    function catchMe(str) {
-        return `(()=>{try{return ${str}}catch(e){return "${str.replaceAll('"','\\"').replaceAll('\n','\\n')}"}})()`
-    }
-    function catchMeTemplate(str) {
-        return `(()=>{try{return ${str}}catch(e){return "${str.substring(1,str.length-1).replaceAll('"','\\"').replaceAll('\n','\\n')}"}})()`
-    }
+    // function catchMe(str) {
+    //     console.log('catchMe',str)
+    //     return `(()=>{try{return ${str}}catch(e){return "${str.replaceAll('"','\\"').replaceAll('\n','\\n')}"}})()`
+    // }
 
-    function args(arr) {
-        let s = '['
-        for (let i=0 ; i<arr.length ; i++) {
-            if (i>0) {
-                s += ','
-            }
+    // function catchMeTemplate(str) {
+    //     console.log('catchMeTemplate',str)
+    //     return `(()=>{try{return ${str}}catch(e){return "${str.substring(1,str.length-1).replaceAll('"','\\"').replaceAll('\n','\\n')}"}})()`
+    // }
 
-            switch (arr[i].type) {
-                case 'literal': {
-                    s += `${catchMe(arr[i].value)}`
-                    break
-                }
-                case 'non-literal': {
-                    s += `${catchMe(arr[i].value)}`
-                    break
-                }
-                case 'template-literal': {
-                    s += `${catchMeTemplate(arr[i].value)}`
-                    break
-                }
-                default: {
-                    throw new Error(`unknown arg type ${arr[i].type}`)
-                }
-            }
-        }
-        s += ']'
-        return s
-    }
+    // function args(arr) {
+    //     let s = '['
+    //     for (let i=0 ; i<arr.length ; i++) {
+    //         if (i>0) {
+    //             s += ','
+    //         }
+
+    //         switch (arr[i].type) {
+    //             case 'literal': {
+    //                 s += `${catchMe(arr[i].value)}`
+    //                 break
+    //             }
+    //             case 'non-literal': {
+    //                 s += `${catchMe(arr[i].value)}`
+    //                 break
+    //             }
+    //             case 'template-literal': {
+    //                 s += `${catchMeTemplate(arr[i].value)}`
+    //                 break
+    //             }
+    //             default: {
+    //                 throw new Error(`unknown arg type ${arr[i].type}`)
+    //             }
+    //         }
+    //     }
+    //     s += ']'
+    //     return s
+    // }
 
     function stringifyArgsObj(obj) {
 
@@ -74,12 +77,10 @@ export default function sqrmToJs(sqrm) {
     }
 
     function stringifyInclude(obj) {
-        console.log('stringifyInclude',obj)
         return `include(${stringifyArgsObj(obj)})`
     }
 
     function stringifyInlineTag(obj) {
-        console.log('stingifyInlineTag',obj)
         return `inlineTag(${stringifyArgsObj(obj)})`
     }
 
@@ -149,9 +150,7 @@ export default function sqrmToJs(sqrm) {
     }
 
     function stringifyMaybeYaml(obj) {
-        console.log('stringifyMaybeYaml',obj)
-        const r = `maybeYaml(${stringifyYamlLine(obj)})\n`
-        return r
+        return `maybeYaml(${stringifyYamlLine(obj)})\n`
     }
 
     let out = ''
@@ -230,7 +229,14 @@ export default function sqrmToJs(sqrm) {
     
     }
 
-    
+    out += 'let ln = 0\n'
+    out += 'const lines = {}\n'
+    for (let i=0 ; i<sqrm.length ; i++) {
+        let ln = sqrm[i]
+        if (ln.text !== undefined) {
+            out += `lines[${ln.line}] = "${ln.text.replace(/\\([\s\S])|(")/g,"\\$1$2")}"\n`
+        }
+    }
     out += 'try {\n'
     out += '\n'
     out += 'const request = arguments[0];\n'
@@ -245,7 +251,7 @@ export default function sqrmToJs(sqrm) {
     out += 'const selectAll = response.libs.selectAll;\n'
     out += 'const processHast = response.libs.processHast;\n'
 
-    out += 'let json = response.json;\n'
+    // out += 'let json = response.json;\n'
 //    out += 'const root = response.root;\n'
 //    out += 'const j = response.libs.j;\n'
 
@@ -256,11 +262,11 @@ export default function sqrmToJs(sqrm) {
     out += 'const include = response.libs.include;\n'
 
 //    out += 'const append = response.libs.append;\n'
-    out += '\n'
 
     for (let i=0 ; i<sqrm.length ; i++) {
         let ln = sqrm[i]
-//        out += '// ln:' + ln.line + '\n'
+        // console.log(ln.line ? ln.line : ln)
+        out += 'ln=' + ln.line + ';'
         if (ln.type == 'script') {
             out += ln.code + '\n'
         } else if (ln.type == 'yaml') {
@@ -277,7 +283,11 @@ export default function sqrmToJs(sqrm) {
     }
 
     out += '\n} catch (e) {\n'
-    out += '  console.log(e.stack);\n'
+    out += '  console.log("======= exception in sqrm code ==============")\n'
+    out += '  console.log(`on line: ${ln}`);\n'
+    out += '  console.log(`on line: ${lines[ln]}`);\n'
+    out += 'e.lineNum = ln\n'
+    out += 'e.lineStr = lines[ln]\n'
     out += '  throw e;\n'
     out += '}\n'      
     

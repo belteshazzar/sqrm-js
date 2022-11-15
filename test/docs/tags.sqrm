@@ -1,20 +1,20 @@
 
 
 <% 
-  appendToHtml({type:'text',indent: 0, children: [t('fr\'"`ed%>')] })
-  appendToHtml({type:'text',indent: 0, children: [t("fr\"'`ed%>")] })
-  appendToHtml({type:'text',indent: 0, children: [t(`fr\`'"ed%>`)] })
-  appendToHtml({type:'text',indent: 0, children: [t('this is a list')] })
+  appendToHtml({type:'paragraph',indent: 0, children: [t('fr\'"`ed%>')] })
+  appendToHtml({type:'paragraph',indent: 0, children: [t("fr\"'`ed%>")] })
+  appendToHtml({type:'paragraph',indent: 0, children: [t(`fr\`'"ed%>`)] })
+  appendToHtml({type:'paragraph',indent: 0, children: [t('this is a list')] })
 
   const ul = h('ul')
   for (let i=1 ; i<=10; i++) {
       ul.children.push(h('li',{},[t(i + ' apples')]))
   }
-  appendToHtml({type:'text',indent: 0, children: ul })
+  appendToHtml({type:'paragraph',indent: 0, children: ul })
 
 %>
 
-    <% appendToHtml({type:'text',indent: 0, children: [t('fred')] }) %>
+    <% appendToHtml({type:'paragraph',indent: 0, children: [t('fred')] }) %>
 
 #value( 42 )
 

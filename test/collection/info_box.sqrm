@@ -3,7 +3,7 @@
 <%
 console.log('--- info box -----');
 console.log('info box request',request)
-console.log('json',json)
+
 %>
 
 The city of ${request.args[0].city} is in the country of ${request.args[0].country}.

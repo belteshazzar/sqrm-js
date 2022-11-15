@@ -1,5 +1,7 @@
 
-This is page2.
+id: page-include-multiple-json
+
+This is ${response.json.id}
 <%
 
     let cities = docs.find((doc) => doc.city !== undefined)
