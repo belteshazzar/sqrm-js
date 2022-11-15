@@ -1,48 +1,10 @@
+import qouted from './quoted-string.js'
 
 export default function sqrmToJs(sqrm) {
 
     function escape(s) {
         return s.replaceAll('\\','\\\\').replaceAll('\`','\\\`').replaceAll('\\\\$','\\$')
     }
-
-    // function catchMe(str) {
-    //     console.log('catchMe',str)
-    //     return `(()=>{try{return ${str}}catch(e){return "${str.replaceAll('"','\\"').replaceAll('\n','\\n')}"}})()`
-    // }
-
-    // function catchMeTemplate(str) {
-    //     console.log('catchMeTemplate',str)
-    //     return `(()=>{try{return ${str}}catch(e){return "${str.substring(1,str.length-1).replaceAll('"','\\"').replaceAll('\n','\\n')}"}})()`
-    // }
-
-    // function args(arr) {
-    //     let s = '['
-    //     for (let i=0 ; i<arr.length ; i++) {
-    //         if (i>0) {
-    //             s += ','
-    //         }
-
-    //         switch (arr[i].type) {
-    //             case 'literal': {
-    //                 s += `${catchMe(arr[i].value)}`
-    //                 break
-    //             }
-    //             case 'non-literal': {
-    //                 s += `${catchMe(arr[i].value)}`
-    //                 break
-    //             }
-    //             case 'template-literal': {
-    //                 s += `${catchMeTemplate(arr[i].value)}`
-    //                 break
-    //             }
-    //             default: {
-    //                 throw new Error(`unknown arg type ${arr[i].type}`)
-    //             }
-    //         }
-    //     }
-    //     s += ']'
-    //     return s
-    // }
 
     function stringifyArgsObj(obj) {
 
@@ -127,7 +89,9 @@ export default function sqrmToJs(sqrm) {
                 s += ','
             }
 
-            if (key == 'yaml') {
+            if (key == 'type' || key == 'name') {
+                s += `"${key}":"${value}"`
+            } else if (key == 'yaml') {
                 s += `"${key}":${stringifyYaml(value)}`
             } else if (key == 'value') {
                 s += `"${key}":${value}`
@@ -234,7 +198,7 @@ export default function sqrmToJs(sqrm) {
     for (let i=0 ; i<sqrm.length ; i++) {
         let ln = sqrm[i]
         if (ln.text !== undefined) {
-            out += `lines[${ln.line}] = "${ln.text.replace(/\\([\s\S])|(")/g,"\\$1$2")}"\n`
+            out += `lines[${ln.line}] = ${qouted(ln.text)}\n`
         }
     }
     out += 'try {\n'
@@ -251,7 +215,7 @@ export default function sqrmToJs(sqrm) {
     out += 'const selectAll = response.libs.selectAll;\n'
     out += 'const processHast = response.libs.processHast;\n'
 
-    // out += 'let json = response.json;\n'
+    out += 'let json = response.json;\n'
 //    out += 'const root = response.root;\n'
 //    out += 'const j = response.libs.j;\n'
 
@@ -265,7 +229,6 @@ export default function sqrmToJs(sqrm) {
 
     for (let i=0 ; i<sqrm.length ; i++) {
         let ln = sqrm[i]
-        // console.log(ln.line ? ln.line : ln)
         out += 'ln=' + ln.line + ';'
         if (ln.type == 'script') {
             out += ln.code + '\n'
@@ -283,11 +246,9 @@ export default function sqrmToJs(sqrm) {
     }
 
     out += '\n} catch (e) {\n'
-    out += '  console.log("======= exception in sqrm code ==============")\n'
-    out += '  console.log(`on line: ${ln}`);\n'
-    out += '  console.log(`on line: ${lines[ln]}`);\n'
-    out += 'e.lineNum = ln\n'
-    out += 'e.lineStr = lines[ln]\n'
+    // TODO: create own exception class
+    out += '  e.lineNum = ln\n'
+    out += '  e.lineStr = lines[ln]\n'
     out += '  throw e;\n'
     out += '}\n'      
     

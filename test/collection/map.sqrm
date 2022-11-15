@@ -1,6 +1,2 @@
-<%
-console.log('----- map ------')
-console.log('map request',request)
-%>
-<map latitude="${request.args[0].lat}" longitude="${request.args[0].lon}"
 
+<map latitude="${request.args[0].lat}" longitude="${request.args[0].lon}"

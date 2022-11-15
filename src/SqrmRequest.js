@@ -17,7 +17,6 @@ let handler = {
             if (typeof value === 'object' && value === Object(value)) {
                 return new Proxy(value,handler);
             } else {
-                console.log(property,value)
                 return value
             }
         } else if (isPrimitive(property)) {

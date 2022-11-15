@@ -1,19 +1,12 @@
 
 import {expect} from 'chai';
-
-
-import {h} from 'hastscript'
-import {t} from '../src/hastscript-tools.js'
-import sqrm from '../src/sqrm.js'
 import SqrmFSCollection from '../src/SqrmFSCollection.js';
-
 
 describe("file system collection tests", function() {
 
     describe("single folder", function() {
 
         it("file system collection", function() {
-
 
             const options = {
                 log_src: process.env.npm_config_src == 'true',
@@ -26,7 +19,6 @@ describe("file system collection tests", function() {
                 log_html: process.env.npm_config_html == 'true',
                 log_jast: process.env.npm_config_jast == 'true',
                 log_json: process.env.npm_config_json == 'true'
- 
             };
 
             const c = new SqrmFSCollection('./test/collection',options)
@@ -79,15 +71,19 @@ describe("file system collection tests", function() {
             expect(page_find).to.not.be.null
             expect(page_find.html).to.not.be.null
             expect(page_find.json).to.not.be.null
-            expect(page_find.html).to.equal(``)
-            expect(page_find.json).to.deep.equal({})
+            expect(page_find.html).to.equal(`<div class="p">This is page-find.</div>`)
+            expect(page_find.json).to.deep.equal({
+                city: 'Paris',
+                country: 'France',
+                coordinates: { lat: 48.856613, lon: 2.352222 }
+              })
 
             expect(c.get('page-include-chained')).to.not.be.null
             const page_include_chained = c.call('page-include-chained')
             expect(page_include_chained).to.not.be.null
             expect(page_include_chained.html).to.not.be.null
             expect(page_include_chained.json).to.not.be.null
-            expect(page_include_chained.html).to.equal(``)
+            expect(page_include_chained.html).to.equal(`<div class="p">This is page-include-chained.</div>`)
             expect(page_include_chained.json).to.deep.equal({})
 
             expect(c.get('page-include-direct')).to.not.be.null
@@ -95,62 +91,27 @@ describe("file system collection tests", function() {
             expect(page_include_direct).to.not.be.null
             expect(page_include_direct.html).to.not.be.null
             expect(page_include_direct.json).to.not.be.null
-            expect(page_include_direct.html).to.equal(``)
-            expect(page_include_direct.json).to.deep.equal({})
+            expect(page_include_direct.html).to.equal(`<div class="p">this page includes paris, so its another page that looks like paris</div><div class="p">direct include to include yaml/json for the city of <div class="paris"></div></div>`)
+            expect(page_include_direct.json).to.deep.equal({
+                city: 'Paris',
+                country: 'France',
+                coordinates: { lat: 48.856613, lon: 2.352222 }
+              })
 
             expect(c.get('page-include-multiple-json')).to.not.be.null
             const page_include_multiple_json = c.call('page-include-multiple-json')
             expect(page_include_multiple_json).to.not.be.null
             expect(page_include_multiple_json.html).to.not.be.null
             expect(page_include_multiple_json.json).to.not.be.null
-            expect(page_include_multiple_json.html).to.equal(``)
-            expect(page_include_multiple_json.json).to.deep.equal({})
-
-            // expect(c.get('page-include-chained')).to.not.be.null
-
-            // const page = c.call('page')
-            // expect(page).to.not.be.null
-            // expect(page.html).to.not.be.null
-            // expect(page.json).to.not.be.null
-            // expect(page.html).to.equal('<div class="p">This is page.</div><div class="p"><div class="paris"></div></div>')
-            // expect(page.json).to.deep.equal({city: 'Paris', country: 'France', coordinates: { lat: 48.856613, lon: 2.352222}})
-
-            throw new Error('not working')
-
-            // const result = sqrm(source,{
-            //     collection: new SqrmFSCollection('./collection'),
-                
-            //     log_src: process.env.npm_config_src,
-            //     log_lines: process.env.npm_config_lines,
-            //     log_sxast: process.env.npm_config_sxast,
-            //     log_code: process.env.npm_config_code,
-    
-            //     log_sast: process.env.npm_config_sast,
-            //     log_hast: process.env.npm_config_hast,
-            //     log_html: process.env.npm_config_html,
-            //     log_jast: process.env.npm_config_jast,
-            //     log_json: process.env.npm_config_json,
-            // })
-    
-            // let html,json
-    
-            // if (Array.isArray(result)) {
-    
-            //     html = ''
-            //     json = []
-    
-            //     result.forEach((el) => {
-            //         html += el.html
-            //         json.push(el.json)
-            //     })
-    
-            // } else {
-            //     html = result.html
-            //     json = result.json
-            // }
-    
-            // expect(json).to.eql(expectedJson)
-            // expect(html).to.eql(expectedHtml);
+            expect(page_include_multiple_json.html).to.equal(`<div class="p">This is page-include-multiple-json.</div><ul><li>London</li><li>Paris</li><li>Paris</li><li>Paris</li></ul>`)
+            expect(page_include_multiple_json.json).to.deep.equal({
+                cities: [
+                  { City: 'London' },
+                  { City: 'Paris' },
+                  { City: 'Paris' },
+                  { City: 'Paris' }
+                ]
+              })
         })
     })
 })

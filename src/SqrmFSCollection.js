@@ -11,6 +11,7 @@ import SqrmResponse from './SqrmResponse.js'
 import SqrmCollection from './SqrmCollection.js'
 import sxastParser from './sxast-parser.js';
 import responseToResult from './response-to-result.js';
+import mongo from 'mongols'
 
 export default class SqrmFSCollection extends SqrmCollection {
 
@@ -19,6 +20,10 @@ export default class SqrmFSCollection extends SqrmCollection {
         this.folder = folder;
         this.options = options;
         this.docs = new Map()
+        this.docsBy_id = new Map()
+
+        this.db = new mongo.DB()
+        this.db.createCollection("collection")
 
         const docNames = fs.readdirSync(folder).map((f) => f.split('.'))
             .filter((el) => {
@@ -57,67 +62,25 @@ export default class SqrmFSCollection extends SqrmCollection {
             }
         });
 
-        // console.log(Array.from(this.docs.keys()))
-
         this.docs.forEach((doc,name) => {
 
-            console.log("|")
-            console.log('------ ' + name + ' ---------------------------------')
-            console.log("|")
             let request = new SqrmRequest();
             let response = new SqrmResponse(this);
+
             try {
                 doc.execute(request,response);
                 const res = responseToResult(response,this.options)
-                console.log(res)
+                this.db.collection.insertOne(res.json)
+                this.docsBy_id.set(res.json._id,doc)
             } catch (e) {
-                console.log(`------ failed to execute: ${name} --------`)
-                // console.log(doc.fn.toString());
-                // console.log('---------------------------------------')
-                console.log(e.lineNum,e.lineStr)
-                console.log('e',e);
-                console.log('---------------------------------------')
+                console.log(`!!! ERROR: failed to execute: ${name}`)
+                console.log('!!! line:  ',e.lineNum)
+                console.log('!!! line:  ',e.lineStr)
+                console.log('!!! error: ',e.stack.split('\n')[0]);
             }
 
         })
     }
-
-
-    // load(doc) {
-    //     if (doc.src!=null) return;
-    //     doc.src = fs.readFileSync(`${this.folder}/${doc.id}.${doc.rev}.sqrm`, 'utf-8').toString();
-    // }
-
-    // include(name,request,response) {
-    //     console.log('include',arguments)
-    //     if (!this.docs.has(name)) {
-    //         response.appendToHtml({type:'div',tag:'!--',properties:`failed to find document: ${name}`})
-    //         return;
-    //     }
-
-    //     const doc = this.docs.get(name);
-    //     let args = [];
-    //     for (let i=3 ; i<arguments.length ; i++) args.push(arguments[i])
-    //     let newRequest = Object.assign({},request);
-    //     newRequest.args= args;
-        
-    //     doc.execute(newRequest,response)
-    // }
-
-    // call(name,request,response) {
-    //     console.log('call',arguments)
-    //     if (!this.docs.has(name)) {
-    //         response.html.out += `<!-- failed to find document: ${name} -->`
-    //         return;
-    //     }
-
-    //     const fn = this.docs.get(name).fn;
-    //         let args = [];
-    //         for (let i=3 ; i<arguments.length ; i++) args.push(arguments[i])
-    //         let newRequest = Object.assign({},request);
-    //         newRequest.args= args;
-    //         fn(newRequest,response)  
-    // }
 
     call(name,args) {
         let request = new SqrmRequest(args);
@@ -129,10 +92,6 @@ export default class SqrmFSCollection extends SqrmCollection {
         }
         try {
             doc.execute(request,response);
-            // console
-            // doc.json = response.json
-            // doc.json._id = doc.id;
-            // doc.json._rev = doc.rev;
         } catch (e) {
             console.log(`-- failed to call ${name}(${args}) : script error --`)
             console.log(e);
@@ -143,52 +102,36 @@ export default class SqrmFSCollection extends SqrmCollection {
 
     }
 
-    // get(name) {
-    //     // console.log('get',name,this.docs.get(name))
-    //     if (!this.docs.has(name)) {
-    //         // response.html.out += `<!-- failed to find document: ${name} -->`
-    //         return null;
-    //     }
-    //     return this.docs.get(name)
-    // }
-
-    find(select,filter,skip,count) {
-        console.log('find',arguments)
-
-        // console.log('find',select.toString())
-        // try {
-        //     let tree = acorn.parse(select.toString(), {ecmaVersion: 2020})
-        //     let param = tree.body[0].expression.params[0].name;
-        //     walk.simple(tree, {
-        //         MemberExpression(node) {
-        //             if (node.object.name == param) {     
-        //                 console.log('find',node.property.name);
-        //             }
-        //         }
-        //       })
-
-        // } catch (e) {
-        //     console.log('acorn parse error',e)
-        // }
-
-
-        let res = [];
+    find(select,sort,skip,limit) {
 
         if (typeof select == "string") {
+
             return this.docs.get(select)
-        } else if (typeof select == "function") {
-            let it = this.docs.values();
-            let el = it.next();
-            while (!el.done) {
-//                console.log(el.value)
-                if (el.value.json !== undefined
-                        && select(el.value.json)) {
-                    res.push(el.value)
+
+        } else if (typeof select == 'object' && select == Object(select)) {
+
+            let c = this.db.collection.find(select)
+
+            if (sort !== undefined) {
+                c = c.sort(sort)
+
+                if (skip !== undefined) {
+                    c = c.skip(skip)
+
+                    if (limit !== undefined) {
+                        c = c.limit(limit)
+                    }
                 }
-                el = it.next();
             }
+
+            let res = [];
+
+            c.forEach(doc => {
+                res.push(this.docsBy_id.get(doc._id))
+            })
+
+            return res
         }
-        return res
     }
 
 }

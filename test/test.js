@@ -16,7 +16,7 @@ class TestSqrmCollection {
     this.includeCallback = includeCallback;
   }
 
-  get(name) {
+  find(select,filter,skip,count) {
     return {
       execute : (req,res) => {
         res.libs.appendToHtml({type: 'paragraph', indent: 0, children: [this.includeCallback(req.args)] })
@@ -24,8 +24,6 @@ class TestSqrmCollection {
     }
   }
 
-  find(select,filter,skip,count) {
-  }
 }
 
 function test(name,source,expectedHtml,expectedJson={},includeCallback) {
@@ -245,6 +243,15 @@ describe("Non-file based tests", function() {
             '<ul><li>a b\nc d</li><li>e f</li></ul>',
             {})
 
+        test("lists 2",
+            'i: 3\n- v : ${json.i}\n',
+            '<ul><li>v : 3</li></ul>',
+            {i: 3 })
+
+        test("lists 3",
+            'i: 3\nvs:\n- v : json.i\n',
+            '',
+            { i: 3, vs: [ {v: 3 }]})
     })
 
     describe("formatting", function() {

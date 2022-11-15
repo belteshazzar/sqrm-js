@@ -1,10 +1,16 @@
 
-id: page-include-multiple-json
-
-This is ${response.json.id}
+This is page-include-multiple-json.
 <%
-
-    let cities = docs.find((doc) => doc.city !== undefined)
-    console.log('cities',cities);
+  let cities = docs.find({ city: { $exists: true }})
+%>
+  cities:
+<%
+  cities.forEach(c => {
+    let id = c.id
+    let res = c.execute().json
+%>
+    - City: res.city
+<%  appendToHtml({"type":"unordered-list-item","indent":0,"children":[{"type":"text","value": res.city }]})
+  })
 %>
 

@@ -1,8 +1,11 @@
 
 This is page-include-chained.
+
 <%
+  let info = docs.find('info_box')
+  let cities = docs.find({ city: { $exists: true }})
 
-    let cities = docs.find((doc) => doc.city !== undefined)
-    console.log('cities',cities);
+  cities.forEach(city => {
+    response.include(info,city.execute().json)
+  })
 %>
-

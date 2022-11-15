@@ -1,14 +1,5 @@
 
 This is page-find.
 <%
-    console.log('-- page-find : docs.find("paris") --')
-    let paris = docs.find('paris')
-    console.log('paris',paris)
-
-    console.log('-- page-find : docs.find(cities) --')
-    let cities = docs.find((doc) => doc.city !== undefined)
-    console.log('cities',cities);
-
-    console.log('-- /page-find ---------------------')
+  response.include({name:'paris',args:[]})
 %>
-

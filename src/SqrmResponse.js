@@ -47,28 +47,16 @@ export default class SqrmResponse {
         this.hastCallbacks.push(cb)
     }
 
-    // updateJson() {
-    //     this.json = toJson(this.jsonTree)
-    // }
-
-
     include({name,args}) {
-        // console.log('include',arguments)
-
         let doc = this.docs.find(name)
         if (doc == null) {
-            return { type: 'comment', value: `failed to include doc: ${name}( ${JSON.stringify(value)} )` }
+            return { type: 'comment', value: `failed to include doc: ${name}( ${JSON.stringify(args)} )` }
         }
 
         let request = new SqrmRequest(args);
         let response = new SqrmResponse(this.docs,this.jsonTree);
-        // console.log('include response.root',util.inspect(response.root,false,null,true))
-        try {
-            doc.execute(request,response)
-        } catch (e) {
-            console.log(`error executing doc ${name}`,e)
-        }
-// console.log('include response.root',util.inspect(response.root,false,null,true))
+        doc.execute(request,response)
+
         let hast = sastToHast(response.root)
 
         return h('div',{class: name},hast.children)
@@ -76,7 +64,6 @@ export default class SqrmResponse {
 
     appendToHtml(obj) {
 
-// console.log('appendToHtml',obj)
         if (this.yamlNotAllowedIndent != -1 && obj.type != 'blank') {
             if (obj.indent < this.yamlNotAllowedIndent) {
                 this.yamlNotAllowedIndent = -1
@@ -212,8 +199,6 @@ export default class SqrmResponse {
     }
 
     inlineTag({name,args,children}) {
-        // console.log('inlineTag',arguments)
-
         this.jsonTag({
             indent: 0,
             isArrayElement: false,
@@ -226,7 +211,6 @@ export default class SqrmResponse {
     }
 
     // j(name,value) {
-    //     console.log('j',name,value)
 
     //     if (typeof name == 'object') {
     //         if (this.jsonTag(name)) {
