@@ -5,7 +5,6 @@ import SqrmResponse from './SqrmResponse.js'
 
 export default class SqrmDocument {
     
-    // constructor(fn, _options) {
     constructor(collection,id,sxast,options) {
         this.collection = collection
         this.id = id
@@ -38,5 +37,4 @@ export default class SqrmDocument {
 
         return response
     }
-
 }

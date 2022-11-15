@@ -1,5 +1,4 @@
 
-
 export default function sqrmToLines(str, indentation = 2) {
 
     const l = str.length

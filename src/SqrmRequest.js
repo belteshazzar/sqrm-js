@@ -1,3 +1,4 @@
+
 let isPrimitive = (val) => {
     
   if ( val === Object(val) ) {

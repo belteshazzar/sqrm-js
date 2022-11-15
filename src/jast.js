@@ -1,6 +1,4 @@
 
-
-
 let handler = {
     has(target, property) {
         throw new Error('json.has not-implemented')
@@ -58,6 +56,5 @@ export default class JsonTree {
                 el = null
             }
         }
-    }
-    
+    }   
 }

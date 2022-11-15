@@ -1,5 +1,3 @@
-import {h} from 'hastscript'
-import {t} from './hastscript-tools.js'
 
 export default class SqrmCollection {
 

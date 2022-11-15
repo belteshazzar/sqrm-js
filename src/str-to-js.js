@@ -1,13 +1,6 @@
 
 
-//import * as acorn from 'acorn'
-import JSON5 from 'json5'
-//import { parse } from 'node:path'
-import util from 'node:util'
-
 import * as acorn from 'acorn'
-
-import * as walk from "acorn-walk"
 import quote from './quoted-string.js'
 
 export default function strToJs(str,throwOnInvalid = false) {

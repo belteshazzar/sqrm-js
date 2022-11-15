@@ -1,6 +1,6 @@
 
 import {h} from 'hastscript'
-import {t,i} from './hastscript-tools.js'
+import {t} from './hastscript-tools.js'
 import linkifyStr from 'linkify-string';
 import strToJs from './str-to-js.js'
 
