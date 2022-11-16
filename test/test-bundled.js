@@ -10,7 +10,7 @@ describe("Bundle Tests", function() {
         it("simple", function() {
 
             const {html,json} = sqrm('fred was **here**, he really was')
-            expect(html).to.eql("<p>fred was <b>here</b>, he really was</p>")
+            expect(html).to.eql(`<div class="p">fred was <b>here</b>, he really was</div>`)
             expect(json).to.eql({})
 
         })
@@ -21,7 +21,7 @@ describe("Bundle Tests", function() {
         it("simple", function() {
 
             const{html,json} = sqrmMin('may __fred__ was ~~not~~ actually here :(')
-            expect(html).to.eql("<p>may <u>fred</u> was <i>not</i> actually here 😞</p>")
+            expect(html).to.eql(`<div class="p">may <u>fred</u> was <i>not</i> actually here 😞</div>`)
             expect(json).to.eql({})
 
         })
