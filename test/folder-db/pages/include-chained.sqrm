@@ -2,8 +2,8 @@
 This is page-include-chained.
 
 <%
-  let info = docs.find('info_box')
-  let cities = docs.find({ city: { $exists: true }})
+  let info = db.find('info_box')
+  let cities = db.find({ city: { $exists: true }})
 
   cities.forEach(city => {
     response.include(info,city.execute().json)

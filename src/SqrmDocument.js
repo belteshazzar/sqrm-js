@@ -5,14 +5,14 @@ import SqrmResponse from './SqrmResponse.js'
 
 export default class SqrmDocument {
     
-    constructor(collection,id,sxast,options) {
-        this.collection = collection
-        this.id = id
-        this.options = options;
+    constructor(collectionName,name,sxast,db) {
+        this.collectionName = collectionName
+        this.name = name
+        this.db = db;
 
-        const js = sxastToJs(sxast)
+        const js = sxastToJs(collectionName,name,sxast)
     
-        if (options.log_code) {
+        if (this.db.settings.log_code) {
             console.log('= js =============')
             console.log(js)
         }
@@ -30,7 +30,7 @@ export default class SqrmDocument {
 
         if (arguments.length == 0) {
             request = new SqrmRequest();
-            response = new SqrmResponse(this.collection);
+            response = new SqrmResponse(this.db);
         }
 
         this.fn(request,response)

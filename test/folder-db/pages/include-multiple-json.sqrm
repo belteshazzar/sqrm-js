@@ -1,7 +1,7 @@
 
 This is page-include-multiple-json.
 <%
-  let cities = docs.find({ city: { $exists: true }})
+  let cities = db.find('cities',{ city: { $exists: true }})
 %>
   cities:
 <%

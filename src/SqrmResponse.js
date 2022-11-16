@@ -7,8 +7,8 @@ import sastToHast from './sast-to-hast.js';
 import JsonTree from './jast.js'
 
 export default class SqrmResponse {
-    constructor(docs,jsonTree) {
-        this.docs = docs
+    constructor(db,jsonTree) {
+        this.db = db
         this.root = [];
 
         this.yamlNotAllowedIndent = -1
@@ -42,19 +42,20 @@ export default class SqrmResponse {
         this.hastCallbacks.push(cb)
     }
 
-    include({name,args}) {
-        let doc = this.docs.find(name)
+    include({collection = 'default',name,args}) {
+
+        let doc = this.db.find(collection,name)
         if (doc == null) {
-            return { type: 'comment', value: `failed to include doc: ${name}( ${JSON.stringify(args)} )` }
+            return { type: 'comment', value: `failed to include doc: ${collection}.${name}( ${JSON.stringify(args)} )` }
         }
 
         let request = new SqrmRequest(args);
-        let response = new SqrmResponse(this.docs,this.jsonTree);
+        let response = new SqrmResponse(this.db,this.jsonTree);
         doc.execute(request,response)
 
         let hast = sastToHast(response.root)
 
-        return h('div',{class: name},hast.children)
+        return h('div',{class: `${collection}.${name}`},hast.children)
     }
 
     appendToHtml(obj) {

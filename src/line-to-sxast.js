@@ -195,11 +195,13 @@ export default function lineToSxast(str) {
                     index++;
                 }
                 let jj = index
+                let dotAt = -1
                 for (; jj < s.length; jj++) {
                     let ch = s.charAt(jj)
                     if ((jj==index && ch.match(ch0))
-                            || (ch.match(chx))) {
+                            || (ch.match(chx)) || (bang==true && ch=='.' && dotAt == -1)) {
                         tag += ch;
+                        if (ch=='.') dotAt = jj
                     } else {
                         break;
                     }
@@ -247,11 +249,18 @@ export default function lineToSxast(str) {
                     }
 
                     if (bang) {
-                        parent.children.push({
-                            type: 'include', 
+                        const includeOpts = {
+                            type: 'include',
                             name: tag, 
                             args: tagValue
-                        })
+                        }
+                        if (dotAt != -1) {
+                            const ss = tag.split('.')
+                            if (ss.length != 2) throw new Error(`error parsing tag with namespace "${tag}"`)
+                            includeOpts.collection = ss[0]
+                            includeOpts.name = ss[1]
+                        }
+                        parent.children.push(includeOpts)
                     } else {
                         parent.children.push({
                             type:'tag',

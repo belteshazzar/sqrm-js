@@ -9,17 +9,18 @@ import JSON5 from 'json5'
 import {h} from 'hastscript'
 import {t} from '../src/hastscript-tools.js'
 import sqrm from '../src/sqrm.js'
+import SqrmDB from '../src/SqrmDB.js'
 
-class TestSqrmCollection {
+class TestSqrmDB extends SqrmDB {
 
-  constructor(includeCallback) {
-    this.includeCallback = includeCallback;
+  constructor(settings) {
+    super(settings)
   }
 
-  find(select,filter,skip,count) {
+  find(collection,select,filter,skip,count) {
     return {
       execute : (req,res) => {
-        res.libs.appendToHtml({type: 'paragraph', indent: 0, children: [this.includeCallback(req.args)] })
+        res.libs.appendToHtml({type: 'paragraph', indent: 0, children: [this.settings.includeCallback(collection,select,req.args)] })
       }
     }
   }
@@ -30,9 +31,8 @@ function test(name,source,expectedHtml,expectedJson={},includeCallback) {
     
     it(name+"", function() {
 
-        const result = sqrm(source,{
-            collection: new TestSqrmCollection(includeCallback),
-            
+        const db = new TestSqrmDB({
+            includeCallback: includeCallback,
             log_src: process.env.npm_config_src,
             log_lines: process.env.npm_config_lines,
             log_sxast: process.env.npm_config_sxast,
@@ -44,6 +44,8 @@ function test(name,source,expectedHtml,expectedJson={},includeCallback) {
             log_jast: process.env.npm_config_jast,
             log_json: process.env.npm_config_json,
         })
+
+        const result = sqrm(source,db)
 
         let html,json
 
@@ -395,9 +397,9 @@ describe("Non-file based tests", function() {
 
         test('simple hash bang for an image with error',
             'this is an image: #!image(my_image.png,200,200,alt text) inline',
-            '<div class="p">this is an image: <div class="image"><div class="p"><img src="my_image.png,200,200,alt text" width="undefined" height="undefined" alt="undefined"></div></div>(my_image.png,200,200,alt text) inline</div>',
+            '<div class="p">this is an image: <div class="default.image"><div class="p"><img src="my_image.png,200,200,alt text" width="undefined" height="undefined" alt="undefined"></div></div>(my_image.png,200,200,alt text) inline</div>',
             {},
-            function includeCallback(args) {
+            function includeCallback(collection,name,args) {
                 return h('img',{
                     src: `${args[0]}`,
                     width: `${args[1]}`,
@@ -408,9 +410,9 @@ describe("Non-file based tests", function() {
 
         test('simple hash bang for an image',
             'this is an image: #!image("my_image.png",200,200,"alt text") inline',
-            '<div class="p">this is an image: <div class="image"><div class="p"><img src="my_image.png" width="200" height="200" alt="alt text"></div></div> inline</div>',
+            '<div class="p">this is an image: <div class="default.image"><div class="p"><img src="my_image.png" width="200" height="200" alt="alt text"></div></div> inline</div>',
             {},
-            function includeCallback(args) {
+            function includeCallback(collection,name,args) {
                 return h('img',{
                     src: `${args[0]}`,
                     width: `${args[1]}`,
@@ -422,9 +424,9 @@ describe("Non-file based tests", function() {
 
         test('hash bang param testing',
             'this is an image: #!image("my_image.png",200,400,"alt text",request.args,`-\\${i}-`,true,null, 5 * 3, Math.max(4,5)) inline',
-            '<div class="p">this is an image: <div class="image"><div class="p"><img src="my_image.png" width="200" height="400" alt="alt text"></div></div> inline</div>',
+            '<div class="p">this is an image: <div class="default.image"><div class="p"><img src="my_image.png" width="200" height="400" alt="alt text"></div></div> inline</div>',
             {},
-            function includeCallback(args) {
+            function includeCallback(collection,name,args) {
 
                 expect(args).to.not.be.null
                 expect(args.length).to.eql(10)
@@ -450,9 +452,9 @@ describe("Non-file based tests", function() {
 
         test('hash bang param testing',
             'i: 3\nthis is an image: #!image("my_image.png",200,400,"alt text",request.args,`-${json.i}-`,true,null, 5 * 3, Math.max(4,5)) inline',
-            '<div class="p">this is an image: <div class="image"><div class="p"><img src="my_image.png" width="200" height="400" alt="alt text"></div></div> inline</div>',
+            '<div class="p">this is an image: <div class="default.image"><div class="p"><img src="my_image.png" width="200" height="400" alt="alt text"></div></div> inline</div>',
             {i:3},
-            function includeCallback(args) {
+            function includeCallback(collection,name,args) {
 
                 expect(args).to.not.be.null
                 expect(args.length).to.eql(10)
@@ -475,6 +477,17 @@ describe("Non-file based tests", function() {
                 })
             }
         )
+
+        test('simple hash collection',
+            '#!pages.page',
+            '<div class="p"><div class="pages.page"><div class="p"><img></div></div></div>',
+            {},
+            function includeCallback(collection,name,args) {
+                expect(collection).to.equal('pages')
+                expect(name).to.equal('page')
+                expect(args).to.deep.equal([true])
+                return h('img')
+            })
     })
 
     describe("template strings", function() {
@@ -512,7 +525,7 @@ describe("Non-file based tests", function() {
 
 describe("file based tests", function() {
 
-    function includeCallback(args) {
+    function includeCallback(collection,name,args) {
         return h('img',{
             src: `${args[0]}`,
             width: `${args[1]}`,

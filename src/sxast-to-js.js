@@ -1,7 +1,7 @@
 
 import qouted from './quoted-string.js'
 
-export default function sqrmToJs(sqrm) {
+export default function sxastToJs(collectionName,name,sxast) {
 
     function escape(s) {
         return s.replaceAll('\\','\\\\').replaceAll('\`','\\\`').replaceAll('\\\\$','\\$')
@@ -196,18 +196,21 @@ export default function sqrmToJs(sqrm) {
 
     out += 'let ln = 0\n'
     out += 'const lines = {}\n'
-    for (let i=0 ; i<sqrm.length ; i++) {
-        let ln = sqrm[i]
+    for (let i=0 ; i<sxast.length ; i++) {
+        let ln = sxast[i]
         if (ln.text !== undefined) {
             out += `lines[${ln.line}] = ${qouted(ln.text)}\n`
         }
     }
+    
+    out += `const collection = ${qouted(collectionName)}\n`
+    out += `const name = ${qouted(name)}\n`
     out += 'try {\n'
     out += '\n'
     out += 'const request = arguments[0];\n'
     out += 'const response = arguments[1];\n'
     out += '\n'
-    out += 'const docs = response.docs;\n';
+    out += 'const db = response.db;\n';
     out += '\n'
     out += 'const h = response.libs.h;\n'
     out += 'const t = response.libs.t;\n'
@@ -228,8 +231,8 @@ export default function sqrmToJs(sqrm) {
 
 //    out += 'const append = response.libs.append;\n'
 
-    for (let i=0 ; i<sqrm.length ; i++) {
-        let ln = sqrm[i]
+    for (let i=0 ; i<sxast.length ; i++) {
+        let ln = sxast[i]
         out += 'ln=' + ln.line + ';'
         if (ln.type == 'script') {
             out += ln.code + '\n'
@@ -248,6 +251,8 @@ export default function sqrmToJs(sqrm) {
 
     out += '\n} catch (e) {\n'
     // TODO: create own exception class
+    out += '  e.collection = collection\n'
+    out += '  e.name = name\n'
     out += '  e.lineNum = ln\n'
     out += '  e.lineStr = lines[ln]\n'
     out += '  throw e;\n'
