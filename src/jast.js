@@ -1,7 +1,31 @@
 
 let handler = {
     has(target, property) {
-        throw new Error('json.has not-implemented')
+        switch (target.type) {
+            case 'object': {
+                for (let i=0 ; i<target.children.length ; i++) {
+                    let child = target.children[i]
+                    if (child.name == property) {
+                        return true
+                    }
+                }
+            }
+            case 'array': {
+                return property in target.children
+            }
+            case 'unknown': {
+                return false
+            }
+            // case 'value': {
+            //     return true
+            // }
+            default: {
+                throw new Error(target.type)
+            }
+        }
+        return false
+
+        // return property in target
     },
     get(target, property, receiver) {
         switch (target.type) {

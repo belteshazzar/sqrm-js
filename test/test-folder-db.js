@@ -84,7 +84,7 @@ describe("folder db tests", function() {
             expect(page_include_chained).to.not.be.null
             expect(page_include_chained.html).to.not.be.null
             expect(page_include_chained.json).to.not.be.null
-            expect(page_include_chained.html).to.equal(`<div class="p">This is page-include-chained.</div>`)
+            expect(page_include_chained.html).to.equal(`<div class="p">This is page-include-chained.</div><div class="p"><div class="parts.info_box"><div class="p">The city of ${london.json.city} is in the country of ${london.json.country}.</div><div class="p"><div class="parts.map"><map latitude="${london.json.coordinates.lat}" longitude="${london.json.coordinates.lon}"></map></div></div></div></div><div class="p"><div class="parts.info_box"><div class="p">The city of ${paris.json.city} is in the country of ${paris.json.country}.</div><div class="p"><div class="parts.map"><map latitude="${paris.json.coordinates.lat}" longitude="${paris.json.coordinates.lon}"></map></div></div></div></div>`)
             expect(page_include_chained.json).to.deep.equal({})
 
             expect(c.find('pages','include-direct')).to.not.be.null

@@ -5,12 +5,12 @@ import SqrmResponse from './SqrmResponse.js'
 
 export default class SqrmDocument {
     
-    constructor(collectionName,name,sxast,db) {
-        this.collectionName = collectionName
+    constructor(collection,name,sxast,db) {
+        this.collection = collection
         this.name = name
         this.db = db;
 
-        const js = sxastToJs(collectionName,name,sxast)
+        const js = sxastToJs(collection,name,sxast)
     
         if (this.db.settings.log_code) {
             console.log('= js =============')

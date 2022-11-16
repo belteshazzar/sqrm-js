@@ -2,10 +2,12 @@
 This is page-include-chained.
 
 <%
-  let info = db.find('info_box')
-  let cities = db.find({ city: { $exists: true }})
+  let info = db.find('parts','info_box')
+  let cities = db.find('cities',{ city: { $exists: true }})
 
   cities.forEach(city => {
-    response.include(info,city.execute().json)
+    let j = city.execute().json
+    let h = response.include({collection:'parts',name:'info_box',args:[j]})
+    appendToHtml({type:"paragraph",indent:0,children:[h]})
   })
 %>

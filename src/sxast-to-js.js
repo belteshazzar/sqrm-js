@@ -1,7 +1,7 @@
 
 import qouted from './quoted-string.js'
 
-export default function sxastToJs(collectionName,name,sxast) {
+export default function sxastToJs(collection,name,sxast) {
 
     function escape(s) {
         return s.replaceAll('\\','\\\\').replaceAll('\`','\\\`').replaceAll('\\\\$','\\$')
@@ -203,7 +203,7 @@ export default function sxastToJs(collectionName,name,sxast) {
         }
     }
     
-    out += `const collection = ${qouted(collectionName)}\n`
+    out += `const collection = ${qouted(collection)}\n`
     out += `const name = ${qouted(name)}\n`
     out += 'try {\n'
     out += '\n'
