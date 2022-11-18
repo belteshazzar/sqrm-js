@@ -1,7 +1,7 @@
 {
   "name": "sqrm",
-  "version": "0.1.0",
-  "description": "sqrm (pronounced squirm) is markdown, but re-imagined from a clean sheet. There are two main differences between sqrm and markdown:",
+  "version": "0.1.1",
+  "description": "sqrm (pronounced squirm and short for square embrace) is the illicit love child of markdown and yaml.",
   "main": "build/main.min.js",
   "bin": {
     "sqrm": "bin/sqrm.js"
@@ -10,9 +10,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/belteshazzar/square-embrace.git"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
   },
   "scripts": {
     "test": "mocha ./test/test.js ./test/test-str-to-js.js ./test/test-folder-db.js",
