@@ -374,7 +374,14 @@ describe("Non-file based tests", function() {
         test('yaml number octal','v : 011','',{ v: 9 })
 
         test('yaml invalid quoting','g : b * "stev','',{g: "b * \"stev"})
-    })
+
+        test('yaml reading numbers',
+            'date1: "2021-06-19"\ndate2: 2021-06-19\nversion: 1.2.3-rc',
+            '',
+            { date1: "2021-06-19", date2: 2021 - 6 - 19, version: "1.2.3-rc"})
+
+        test('yaml multiple values','v : 3\nv: 4','',{ v: 4 })
+        })
 
     describe("hash tags with parameters", function() {
     
