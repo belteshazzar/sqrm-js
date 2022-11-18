@@ -290,6 +290,16 @@ describe("Non-file based tests", function() {
         
     });
 
+    describe("html entities", function() {
+
+        test('entities - markdown',
+            '&nbsp; & &amp; &copy; &AElig; &Dcaron; &frac34; &HilbertSpace; &DifferentialD; &ClockwiseContourIntegral; &ngE;',
+            '<div class="p">\xa0 &#x26; &#x26; © Æ Ď ¾ ℋ ⅆ ∲ ≧̸</div>')
+        test('entities - special',
+            '& © Æ Ď ¾ ℋ ⅆ ∲ ≧̸',
+            '<div class="p">&#x26; © Æ Ď ¾ ℋ ⅆ ∲ ≧̸</div>')
+    })
+
     describe("links", function() {
 
         // links
