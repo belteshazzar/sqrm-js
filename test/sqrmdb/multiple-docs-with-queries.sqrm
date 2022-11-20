@@ -1,0 +1,33 @@
+
+name: steve
+age: 42
+
+---
+
+name: fred
+age: 78
+
+---
+
+name: bob
+age: 56
+
+---
+
+This is page-include-multiple-json.
+<%
+  let people = db.find('default',{ $and: [ { name: {$exists: true }}, { age: { $lt: 70}} ]}, {name : 1})
+%>
+  list of people:
+<%
+  people.forEach(doc => {
+    let id = doc.id
+    let res = doc.execute().json
+    console.log(res)
+    appendToHtml({"type":"unordered-list-item","indent":1,"children":[{"type":"text","value": `${res.name} = ${res.age}` }]})
+  })
+
+
+  let textSearch = db.find('default',{ $text: { $search: 'people' }})
+%>
+
