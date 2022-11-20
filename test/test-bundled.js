@@ -1,6 +1,6 @@
 
-import sqrm from '../build/sqrm-0.1.0.js'
-import sqrmMin from '../build/sqrm-0.1.0.min.js'
+import sqrm from '../build/sqrm-0.1.1.js'
+import sqrmMin from '../build/sqrm-0.1.1.min.js'
 import {expect} from 'chai';
 
 describe("Bundle Tests", function() {
