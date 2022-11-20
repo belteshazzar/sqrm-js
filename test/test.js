@@ -306,14 +306,46 @@ describe("Non-file based tests", function() {
         
         test("links 27",'s1df \\[Link back to H2] fred','<div class="p">s1df [Link back to H2] fred</div>')
         test("links 28",'s2df [Link back to H2\\] fred','<div class="p">s2df [Link back to H2] fred</div>')
-        test("links 29",'s3df [ Link back to H2 ] fred','<div class="p">s3df <a href="/link_back_to_h2">Link back to H2</a> fred</div>')
-        test("links 30",'s4df [ Link text | url ] fred','<div class="p">s4df <a href="/url">Link text</a> fred</div>')
-        test("links 31",'s5df [Link ba\\|ck to H2] fred','<div class="p">s5df <a href="/link_ba%7Cck_to_h2">Link ba|ck to H2</a> fred</div>')
-        test("links 32",'s6df [Link ba\\]ck to H2] fred','<div class="p">s6df <a href="/link_ba%5Dck_to_h2">Link ba]ck to H2</a> fred</div>')
-        test("links 33",'s7df [Link ba\\ck to H2] fred','<div class="p">s7df <a href="/link_ba%5Cck_to_h2">Link ba\\ck to H2</a> fred</div>')
+        test("links 30",'s4df [ Link text | google.com ] fred','<div class="p">s4df <a href="https://google.com">Link text</a> fred</div>')
+
+        test("links 31",'s4df [ Link text | www.google.com ] fred','<div class="p">s4df <a href="https://www.google.com">Link text</a> fred</div>')
+        test("links 32",'s4df [ Link text | /fred ] fred','<div class="p">s4df <a href="/fred">Link text</a> fred</div>')
+        test("links 33",'s4df [ Link text | #heading-3 ] fred','<div class="p">s4df <a href="#heading-3">Link text</a> fred</div>')
+        test("links 34",'s4df [ www.google.com ] fred','<div class="p">s4df <a href="https://www.google.com">https://www.google.com</a> fred</div>')
+        test("links 35",'s4df [ fred@google.com ] fred','<div class="p">s4df <a href="mailto:fred@google.com">mailto:fred@google.com</a> fred</div>')
+        test("links 37",'s4df [ /fred ] fred','<div class="p">s4df <a href="/fred">/fred</a> fred</div>')
+        test("links 38",'s4df [ #heading-3 ] fred','<div class="p">s4df <a href="#heading-3">#heading-3</a> fred</div>')
+    })
+
+    describe("link refs", function() {
+
+       test("link refs 0",'s4df [ Link text ] fred','<div class="p">s4df <a link-ref="link text">Link text</a> fred</div>')
+       test("link refs 1",'s5df [Link text | ref ] fred','<div class="p">s5df <a link-ref="ref">Link text</a> fred</div>')
+       test("link refs 2",'s6df [Link text | ref 2 ] fred','<div class="p">s6df <a link-ref="ref 2">Link text</a> fred</div>')
+       test("link refs 3",'s7df [Link text | ref-x ] fred','<div class="p">s7df <a link-ref="ref-x">Link text</a> fred</div>')
         
     });
 
+    describe("link refs w/definitions", function() {
+
+        test("link ref defs 0",
+            's5df [ Link text ] fred\n[ link text ]: www.google.com',
+            '<div class="p">s5df <a href="https://www.google.com">Link text</a> fred</div>')
+        test("link ref defs 1",
+            's5df [Link text | ref ] fred\n[ref]: www.google.com',
+            '<div class="p">s5df <a href="https://www.google.com">Link text</a> fred</div>')
+        test("link ref defs 2",
+            's6df [Link text | ref 2 ] fred\n[ ref 2]: www.google.com',
+            '<div class="p">s6df <a href="https://www.google.com">Link text</a> fred</div>')
+        test("link ref defs 3",
+            's7df [Link text | ref-x ] fred\n[ ref-x  ] : www.google.com',
+            '<div class="p">s7df <a href="https://www.google.com">Link text</a> fred</div>')
+         
+        test("link ref defs 4",
+            's7df [google] fred\n[ google  ] : this is a link to google | www.google.com',
+            '<div class="p">s7df <a href="https://www.google.com">this is a link to google</a> fred</div>')
+     });
+ 
     describe("divs", function() {
     
         test('divs 1','fred\n\n< blockquote\n\n  <div id="fred" class="woot" \n woot\n\n','<div class="p">fred</div><blockquote><div id="fred" class="woot"></div></blockquote><div class="p">woot</div>')

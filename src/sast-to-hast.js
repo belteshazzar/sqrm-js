@@ -109,6 +109,7 @@ export default function sastToHast(sqrm) {
 
     const doc = { type: "root", children: [] }
     let footnotes = []
+    let linkDefinitions = []
     let i = 0
 
     function next() {
@@ -121,18 +122,18 @@ export default function sastToHast(sqrm) {
         return sqrm[i]
     }
 
-    function footnoteNum(id,text) {
-        for (let i=0 ; i<footnotes.length ; i++) {
-            if (footnotes[i].id == id) {
-                if (text != undefined) {
-                    footnotes[i].text = text;
-                }
-                return i+1
-            }
-        }
-        footnotes.push({ id: id, text: text });
-        return footnotes.length;
-    }
+    // function footnoteNum(id,text) {
+    //     for (let i=0 ; i<footnotes.length ; i++) {
+    //         if (footnotes[i].id == id) {
+    //             if (text != undefined) {
+    //                 footnotes[i].text = text;
+    //             }
+    //             return i+1
+    //         }
+    //     }
+    //     footnotes.push({ id: id, text: text });
+    //     return footnotes.length;
+    // }
 
     function processIndentation(indent) {
 
@@ -440,6 +441,9 @@ export default function sastToHast(sqrm) {
                     return table()
                 case "yaml":
                     return yaml()
+                case "link-definition":
+                    linkDefinitions.push(next())
+                    return null
                 default:
                     throw new Error('un-handled type: ' + ln.type)                
             }
@@ -484,6 +488,34 @@ export default function sastToHast(sqrm) {
                 ol.children.push(h('li',{},[ h('a',{name:`footnote-${id}`}) ]))
             }
             node.children[0].value = `[${num}]`
+        })
+    }
+
+    if (linkDefinitions.length>0) {
+
+        let lookup = {}
+
+        for (let i=0 ; i<linkDefinitions.length ; i++) {
+            lookup[linkDefinitions[i].id] = linkDefinitions[i]
+            console.log(linkDefinitions[i].link.children)
+        }
+
+        visit(doc, (node) => {
+            return node.type=='element' && node.tagName=='a' && node.properties['link-ref'] !== undefined
+        }, (node) => {
+            const id = node.properties['link-ref']
+            let ld = lookup[id]
+            if (ld) {
+                delete node.properties['link-ref']
+                const href = ld.link.properties.href
+                const txt = ld.link.children[0].value
+                console.log('href == txt',href == txt)
+                node.properties['href'] = ld.link.properties.href
+                if (href != txt) {
+                    // if these are different the link definition contains link text
+                    node.children = ld.link.children
+                }
+            }
         })
     }
 

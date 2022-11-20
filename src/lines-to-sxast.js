@@ -2,6 +2,7 @@
 
 import lineToSxast from './line-to-sxast.js'
 import strToJs from './str-to-js.js'
+import link from './str-to-link.js'
 
 const RE_DocumentSeparator = /^---$/
 
@@ -10,6 +11,7 @@ const RE_Tag = /^\s*(([a-zA-Z_$][-a-zA-Z\d_$]*)\s*:(\s+(.*?))?)\s*$/
 const RE_ListItemTag = /^\s*-\s+([a-zA-Z_$][-a-zA-Z\d_$]*)(\s*:(\s+(.*?))?)?\s*$/
 const RE_Script = /^(\s*)<%(.*?)\s*$/
 const RE_Footnote = /^\s*\[ *\^ *(\S+) *\] *: *(.+?) *$/
+const RE_LinkDefinition = /^\s*\[ *([^\]]+) *\] *: *(.+?) *$/
 const RE_CodeBlock = /^\s*``` *(([a-zA-Z]+)?)\s*$/
 const RE_Div = /^\s*(<\s*((\!doctype)|([a-z]+))((?:\s+[a-z]+(="[^"]*")?)*)\s*>?\s*)$/i
 const RE_Heading = /^\s*((=+)\s*(\S.*?)\s*[-=]*)\s*$/
@@ -322,6 +324,11 @@ function lineToSqrm(ln) {
     m = ln.text.match(RE_Footnote);
     if (m) {
         return { type: 'footnote', indent: ln.indent, id: m[1], children: textToHast(m[2]), text: ln.text }
+    }
+
+    m = ln.text.match(RE_LinkDefinition);
+    if (m) {
+        return { type: 'link-definition', indent: ln.indent, id: m[1].trim().toLowerCase(), link: link(m[2]) }
     }
 
     m = ln.text.match(RE_CodeBlock);

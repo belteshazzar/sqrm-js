@@ -9,7 +9,7 @@ links [ google | www.google.com ] and anything else
 this is a ref [  ^a] style link, it can be called anything [^  a] repeated
 and [^bb  ] used anywhere, this is not defined [^XX], boo
 
-[^bb]: this is the footnote with !!formatting!! and [links]
+[^bb]: this is the footnote with !!formatting!! and [ links ]
 
 foot notes, if defined get added to the bottom of a rendered document
 

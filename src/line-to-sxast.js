@@ -1,13 +1,12 @@
 
 import {h} from 'hastscript'
 import {t} from './hastscript-tools.js'
-import linkifyStr from 'linkify-string';
 import strToJs from './str-to-js.js'
+import link from './str-to-link.js'
 
 export default function lineToSxast(str) {
 
     let root = h()
-    let linkifyOptions = { defaultProtocol: 'https' };
 
     if (typeof str == 'string') {
         process(root,str,0,'')
@@ -53,60 +52,11 @@ export default function lineToSxast(str) {
     }
 
 
-    function escapeString(s) {
-        let punc = /^[-!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]$/
-        let r = ''
-        for (let i=0 ; i<s.length ; i++) {
-            let a = s[i]
-            r += escapeChar(a)
-        }
-        return r;
-    }
+    // function path(s) {
+    //     return '/' + encodeURIComponent(s.replace(/ +/g,"_").toLowerCase());
+    // }
 
-    function path(s) {
-        return '/' + encodeURIComponent(s.replace(/ +/g,"_").toLowerCase());
-    }
-
-    function url(s) {
-        s = s.replace(/\\\\/g,'\\')
-        const l = linkifyStr(s, {
-            defaultProtocol : 'https'
-        });
-        const m = l.match(/"([^"]+)"/)
-        if (m==null) {
-            return path(s);
-        } else {
-            return m[1]
-        }
-    }
-
-
-    function link(s) {
-        var parts = s.split("|", 2);
-        if (parts.length == 2 && parts[0].charAt(parts[0].length-1) == '\\') {
-            parts[0] = parts[0].substring(0,parts[0].length - 1) + '|' + parts[1]
-            parts.pop();
-        }
-        if (parts.length == 1) {
-            if (parts[0].trim() == '') {
-                return t(`[${s}]`)
-            }
-
-            let u = escapeString(parts[0].trim().replace(/\\\]/g,']'));
-
-            if (u[0] == '^') {
-                u = u.substring(1).trim();
-                return h('sup',{},[ h('a',{'footnote-u':u,'href': `#footnote-${u}`},[t(`TBD`)])])
-            } else {
-                return h('a',{'href':url(u)},[t(u)])
-            }
-        } else {
-            const txt = escapeString(parts[0].trim().replace(/\|/g,'|'));
-            const addr = parts[1].trim().replace(/\]/g,']');
-            return h('a',{'href':url(addr)},[t(txt)])
-        }
-    }
-
+ 
     function process(parent,s,index,inChar) {
         var a, b;
         let str = '';
