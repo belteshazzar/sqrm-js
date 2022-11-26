@@ -23,11 +23,10 @@ This is page-include-multiple-json.
   people.forEach(doc => {
     let id = doc.id
     let res = doc.execute().json
-    console.log(res)
     appendToHtml({"type":"unordered-list-item","indent":1,"children":[{"type":"text","value": `${res.name} = ${res.age}` }]})
   })
 
 
-  let textSearch = db.find('default',{ $text: { $search: 'people' }})
+  let textSearch = db.find('default',{ _text: { $text: 'people' }})
 %>
 

@@ -39,8 +39,15 @@ export default class SqrmDocument {
     }
 
     getIndexedJson() {
-        const res = this.db.db[this.collection].findOne({ _id: this._id })
+        const doc = this.db.db[this.collection].findOne({ _id: this._id })
+        const res = Object.assign({},doc)
         delete res._id
+        delete res._text
         return res
+    }
+
+    getIndexedText() {
+        const doc = this.db.db[this.collection].findOne({ _id: this._id })
+        return doc._text
     }
 }

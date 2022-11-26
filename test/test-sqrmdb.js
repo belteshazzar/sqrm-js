@@ -47,10 +47,9 @@ describe("sqrmdb tests", function() {
             expect(doc4).to.not.be.undefined
             expect(doc4.collection).to.equal('default')
             expect(doc4.name).to.equal('document-4')
-            expect(doc4.getIndexedJson()).to.deep.equal({})
-            expect(doc4.getIndexedText()).to.equal('')
 
-            console.log(doc4)
+            expect(doc4.getIndexedJson()).to.deep.equal({})
+            expect(doc4.getIndexedText()).to.equal('This is page-include-multiple-json.\nlist of people:\nbob = 56\nsteve = 42\n')
 
             // // defines json, has no params or data needs
             // // test calling directly

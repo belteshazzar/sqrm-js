@@ -497,7 +497,6 @@ export default function sastToHast(sqrm) {
 
         for (let i=0 ; i<linkDefinitions.length ; i++) {
             lookup[linkDefinitions[i].id] = linkDefinitions[i]
-            console.log(linkDefinitions[i].link.children)
         }
 
         visit(doc, (node) => {
@@ -509,7 +508,6 @@ export default function sastToHast(sqrm) {
                 delete node.properties['link-ref']
                 const href = ld.link.properties.href
                 const txt = ld.link.children[0].value
-                console.log('href == txt',href == txt)
                 node.properties['href'] = ld.link.properties.href
                 if (href != txt) {
                     // if these are different the link definition contains link text

@@ -5,9 +5,9 @@ import {expect} from 'chai';
 
 import * as fs from 'fs'//const fs = require("fs");
 
-import JSON5 from 'json5'
+//import JSON5 from 'json5'
 import {h} from 'hastscript'
-import {t} from '../src/hastscript-tools.js'
+//import {t} from '../src/hastscript-tools.js'
 import sqrm from '../src/sqrm.js'
 import SqrmDB from '../src/SqrmDB.js'
 
@@ -596,7 +596,7 @@ describe("file based tests", function() {
                 : '' )
             const expectedJson = (
                 fs.existsSync(`./test/docs/${name}.json`)
-                ? JSON5.parse(fs.readFileSync(`./test/docs/${name}.json`, 'utf-8').toString())
+                ? JSON.parse(fs.readFileSync(`./test/docs/${name}.json`, 'utf-8').toString())
                 : {} )
 
             test(`file: ${file}`,src,expectedHtml,expectedJson,includeCallback)

@@ -1,6 +1,5 @@
 
-import mongo from 'mongols'
-
+import * as mongo from 'mongo-local-db'
 
 import SqrmDocument from './SqrmDocument.js'
 import SqrmRequest from './SqrmRequest.js'
@@ -8,9 +7,6 @@ import SqrmResponse from './SqrmResponse.js'
 import sxastParser from './sxast-parser.js';
 import responseToResult from './response-to-result.js';
 
-import flexsearch from "flexsearch";
-
-const { Index, Document, Worker } = flexsearch
 const options = {}
 
 const defaults = {
@@ -42,7 +38,7 @@ export default class SqrmDB {
   
     createCollection(name) {
         this.db.createCollection(name)
-        let info = { name: name, docs: new Map(), docsBy_id: new Map(), textIndex: new Index(options) }
+        let info = { name: name, docs: new Map(), docsBy_id: new Map() }
         this.collections.set(name,info)
         return info
     }
@@ -98,13 +94,14 @@ export default class SqrmDB {
                 doc.execute(request,response);
                 const res = responseToResult(response,this.settings)
 
+                const json = res.json
+                json._text = res.text
+
                 // add to mongo
-                this.db[doc.collection].insertOne(res.json)
+                this.db[doc.collection].insertOne(json)
                 doc._id = res.json._id
                 this.collections.get(doc.collection).docsBy_id.set(res.json._id,doc)
 
-                // add to flex search index for collection
-                this.collections.get(doc.collection).add(doc._id, res.html);
             } catch (e) {
                 console.log(`!!! ERROR: failed to index: ${doc.collection}.${doc.name}`)
                 console.log('!!! line:  ',e.lineNum)
@@ -165,8 +162,6 @@ export default class SqrmDB {
         if (select == undefined) {
             return cursorToDocs(this.db[collection].find())
         } else if (typeof select == "string") {
-
-            console.log(col.docs)
             return col.docs.get(select)
         } else if (typeof select == 'object' && select == Object(select)) {
 

@@ -2,6 +2,7 @@
 import {toHtml} from 'hast-util-to-html'
 import sastToHast from './sast-to-hast.js';
 import toJson from './jast-to-json.js'
+import {visit} from 'unist-util-visit'
 
 export default function responseToResult(response,options = {}) {
     let sast = response.root
@@ -28,6 +29,16 @@ export default function responseToResult(response,options = {}) {
         console.log(html)
     }
 
+    let text = ''
+    visit(hast, 'text', (node) => {
+        text += node.value +'\n'
+    })
+
+    if (options.log_text) {
+        console.log('= text =================')
+        console.log(text)
+    }
+
     let jast = response.jsonTree
 
     if (options.log_jast) {
@@ -43,5 +54,5 @@ export default function responseToResult(response,options = {}) {
         console.log(json);
     }
 
-    return {html: html, json: json}
+    return {html: html, json: json, text: text}
 }
