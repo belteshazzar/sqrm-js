@@ -49,12 +49,12 @@ function test(name,source,expectedHtml,expectedJson={},includeCallback) {
 
         let html,json
 
-        if (Array.isArray(result)) {
+        if (result.docs !== undefined && Array.isArray(result.docs)) {
 
             html = ''
             json = []
 
-            result.forEach((el) => {
+            result.docs.forEach((el) => {
                 html += el.html
                 json.push(el.json)
             })
@@ -288,6 +288,7 @@ describe("Non-file based tests", function() {
         
         test('formatting 25','a ^^ b __ c -- !! d !! e','<div class="p">a <sup> b <u> c <del> <b> d </b> e</del></u></sup></div>')
         
+        test('formatting after template','v: 3\nthe value is **${json.v}** and not bold','<div class="p">the value is <b>3</b> and not bold</div>',{v: 3})
     });
 
     describe("html entities", function() {

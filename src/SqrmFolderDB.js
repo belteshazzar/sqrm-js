@@ -1,12 +1,7 @@
 
 import fs from 'node:fs'
 
-import SqrmDocument from './SqrmDocument.js'
-import SqrmRequest from './SqrmRequest.js'
-import SqrmResponse from './SqrmResponse.js'
 import SqrmDB from './SqrmDB.js'
-import sxastParser from './sxast-parser.js';
-import responseToResult from './response-to-result.js';
 
 export default class SqrmFolderDB extends SqrmDB {
 
@@ -36,9 +31,5 @@ export default class SqrmFolderDB extends SqrmDB {
                 this.createDocument(collection,docName,src)
             });
         })
-
-        this.updateIndex()
     }
-
-
 }

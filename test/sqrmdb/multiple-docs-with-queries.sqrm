@@ -14,19 +14,18 @@ age: 56
 
 ---
 
-This is page-include-multiple-json.
+This is an example of multiple docs in a single file.
+
+List of people younger than 70:
 <%
   let people = db.find('default',{ $and: [ { name: {$exists: true }}, { age: { $lt: 70}} ]}, {name : 1})
-%>
-  list of people:
-<%
+
   people.forEach(doc => {
     let id = doc.id
     let res = doc.execute().json
-    appendToHtml({"type":"unordered-list-item","indent":1,"children":[{"type":"text","value": `${res.name} = ${res.age}` }]})
+%>
+  - ${res.name} = ${res.age}
+<%
   })
-
-
-  let textSearch = db.find('default',{ _text: { $text: 'people' }})
 %>
 

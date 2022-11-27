@@ -33,7 +33,6 @@ export default class SqrmDB {
         this.collections = new Map()
         this.db = new mongo.DB()
         this.createCollection('default')
-        this.docsToIndex = []
     }
   
     createCollection(name) {
@@ -55,13 +54,48 @@ export default class SqrmDB {
             try {
                 let doc = new SqrmDocument(collection,docName,sxasts[0],this)
                 col.docs.set(docName,doc)
-                this.docsToIndex.push(doc)
-                return { collection: collection, document: docName }
+
+                const createdDoc = { collection: collection, document: docName }
+
+                let request = new SqrmRequest();
+                let response = new SqrmResponse(this);
+                try {
+                    // generate output
+                    doc.execute(request,response);
+                    const res = responseToResult(response,this.settings)
+                    const mongoDoc = Object.assign({},res.json)
+                    mongoDoc._text = res.text
+
+                    // add to mongo
+                    this.db[doc.collection].insertOne(mongoDoc)
+                    doc._id = mongoDoc._id
+                    this.collections.get(doc.collection).docsBy_id.set(mongoDoc._id,doc)
+
+                    createdDoc.html = res.html
+                    createdDoc.json = res.json
+                } catch (e) {
+                    createdDoc.error = {
+                        lineNum: e.lineNum,
+                        lineStr: e.lineStr,
+                        exception: e
+                    };
+
+                    if (e.stack) {
+                        createdDoc.error.message = e.stack.split('\n')[0];
+                    } else if (e['$err']) {
+                        createdDoc.error.message = e['$err']
+                    } else {
+                        createdDoc.error.message = 'failed to index'
+                    }
+                }
+
+                return createdDoc
             } catch (e) {
+                console.log(e)
                 return { error: `failed to create document: ${e.getMessage()}` }
             }
         } else {
-            const res = { docs: [] }
+            const createdDocs = { docs: [] }
             let errors = 0
             for (let i=0 ; i<sxasts.length ; i++) {
                 let sxast = sxasts[i]
@@ -70,51 +104,52 @@ export default class SqrmDB {
                     const dn = `${docName}-${i+1}`
                     let doc = new SqrmDocument(collection,dn,sxast,this)
                     col.docs.set(dn,doc)
-                    this.docsToIndex.push(doc)
-                    res.docs.push({ collection: collection, document: dn })
+                    const createdDoc = { collection: collection, document: dn }
+
+                    let request = new SqrmRequest();
+                    let response = new SqrmResponse(this);
+                    try {
+                        // generate output
+                        doc.execute(request,response);
+                        const res = responseToResult(response,this.settings)
+                        const mongoDoc = Object.assign({},res.json)
+                        mongoDoc._text = res.text
+    
+                        // add to mongo
+                        this.db[doc.collection].insertOne(mongoDoc)
+                        doc._id = mongoDoc._id
+                        this.collections.get(doc.collection).docsBy_id.set(mongoDoc._id,doc)
+    
+                        createdDoc.html = res.html
+                        createdDoc.json = res.json
+                    } catch (e) {
+                        createdDoc.error = {
+                            lineNum: e.lineNum,
+                            lineStr: e.lineStr,
+                            exception: e
+                        };
+    
+                        if (e.stack) {
+                            createdDoc.error.message = e.stack.split('\n')[0];
+                        } else if (e['$err']) {
+                            createdDoc.error.message = e['$err']
+                        } else {
+                            createdDoc.error.message = 'failed to index'
+                        }
+                    }        
+    
+                    createdDocs.docs.push(createdDoc)
                 } catch (e) {
-                    res.docs.push({ error: `failed to create ${collection}/${dn}: ${e.getMessage()}` })
+                    createdDocs.docs.push({ error: `failed to create ${collection}/${dn}: ${e.getMessage()}` })
                     errors++
                 }
             }
             if (errors>0) {
-                res.error = `error occured creating ${errors} of ${sxasts.length} documents`
+                createdDocs.error = `error occured creating ${errors} of ${sxasts.length} documents`
             }
-            return res
+            return createdDocs
         }
 
-    }
-
-    updateIndex() {
-        this.docsToIndex.forEach((doc) => {
-            let request = new SqrmRequest();
-            let response = new SqrmResponse(this);
-            try {
-                // generate output
-                doc.execute(request,response);
-                const res = responseToResult(response,this.settings)
-
-                const json = res.json
-                json._text = res.text
-
-                // add to mongo
-                this.db[doc.collection].insertOne(json)
-                doc._id = res.json._id
-                this.collections.get(doc.collection).docsBy_id.set(res.json._id,doc)
-
-            } catch (e) {
-                console.log(`!!! ERROR: failed to index: ${doc.collection}.${doc.name}`)
-                console.log('!!! line:  ',e.lineNum)
-                console.log('!!! line:  ',e.lineStr)
-                if (e.stack) console.log('!!! error: ',e.stack.split('\n')[0]);
-                else if (e['$err']) {
-                    console.log(e)
-                    console.log('!!! ',e['$err'])
-                }
-            }
-
-        })
-        this.docsToIndex = []
     }
 
     call(collection,docName,args) {

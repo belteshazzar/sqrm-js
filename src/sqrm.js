@@ -8,28 +8,33 @@ import responseToResult from './response-to-result.js';
 
 export default function sqrm(src, db = new SqrmDB()) {
 
+    return db.createDocument('default','document',src)
+    // console.log('sqrm.res',res)
+    
+    // let result = []
 
-    const sxasts = sxastParser(src,db.settings)
+    // const f = db.find('default')
 
-    let result = []
+    // if (Array.isArray(f)) {
 
-    for (let i=0 ; i<sxasts.length ; i++) {
+    //     f.forEach((doc) => {
+    //         let request = new SqrmRequest([]);
+    //         let response = new SqrmResponse(db);
+    //         doc.execute(request,response)
+    //         result.push(responseToResult(response,db.settings))    
+    //     })
 
-        let sxast = sxasts[i]
+    // } else {
+    //     console.log(f)
+    //     let request = new SqrmRequest([]);
+    //     let response = new SqrmResponse(db);
+    //     f.execute(request,response)
+    //     result.push(responseToResult(response,db.settings))
+    // }
 
-        let doc = new SqrmDocument(db.settings.collection,`${db.settings.name}-${i+1}`,sxast,db);
-
-        let request = new SqrmRequest([]);
-        let response = new SqrmResponse(db);
-
-        doc.execute(request,response);
-
-        result.push(responseToResult(response,db.settings))
-    }
-
-    if (result.length==1) {
-        return result[0]
-    } else {
-        return result
-    }
+    // if (result.length==1) {
+    //     return result[0]
+    // } else {
+    //     return result
+    // }
 }
