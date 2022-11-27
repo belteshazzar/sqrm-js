@@ -1,6 +1,6 @@
 {
   "name": "sqrm",
-  "version": "0.1.2",
+  "version": "0.1.4",
   "description": "sqrm (pronounced squirm and short for square embrace) is the illicit love child of markdown and yaml.",
   "main": "build/main.min.js",
   "bin": {
@@ -40,7 +40,7 @@
     "hastscript": "^7.0.2",
     "html-entities": "^2.3.3",
     "linkify-string": "^3.0.4",
-    "mongo-local-db": "1.1.2",
+    "mongo-local-db": "1.1.3",
     "smile2emoji": "^2.9.0",
     "unist-util-visit": "^4.1.1"
   }
