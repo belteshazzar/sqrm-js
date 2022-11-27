@@ -91,8 +91,8 @@ export default class SqrmDB {
 
                 return createdDoc
             } catch (e) {
-                console.log(e)
-                return { error: `failed to create document: ${e.getMessage()}` }
+                console.log(e.message)
+                return { error: `failed to create document: ${e.message}` }
             }
         } else {
             const createdDocs = { docs: [] }

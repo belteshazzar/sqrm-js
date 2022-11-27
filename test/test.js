@@ -288,7 +288,20 @@ describe("Non-file based tests", function() {
         
         test('formatting 25','a ^^ b __ c -- !! d !! e','<div class="p">a <sup> b <u> c <del> <b> d </b> e</del></u></sup></div>')
         
-        test('formatting after template','v: 3\nthe value is **${json.v}** and not bold','<div class="p">the value is <b>3</b> and not bold</div>',{v: 3})
+        test('formatting after template 1','v: 3\nthe value is **${json.v}** and not bold','<div class="p">the value is <b>3</b> and not bold</div>',{v: 3})
+        test('formatting after template 2','v: 3\nthe value is **${json.v}','<div class="p">the value is <b>3</b></div>',{v: 3})
+        test('formatting after template 3','v: 3\nthe value is **${json.v + "}" }','<div class="p">the value is <b>3}</b></div>',{v: 3})
+        test('formatting after template 4','v: 3\nthe value is **${ "}**" }','<div class="p">the value is <b>}**</b></div>',{v: 3})
+        test('formatting after template 5','v: 3\nthe value is **${ \'}**\' }','<div class="p">the value is <b>}**</b></div>',{v: 3})
+
+        test('formatting invalid template 1','${','<div class="p">${</div>')
+        test('formatting invalid template 2','$','<div class="p">$</div>')
+        test('formatting invalid template 3','${ "fred}','<div class="p">${ "fred}</div>')
+        test('formatting invalid template 4','${ 4 + 3" ','<div class="p">${ 4 + 3"</div>')
+        test('formatting invalid template 5','${ \'} " ','<div class="p">${ \'} "</div>')
+
+        test('formatting template with html','${ "<b>bold</b>" }','<div class="p">&#x3C;b>bold&#x3C;/b></div>',)
+
     });
 
     describe("html entities", function() {

@@ -65,6 +65,8 @@ export default function lineToSxast(str) {
             a = s.charAt(index++);
             b = s.charAt(index);
 
+            // TODO: change from if statements that can fall into each other
+
             if (a == '\\') {
                 if (b == '$') {
                     str += '\\$';
@@ -123,15 +125,31 @@ export default function lineToSxast(str) {
                 }
             }
             if (a == '$' && b == '{') {
-                str += '$'
-                for (let k = index; k < s.length; k++) {
-                    let ch = s.charAt(k)
-                    str += ch;
-                    if (ch=='}') {
-                        index = k + 1
-                        a = s.charAt(index++);
-                        break;
+                let template = ''
+                index++
+                while (index < s.length) {
+                    let ch = s.charAt(index)
+
+                    if (ch!='}') {
+                        template += ch
+                    } else {
+                        try {
+                            strToJs(template,true)
+                            str += '${' + template + '}'
+                            template = null
+                            index++
+                            a = s.charAt(index++);
+                            b = s.charAt(index);
+                            break;
+                        } catch (e) {
+                            template += ch
+                        }
                     }
+                    index++
+                }
+                if (index == s.length && template != null) {
+                    str += '\\${' + template
+                    continue
                 }
             }
             if (a == '#') {
