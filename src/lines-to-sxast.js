@@ -13,7 +13,7 @@ const RE_Script = /^(\s*)<%(.*?)\s*$/
 const RE_Footnote = /^\s*\[ *\^ *(\S+) *\] *: *(.+?) *$/
 const RE_LinkDefinition = /^\s*\[ *([^\]]+) *\] *: *(.+?) *$/
 const RE_CodeBlock = /^\s*``` *(([a-zA-Z]+)?)\s*$/
-const RE_Div = /^\s*(<\s*((\!doctype)|([a-z]+))((?:\s+[a-z]+(="[^"]*")?)*)\s*>?\s*)$/i
+const RE_Div = /^\s*(<\s*((\!doctype)|([a-z]+([a-z0-9]+)?))((?:\s+[a-z]+(="[^"]*")?)*)\s*>?\s*)$/i
 const RE_Heading = /^\s*((=+)\s*(\S.*?)\s*[-=]*)\s*$/
 const RE_HR = /^\s*[-=_\*\s]+$/
 const RE_ListItem = /^\s*(?:(?:([-*+])|(\d+[\.)]))\s+(\S.*?))\s*$/
@@ -288,8 +288,8 @@ function lineToSqrm(ln) {
     m = ln.text.match(RE_Div)
     if (m) {
         let properties = {}
-        if (m[5]) {
-            let props =  [... m[5].matchAll(/([^\s=]+)(=["]([^"]*)["])?/g) ]
+        if (m[6]) {
+            let props =  [... m[6].matchAll(/([^\s=]+)(=["]([^"]*)["])?/g) ]
             for (let prop of props) {
                 if (prop[3]) {
                     properties[prop[1]] = { value: prop[3] }

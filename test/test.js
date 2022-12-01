@@ -365,6 +365,13 @@ describe("Non-file based tests", function() {
         test('divs 1','fred\n\n< blockquote\n\n  <div id="fred" class="woot" \n woot\n\n','<div class="p">fred</div><blockquote><div id="fred" class="woot"></div></blockquote><div class="p">woot</div>')
         test('divs 2','fred\n\n<blockquote\n\n  with more\n\n  <div\n\n    another indented','<div class="p">fred</div><blockquote><div class="p">with more</div><div><div class="p">another indented</div></div></blockquote>')
         
+        test('divs h1','<h1\n  fred','<h1><div class="p">fred</div></h1>')
+        test('divs h2','<h2\n  fred','<h2><div class="p">fred</div></h2>')
+        test('divs h3','<h3\n  fred','<h3><div class="p">fred</div></h3>')
+        test('divs h4','<h4\n  fred','<h4><div class="p">fred</div></h4>')
+        test('divs h5','<h5\n  fred','<h5><div class="p">fred</div></h5>')
+        test('divs h6','<h6\n  fred','<h6><div class="p">fred</div></h6>')
+        test('divs h7','<h7\n  fred','<h7><div class="p">fred</div></h7>')
     });
 
     describe("inline mentions", function() {
