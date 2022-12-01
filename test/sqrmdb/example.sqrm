@@ -1,0 +1,109 @@
+= Square Embrace Syntax Guide
+
+== Headers
+
+Note that headers use = instead of # like in markdown,
+thats because # is used for #tags, and they are
+powerful (hint: look at the javascript console - but we’ll get to that latter ;) )
+ 
+= This is a Heading h1
+== This is a Heading h2 
+====== This is a Heading h6
+
+== Formatting
+
+~~This text will be italic~~ and //so is this//
+
+**This text will be bold** and !!so is this!!
+
+There is also support for --strike-through--, ``code``, __underscore__, ^^super^^ and $$keyboard$$. ~~You **can** combine them and they end at the end of a line
+
+== Lists
+
+=== Unordered
+
+* Item 1
+- Item 2
++ Item 2a
+* Item 2b
+
+=== Ordered
+
+1. Item 1
+8. Item 2
+1. Item 3
+  1. Item 3a
+  1. Item 3b
+
+== Images
+
+Images use the div line markup:
+<img src="image/sample.png" width="200" height="200" alt="This is a sample image"
+
+== Links
+
+This was forked from [Markdown Live Preview | https://markdownlivepreview.com/ ].
+
+== Blockquotes
+
+Indenting is used in square embrace to structure html, along with lines that start with <, so while block quotes are not supported, the same can be acheived with the following:
+
+<blockquote
+  Markdown is a lightweight markup language with plain-text-formatting syntax, created in 2004 by John Gruber with Aaron Swartz.
+
+  <blockquote
+    Markdown is often used to format readme files, for writing messages in online discussion forums, and to create rich text using a plain text editor.
+
+== Tables
+
+Tables are similar but a little different to markdown, and a whole lot more powerful. A row with only -'s and |'s splits a table head from a table body, but each cell can also
+be formatted individually. Formatting applied to a header is applied to the whole column.
+
+| columns  |c centered |r right aligned |
+| -------- |   -    ---| -- |
+| foo      |! heading       | foo |
+|v row span      |> col span |
+|        baz       |r baz |
+
+== Blocks of code
+
+As with blockquotes, indenting (2 spaces) is used in square embrace. Code blocks can be created with <pre and <code blocks but the three tick shorthand can also be used.
+
+```javascript
+  let message = ‘Hello world’;
+  alert(message);
+
+```note
+  info, tip, note and warning are supported languages that create special panels
+
+---
+
+name: steve
+age: 42
+
+---
+
+name: fred
+age: 78
+
+---
+
+name: bob
+age: 56
+
+---
+
+This is an example of multiple docs in a single file.
+
+List of people younger than 70:
+<%
+  let people = db.find(“default”,{ $and: [ { name: {$exists: true }}, { age: { $lt: 70}} ]}, {name : 1})
+
+  people.forEach(doc => {
+    let id = doc.id
+    let res = doc.execute().json
+%>
+  - ${res.name} = ${res.age}
+<%
+  })  
+%>

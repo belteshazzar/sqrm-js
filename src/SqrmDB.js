@@ -91,7 +91,6 @@ export default class SqrmDB {
 
                 return createdDoc
             } catch (e) {
-                console.log(e.message)
                 return { error: `failed to create document: ${e.message}` }
             }
         } else {
@@ -100,8 +99,8 @@ export default class SqrmDB {
             for (let i=0 ; i<sxasts.length ; i++) {
                 let sxast = sxasts[i]
     
+                const dn = `${docName}-${i+1}`
                 try {
-                    const dn = `${docName}-${i+1}`
                     let doc = new SqrmDocument(collection,dn,sxast,this)
                     col.docs.set(dn,doc)
                     const createdDoc = { collection: collection, document: dn }
@@ -140,7 +139,7 @@ export default class SqrmDB {
     
                     createdDocs.docs.push(createdDoc)
                 } catch (e) {
-                    createdDocs.docs.push({ error: `failed to create ${collection}/${dn}: ${e.getMessage()}` })
+                    createdDocs.docs.push({ error: `failed to create ${collection}/${dn}: ${e.message}` })
                     errors++
                 }
             }
@@ -173,7 +172,6 @@ export default class SqrmDB {
     }
 
     find(collection,select,sort,skip,limit) {
-
         function cursorToDocs(c) {
             let res = [];
 

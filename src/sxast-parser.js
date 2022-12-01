@@ -9,6 +9,9 @@ export default function sxastParser(src,options) {
         console.log(src)
     }
     
+    // TODO: hack to fix invalid javascript quoting
+    src = src.replace(/[“”]/g,'"')
+
     const lines = sqrmToLines(src)
     
     if (options.log_lines) {

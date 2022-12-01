@@ -25,14 +25,14 @@ describe("sqrmdb tests", function() {
             const db = new SqrmDB(options)
             expect(db).to.not.be.null
 
-            const src = fs.readFileSync('./test/sqrmdb/multiple-docs-with-queries.sqrm').toString()
+            const src = fs.readFileSync('./test/sqrmdb/example.sqrm').toString()
             expect(src).to.not.be.null
 
             const res = db.createDocument('default','document',src)
             expect(res).to.not.be.null
             expect(res.error).to.be.undefined
             expect(res.docs).to.not.be.null
-            expect(res.docs.length).to.equal(4)
+            expect(res.docs.length).to.equal(5)
 
             const collectionNames = db.getCollectionNames()
             expect(collectionNames).to.not.be.null
@@ -40,15 +40,15 @@ describe("sqrmdb tests", function() {
 
             const all = db.find('default')
             expect(all).to.not.be.null
-            expect(all.length).to.equal(4)
+            expect(all.length).to.equal(5)
 
-            const doc4 = db.find('default','document-4')
-            expect(doc4).to.not.be.undefined
-            expect(doc4.collection).to.equal('default')
-            expect(doc4.name).to.equal('document-4')
+            const doc5 = db.find('default','document-5')
+            expect(doc5).to.not.be.undefined
+            expect(doc5.collection).to.equal('default')
+            expect(doc5.name).to.equal('document-5')
 
-            expect(doc4.getIndexedJson()).to.deep.equal({})
-            expect(doc4.getIndexedText()).to.equal('This is an example of multiple docs in a single file.\nList of people younger than 70:\nbob = 56\nsteve = 42\n')
+            expect(doc5.getIndexedJson()).to.deep.equal({})
+            expect(doc5.getIndexedText()).to.equal('This is an example of multiple docs in a single file.\nList of people younger than 70:\nbob = 56\nsteve = 42\n')
         })
     })
 })

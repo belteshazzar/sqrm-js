@@ -14,9 +14,14 @@ export default {
     sourcemap: true
   }, {
     file: `build/sqrm-${pkg.version}.min.js`,
-    format: 'es',
     name: 'sqrm',
+    format: 'es',
     plugins: [terser()],
+    sourcemap: true
+  },{
+    file: `build/sqrm-${pkg.version}.iife.js`,
+    name: 'sqrm',
+    format: 'iife',
     sourcemap: true
   }],
   plugins: [json(),nodeResolve(),commonjs()]
