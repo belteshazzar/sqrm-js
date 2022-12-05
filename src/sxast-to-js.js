@@ -168,7 +168,7 @@ function stringifyO(obj) {
         } else if (typeof value === 'object') {
             s += `"${key}":${stringifyO(value)}`
         } else if (typeof value === 'string' && key == 'value') {
-            s += `"${key}":${'`'+escape(value)+'`'}`
+            s += `"${key}":${'template(() => `'+escape(value)+'`)'}`
         } else {
             s += `"${key}":${JSON.stringify(value)}`
         }
@@ -209,6 +209,7 @@ let json = response.json
 
 const maybeYaml = response.libs.maybeYaml
 const inlineTag = response.libs.inlineTag
+const template = response.libs.template
 const addTask = response.libs.addTask
 const appendToHtml = response.libs.appendToHtml
 const include = response.libs.include
@@ -244,7 +245,7 @@ export function sxastToJs(collection,name,sxast) {
     out += '} catch (e) {\n'
 
     out += '  let m = e.stack.match(/<anonymous>:([0-9]+):([0-9]+)/)\n'
-    out += '  const errLine = m[1] - 26\n'
+    out += '  const errLine = m[1] - 27\n'
     out += '  const errColumn = m[2] - 1\n'
     out += `  const errMsg = e.stack.split('\\n')[0]\n`
 
@@ -283,7 +284,7 @@ export function sxastToTextJs(collection,name,sxast,error) {
         let ln = sxast[i]
 
         out += `appendToHtml({type: 'paragraph', indent: 1, text: ${qouted('  '+ln.text)}})\n`
-        if (i == error.errorLine - 2) {
+        if (i == error.errorLine - 3) {
             let uline = ''
             for (let i=0 ; i<error.errorColumn ; i++) uline += ' ';
 

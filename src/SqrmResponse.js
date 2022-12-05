@@ -31,6 +31,7 @@ export default class SqrmResponse {
             addTask: this.addTask.bind(this),
             inlineTag: this.inlineTag.bind(this),
             appendToHtml: this.appendToHtml.bind(this),
+            template: this.template.bind(this),
 //            set: this.set,
 //            append: this.append//.bind(this),
         };//, tree: new Tree(), util: util };
@@ -198,6 +199,10 @@ export default class SqrmResponse {
         // this.updateJson()
     }
 
+    template(fn) {
+        return fn()
+    }
+
     inlineTag({name,args,children}) {
         this.jsonTag({
             indent: 0,
@@ -316,13 +321,21 @@ export default class SqrmResponse {
 
         if (parent.type == 'object' && !isArrayElement) {
  
+            let child = null
             if (colon && value === undefined) {
-                parent.children.push({ minChildIndent: indent, type: 'unknown', name: name })
+                child = { minChildIndent: indent, type: 'unknown', name: name }
             } else {
-                parent.children.push({ type: 'value', name: name, value: value })
+                child = { type: 'value', name: name, value: value }
             }
 
-            // this.updateJson()
+            for (let i=0 ; i<parent.children.length ; i++) {
+                if (parent.children[i].name == name) {
+                    parent.children[i] = child
+                    return parent.children[i]
+                }
+            }
+
+            parent.children.push(child)
             return parent.children[parent.children.length-1]
         }
 

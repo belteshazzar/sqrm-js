@@ -104,7 +104,6 @@ function tableOf(rows) {
     return table;
 }
 
-
 export default function sastToHast(sqrm) {
 
     const doc = { type: "root", children: [] }
