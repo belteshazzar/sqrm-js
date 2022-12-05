@@ -51,101 +51,63 @@ export default class SqrmDB {
         const sxasts = sxastParser(src,this.settings)
         
         if (sxasts.length==1) {
-            try {
-                let doc = new SqrmDocument(collection,docName,sxasts[0],this)
-                col.docs.set(docName,doc)
 
-                const createdDoc = { collection: collection, document: docName }
+            let doc = new SqrmDocument(collection,docName,sxasts[0],this)
+            col.docs.set(docName,doc)
 
-                let request = new SqrmRequest();
-                let response = new SqrmResponse(this);
-                try {
-                    // generate output
-                    doc.execute(request,response);
-                    const res = responseToResult(response,this.settings)
-                    const mongoDoc = Object.assign({},res.json)
-                    mongoDoc._text = res.text
+            const createdDoc = { collection: collection, document: docName }
 
-                    // add to mongo
-                    this.db[doc.collection].insertOne(mongoDoc)
-                    doc._id = mongoDoc._id
-                    this.collections.get(doc.collection).docsBy_id.set(mongoDoc._id,doc)
+            let request = new SqrmRequest();
+            let response = new SqrmResponse(this);
 
-                    createdDoc.html = res.html
-                    createdDoc.json = res.json
-                } catch (e) {
-                    createdDoc.error = {
-                        lineNum: e.lineNum,
-                        lineStr: e.lineStr,
-                        exception: e
-                    };
+            // generate output
+            doc.execute(request,response);
+            const res = responseToResult(response,this.settings)
+            const mongoDoc = Object.assign({},res.json)
+            mongoDoc._text = res.text
 
-                    if (e.stack) {
-                        createdDoc.error.message = e.stack.split('\n')[0];
-                    } else if (e['$err']) {
-                        createdDoc.error.message = e['$err']
-                    } else {
-                        createdDoc.error.message = 'failed to index'
-                    }
-                }
+            // add to mongo
+            this.db[doc.collection].insertOne(mongoDoc)
+            doc._id = mongoDoc._id
+            this.collections.get(doc.collection).docsBy_id.set(mongoDoc._id,doc)
 
-                return createdDoc
-            } catch (e) {
-                return { error: `failed to create document: ${e.message}` }
-            }
+            createdDoc.html = res.html
+            createdDoc.json = res.json
+
+            return createdDoc
+
         } else {
             const createdDocs = { docs: [] }
-            let errors = 0
+
             for (let i=0 ; i<sxasts.length ; i++) {
                 let sxast = sxasts[i]
     
                 const dn = `${docName}-${i+1}`
-                try {
-                    let doc = new SqrmDocument(collection,dn,sxast,this)
-                    col.docs.set(dn,doc)
-                    const createdDoc = { collection: collection, document: dn }
 
-                    let request = new SqrmRequest();
-                    let response = new SqrmResponse(this);
-                    try {
-                        // generate output
-                        doc.execute(request,response);
-                        const res = responseToResult(response,this.settings)
-                        const mongoDoc = Object.assign({},res.json)
-                        mongoDoc._text = res.text
-    
-                        // add to mongo
-                        this.db[doc.collection].insertOne(mongoDoc)
-                        doc._id = mongoDoc._id
-                        this.collections.get(doc.collection).docsBy_id.set(mongoDoc._id,doc)
-    
-                        createdDoc.html = res.html
-                        createdDoc.json = res.json
-                    } catch (e) {
-                        createdDoc.error = {
-                            lineNum: e.lineNum,
-                            lineStr: e.lineStr,
-                            exception: e
-                        };
-    
-                        if (e.stack) {
-                            createdDoc.error.message = e.stack.split('\n')[0];
-                        } else if (e['$err']) {
-                            createdDoc.error.message = e['$err']
-                        } else {
-                            createdDoc.error.message = 'failed to index'
-                        }
-                    }        
-    
-                    createdDocs.docs.push(createdDoc)
-                } catch (e) {
-                    createdDocs.docs.push({ error: `failed to create ${collection}/${dn}: ${e.message}` })
-                    errors++
-                }
+                let doc = new SqrmDocument(collection,dn,sxast,this)
+                col.docs.set(dn,doc)
+                const createdDoc = { collection: collection, document: dn }
+
+                let request = new SqrmRequest();
+                let response = new SqrmResponse(this);
+
+                // generate output
+                doc.execute(request,response);
+                const res = responseToResult(response,this.settings)
+                const mongoDoc = Object.assign({},res.json)
+                mongoDoc._text = res.text
+
+                // add to mongo
+                this.db[doc.collection].insertOne(mongoDoc)
+                doc._id = mongoDoc._id
+                this.collections.get(doc.collection).docsBy_id.set(mongoDoc._id,doc)
+
+                createdDoc.html = res.html
+                createdDoc.json = res.json
+
+                createdDocs.docs.push(createdDoc)
             }
-            if (errors>0) {
-                createdDocs.error = `error occured creating ${errors} of ${sxasts.length} documents`
-            }
+
             return createdDocs
         }
 

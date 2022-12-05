@@ -216,7 +216,7 @@ function textToHast(text) {
 function lineToSqrm(ln) {
 
     if (ln.text.length==0) {
-        return {type:'blank', line:ln.line}
+        return {type:'blank', line:ln.line, text: ln.text}
     }
 
     let m;
@@ -282,7 +282,7 @@ function lineToSqrm(ln) {
 
     m = ln.text.match(RE_Script)
     if (m) {
-        return {type:'script',indent:ln.indent, code: m[1] + '  ' + m[2], line:ln.line}
+        return {type:'script',indent:ln.indent, code: m[1] + '  ' + m[2], line:ln.line, text: ln.text}
     }
 
     m = ln.text.match(RE_Div)

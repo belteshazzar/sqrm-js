@@ -348,7 +348,23 @@ export default function sastToHast(sqrm) {
             }
             return null
         }
-        
+
+        function script() {
+            let n = next()
+            if (n==null || n.type != 'script') {
+                throw new Error('expected script but found ' + n.type);
+            }
+            return h('pre',{},[t(n.text)])
+        }
+
+        function scriptError() {
+            let n = next()
+            if (n==null || n.type != 'script-error') {
+                throw new Error('expected script-error but found ' + n.type);
+            }
+            return h('pre',{class:'script-error'},[t(n.text)])
+        }
+       
         function paragraph() {
             let n = next()
             const p = h('div',{ class: 'p' }, n.children)
@@ -404,7 +420,12 @@ export default function sastToHast(sqrm) {
             let ln = peek()
 
             if (ln.indent == undefined) {
-                return blank()
+                switch (ln.type) {
+                    case 'blank': return blank();
+                    case 'script': return script();
+                    case 'script-error': return scriptError();
+                    default: throw new Error('expected blank or script, found: ' + ln.type);
+                }
             }
     
             if (ln.indent < indent) {

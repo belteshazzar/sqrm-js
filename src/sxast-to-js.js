@@ -1,207 +1,197 @@
 
 import qouted from './quoted-string.js'
 
-export default function sxastToJs(collection,name,sxast) {
+function escape(s) {
+    return s.replaceAll('\\','\\\\').replaceAll('\`','\\\`').replaceAll('\\\\$','\\$')
+}
 
-    function escape(s) {
-        return s.replaceAll('\\','\\\\').replaceAll('\`','\\\`').replaceAll('\\\\$','\\$')
-    }
+function stringifyArgsObj(obj) {
 
-    function stringifyArgsObj(obj) {
+    let s = '{'
+    let first = true
+    for (const [key, value] of Object.entries(obj)) {
 
-        let s = '{'
-        let first = true
-        for (const [key, value] of Object.entries(obj)) {
-
-            if (first) {
-                first = false
-            } else {
-                s += ','
-            }
-
-            if (key == 'args') {
-                s += `"${key}":${value}`
-            } else if (value === undefined) {
-                s += `"${key}":undefined`
-            } else if (value == null) {
-                s += `"${key}":null`
-            } else if (Array.isArray(value)) {
-                s += `"${key}":${stringifyA(value)}`
-            } else if (typeof value === 'object') {
-                s += `"${key}":${stringifyO(value)}`
-            } else if (typeof value === 'string') {
-                s += `"${key}":${'`'+escape(value)+'`'}`
-            } else {
-                s += `"${key}":${JSON.stringify(value)}`
-            }
-        }
-        s += '}'
-        return s
-    }
-
-    function stringifyInclude(obj) {
-        return `include(${stringifyArgsObj(obj)})`
-    }
-
-    function stringifyInlineTag(obj) {
-        return `inlineTag(${stringifyArgsObj(obj)})`
-    }
-
-    function stringifyYaml(obj) {
-        let s = '{'
-        let first = true
-        for (const [key, value] of Object.entries(obj)) {
-
-            if (first) {
-                first = false
-            } else {
-                s += ','
-            }
-
-            if (key == 'value') {
-                s += `"${key}":${value}`
-            } else if (value === undefined) {
-                s += `"${key}":undefined`
-            } else if (value == null) {
-                s += `"${key}":null`
-            } else if (Array.isArray(value)) {
-                s += `"${key}":${stringifyA(value)}`
-            } else if (typeof value === 'object') {
-                s += `"${key}":${stringifyO(value)}`
-            } else if (typeof value === 'string') {
-                s += `"${key}":${'`'+escape(value)+'`'}`
-            } else {
-                s += `"${key}":${JSON.stringify(value)}`
-            }
-        }
-        s += '}'
-        return s
-    }
-
-    function stringifyYamlLine(obj) {
-
-        let s = '{'
-        let first = true
-        for (const [key, value] of Object.entries(obj)) {
-
-            if (first) {
-                first = false
-            } else {
-                s += ','
-            }
-
-            if (key == 'type' || key == 'name') {
-                s += `"${key}":"${value}"`
-            } else if (key == 'yaml') {
-                s += `"${key}":${stringifyYaml(value)}`
-            } else if (key == 'value') {
-                s += `"${key}":${value}`
-            } else if (value === undefined) {
-                s += `"${key}":undefined`
-            } else if (value == null) {
-                s += `"${key}":null`
-            } else if (Array.isArray(value)) {
-                s += `"${key}":${stringifyA(value)}`
-            } else if (typeof value === 'object') {
-                s += `"${key}":${stringifyO(value)}`
-            } else if (typeof value === 'string') {
-                s += `"${key}":${'`'+escape(value)+'`'}`
-            } else {
-                s += `"${key}":${JSON.stringify(value)}`
-            }
-        }
-        s += '}'
-        return s
-    }
-
-    function stringifyMaybeYaml(obj) {
-        return `maybeYaml(${stringifyYamlLine(obj)})\n`
-    }
-
-    let out = ''
-
-    function stringify(obj) {
-
-        if (obj === undefined) {
-            return 'undefined'
-        } else if (obj == null) {
-            return 'null'
-        }
-
-        if (obj.type !== undefined) {
-            if (obj.type == 'tag') {
-                delete obj.type
-                return stringifyInlineTag(obj)
-            } else if (obj.type == 'include') {
-                delete obj.type
-                return stringifyInclude(obj)
-            }
-        }
-
-        if (Array.isArray(obj)) {
-            return stringifyA(obj)
-        } else if (typeof obj === 'object') {
-            return stringifyO(obj)
-        } else if (typeof obj === 'string') {
-            return `\`${escape(obj)}\``
+        if (first) {
+            first = false
         } else {
-            return JSON.stringify(obj)
+            s += ','
         }
 
-    }
-
-    function stringifyO(obj) {
-
-        let s = '{'
-        let first = true
-        for (const [key, value] of Object.entries(obj)) {
-
-            if (first) {
-                first = false
-            } else {
-                s += ','
-            }
-
-            if (value === undefined) {
-                s += `"${key}":undefined`
-            } else if (value == null) {
-                s += `"${key}":null`
-            } else if (Array.isArray(value)) {
-                s += `"${key}":${stringifyA(value)}`
-            } else if (typeof value === 'object') {
-                s += `"${key}":${stringifyO(value)}`
-            } else if (typeof value === 'string' && key == 'value') {
-                s += `"${key}":${'`'+escape(value)+'`'}`
-            } else {
-                s += `"${key}":${JSON.stringify(value)}`
-            }
-        }
-        s += '}'
-        return s
-    }
-    
-    function stringifyA(arr) {
-
-        let s = '['
-        for (let i=0 ; i<arr.length ; i++) {
-            if (i>0) {
-                s += ','
-            }
-            s += stringify(arr[i])
-        }
-        s += ']'
-        return s
-    
-    }
-
-    out += 'let ln = 0\n'
-    out += 'const lines = {}\n'
-    for (let i=0 ; i<sxast.length ; i++) {
-        let ln = sxast[i]
-        if (ln.text !== undefined) {
-            out += `lines[${ln.line}] = ${qouted(ln.text)}\n`
+        if (key == 'args') {
+            s += `"${key}":${value}`
+        } else if (value === undefined) {
+            s += `"${key}":undefined`
+        } else if (value == null) {
+            s += `"${key}":null`
+        } else if (Array.isArray(value)) {
+            s += `"${key}":${stringifyA(value)}`
+        } else if (typeof value === 'object') {
+            s += `"${key}":${stringifyO(value)}`
+        } else if (typeof value === 'string') {
+            s += `"${key}":${'`'+escape(value)+'`'}`
+        } else {
+            s += `"${key}":${JSON.stringify(value)}`
         }
     }
+    s += '}'
+    return s
+}
+
+function stringifyInclude(obj) {
+    return `include(${stringifyArgsObj(obj)})`
+}
+
+function stringifyInlineTag(obj) {
+    return `inlineTag(${stringifyArgsObj(obj)})`
+}
+
+function stringifyYaml(obj) {
+    let s = '{'
+    let first = true
+    for (const [key, value] of Object.entries(obj)) {
+
+        if (first) {
+            first = false
+        } else {
+            s += ','
+        }
+
+        if (key == 'value') {
+            s += `"${key}":${value}`
+        } else if (value === undefined) {
+            s += `"${key}":undefined`
+        } else if (value == null) {
+            s += `"${key}":null`
+        } else if (Array.isArray(value)) {
+            s += `"${key}":${stringifyA(value)}`
+        } else if (typeof value === 'object') {
+            s += `"${key}":${stringifyO(value)}`
+        } else if (typeof value === 'string') {
+            s += `"${key}":${'`'+escape(value)+'`'}`
+        } else {
+            s += `"${key}":${JSON.stringify(value)}`
+        }
+    }
+    s += '}'
+    return s
+}
+
+function stringifyYamlLine(obj) {
+
+    let s = '{'
+    let first = true
+    for (const [key, value] of Object.entries(obj)) {
+
+        if (first) {
+            first = false
+        } else {
+            s += ','
+        }
+
+        if (key == 'type' || key == 'name') {
+            s += `"${key}":"${value}"`
+        } else if (key == 'yaml') {
+            s += `"${key}":${stringifyYaml(value)}`
+        } else if (key == 'value') {
+            s += `"${key}":${value}`
+        } else if (value === undefined) {
+            s += `"${key}":undefined`
+        } else if (value == null) {
+            s += `"${key}":null`
+        } else if (Array.isArray(value)) {
+            s += `"${key}":${stringifyA(value)}`
+        } else if (typeof value === 'object') {
+            s += `"${key}":${stringifyO(value)}`
+        } else if (typeof value === 'string') {
+            s += `"${key}":${'`'+escape(value)+'`'}`
+        } else {
+            s += `"${key}":${JSON.stringify(value)}`
+        }
+    }
+    s += '}'
+    return s
+}
+
+function stringifyMaybeYaml(obj) {
+    return `maybeYaml(${stringifyYamlLine(obj)})\n`
+}
+
+function stringify(obj) {
+
+    if (obj === undefined) {
+        return 'undefined'
+    } else if (obj == null) {
+        return 'null'
+    }
+
+    if (obj.type !== undefined) {
+        if (obj.type == 'tag') {
+            delete obj.type
+            return stringifyInlineTag(obj)
+        } else if (obj.type == 'include') {
+            delete obj.type
+            return stringifyInclude(obj)
+        }
+    }
+
+    if (Array.isArray(obj)) {
+        return stringifyA(obj)
+    } else if (typeof obj === 'object') {
+        return stringifyO(obj)
+    } else if (typeof obj === 'string') {
+        return `\`${escape(obj)}\``
+    } else {
+        return JSON.stringify(obj)
+    }
+
+}
+
+function stringifyO(obj) {
+
+    let s = '{'
+    let first = true
+    for (const [key, value] of Object.entries(obj)) {
+
+        if (first) {
+            first = false
+        } else {
+            s += ','
+        }
+
+        if (value === undefined) {
+            s += `"${key}":undefined`
+        } else if (value == null) {
+            s += `"${key}":null`
+        } else if (Array.isArray(value)) {
+            s += `"${key}":${stringifyA(value)}`
+        } else if (typeof value === 'object') {
+            s += `"${key}":${stringifyO(value)}`
+        } else if (typeof value === 'string' && key == 'value') {
+            s += `"${key}":${'`'+escape(value)+'`'}`
+        } else {
+            s += `"${key}":${JSON.stringify(value)}`
+        }
+    }
+    s += '}'
+    return s
+}
+
+function stringifyA(arr) {
+
+    let s = '['
+    for (let i=0 ; i<arr.length ; i++) {
+        if (i>0) {
+            s += ','
+        }
+        s += stringify(arr[i])
+    }
+    s += ']'
+    return s
+
+}
+
+export default function sxastToJs(collection,name,sxast,error) {
+    let out = ''
     
     out += `const collection = ${qouted(collection)}\n`
     out += `const name = ${qouted(name)}\n`
@@ -233,9 +223,19 @@ export default function sxastToJs(collection,name,sxast) {
 
     for (let i=0 ; i<sxast.length ; i++) {
         let ln = sxast[i]
-        out += 'ln=' + ln.line + ';'
         if (ln.type == 'script') {
-            out += ln.code + '\n'
+            if (error === undefined) {
+                out += ln.code + '\n'
+            } else {
+                out += `appendToHtml(${stringify({type: 'script', text: ln.text})})\n`
+                if (i + 1 == error.errorLine) {
+                    let uline = ''
+                    for (let i=0 ; i<error.errorColumn ; i++) uline += ' ';
+    
+                    out += `appendToHtml(${stringify({type: 'script-error', text: uline+'^'})})\n`
+                    out += `appendToHtml(${stringify({type: 'script-error', text: uline+error.errorMessage})})\n`
+                }
+            }
         } else if (ln.type == 'yaml') {
             out += stringifyMaybeYaml(ln) // `maybeYaml(${ stringify(ln) })\n`
         } else if (ln.type == 'unordered-list-item' && ln.yaml !== undefined) {
@@ -253,8 +253,6 @@ export default function sxastToJs(collection,name,sxast) {
     // TODO: create own exception class
     out += '  e.collection = collection\n'
     out += '  e.name = name\n'
-    out += '  e.lineNum = ln\n'
-    out += '  e.lineStr = lines[ln]\n'
     out += '  throw e;\n'
     out += '}\n'      
     

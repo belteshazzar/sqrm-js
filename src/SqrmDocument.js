@@ -2,6 +2,8 @@
 import sxastToJs from './sxast-to-js.js'
 import SqrmRequest from './SqrmRequest.js'
 import SqrmResponse from './SqrmResponse.js'
+import util from 'util'
+import * as acorn from 'acorn'
 
 export default class SqrmDocument {
     
@@ -12,16 +14,58 @@ export default class SqrmDocument {
 
         const js = sxastToJs(collection,name,sxast)
     
-        if (this.db.settings.log_code) {
-            console.log('= js =============')
-            console.log(js)
-        }
-
         this.fn = null
         try {
             this.fn = new Function(js);
+
+            if (this.db.settings.log_code) {
+                console.log('= js =============')
+                console.log(js)
+            }
+    
         } catch (e) {
-            throw e
+
+            // an error occured compiling the template
+            //
+            // the information from this js runtime isn't very
+            // useful for the user as it exposes the call stack
+            // of this code, rather than the users template code
+            //
+            // so we parse with acorn and get that error, but ...
+            // it can be a different error but in the same 
+            // location so its so useful
+            //
+            // do we throw an error or return the raw text?
+            //
+            // in the spirit of markdown where every document is
+            // a valid document we return the raw text
+
+            // which this isn't doing at the moment!
+
+            try {
+                const node = acorn.parse(js, {ecmaVersion: 2020})
+            } catch (e) {
+                const errorMessage = e.message.replace(/\([0-9]+:[[0-9]+\)/,'')
+                // -1 for 1 based line number in error
+                // -21 for number of extra lines in function
+                const errorLine = e.loc.line - 21 - 1// TODO: magic number
+                // -1 for 1 based column number in error
+                const errorColumn = e.loc.column// - 1
+            
+                const errJs = sxastToJs(collection,name,sxast,{errorMessage,errorLine,errorColumn})
+                try {
+                    this.fn = new Function(errJs);
+
+                    if (this.db.settings.log_code) {
+                        console.log('= js =============')
+                        console.log(errJs)
+                    }
+            
+                } catch (e) {
+                    // this should NOT occur, something really went wrong
+                    throw e
+                }
+            }
         }
     }
 
