@@ -134,6 +134,7 @@ export default class SqrmDB {
     }
 
     find(collection,select,sort,skip,limit) {
+
         function cursorToDocs(c) {
             let res = [];
 
@@ -157,7 +158,7 @@ export default class SqrmDB {
         if (select == undefined) {
             return cursorToDocs(this.db[collection].find())
         } else if (typeof select == "string") {
-            return col.docs.get(select)
+            return [col.docs.get(select)]
         } else if (typeof select == 'object' && select == Object(select)) {
 
             let c = this.db[collection].find(select)

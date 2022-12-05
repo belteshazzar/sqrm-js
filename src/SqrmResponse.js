@@ -44,17 +44,21 @@ export default class SqrmResponse {
 
     include({collection = 'default',name,args}) {
 
-        let doc = this.db.find(collection,name)
-        if (doc == null) {
+        const docs = this.db.find(collection,name)
+
+        if (docs == null) {
             return { type: 'comment', value: `failed to include doc: ${collection}.${name}( ${JSON.stringify(args)} )` }
         }
 
+        if (docs.length != 1) {
+            return { type: 'comment', value: `failed to include single doc: ${collection}.${name}( ${JSON.stringify(args)} )` }
+        }
+
+        const doc = docs[0]
         let request = new SqrmRequest(args);
         let response = new SqrmResponse(this.db,this.jsonTree);
         doc.execute(request,response)
-
         let hast = sastToHast(response.root)
-
         return h('div',{class: `${collection}.${name}`},hast.children)
     }
 

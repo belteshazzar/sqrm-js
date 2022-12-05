@@ -18,11 +18,11 @@ class TestSqrmDB extends SqrmDB {
   }
 
   find(collection,select,filter,skip,count) {
-    return {
+    return [{
       execute : (req,res) => {
         res.libs.appendToHtml({type: 'paragraph', indent: 0, children: [this.settings.includeCallback(collection,select,req.args)] })
       }
-    }
+    }]
   }
 
 }

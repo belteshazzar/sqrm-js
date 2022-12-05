@@ -77,7 +77,11 @@ export default class SqrmDocument {
             response = new SqrmResponse(this.db);
         }
 
-        this.fn(request,response)
+        try {
+            this.fn(request,response)
+        } catch (e) {
+            console.log(e)
+        }
 
         return response
     }
