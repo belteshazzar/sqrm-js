@@ -4,6 +4,7 @@
 // replacements so using double quotes (escape double quotes and new lines)
 // https://gist.github.com/getify/3667624
 export default function qouted(str) {
+	if (str===undefined) return `""`
 	str = str.replaceAll('\r','')
 	str = str.replace(/\\([\s\S])|(")/g,"\\$1$2");
 	str = str.replace(/\\([\s\S])|(\n)/g,"\\$1$2");

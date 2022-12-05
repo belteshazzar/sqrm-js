@@ -1,5 +1,5 @@
 
-import sxastToJs from './sxast-to-js.js'
+import {sxastToJs,sxastToTextJs} from './sxast-to-js.js'
 import SqrmRequest from './SqrmRequest.js'
 import SqrmResponse from './SqrmResponse.js'
 import util from 'util'
@@ -13,16 +13,15 @@ export default class SqrmDocument {
         this.db = db;
 
         const js = sxastToJs(collection,name,sxast)
-    
+
+        if (this.db.settings.log_code) {
+            console.log('= js =============')
+            console.log(js)
+        }
+
         this.fn = null
         try {
             this.fn = new Function(js);
-
-            if (this.db.settings.log_code) {
-                console.log('= js =============')
-                console.log(js)
-            }
-    
         } catch (e) {
 
             // an error occured compiling the template
@@ -52,15 +51,15 @@ export default class SqrmDocument {
                 // -1 for 1 based column number in error
                 const errorColumn = e.loc.column// - 1
             
-                const errJs = sxastToJs(collection,name,sxast,{errorMessage,errorLine,errorColumn})
-                try {
-                    this.fn = new Function(errJs);
+                const errJs = sxastToTextJs(collection,name,sxast,{errorMessage,errorLine,errorColumn})
 
-                    if (this.db.settings.log_code) {
-                        console.log('= js =============')
-                        console.log(errJs)
-                    }
-            
+                if (this.db.settings.log_code) {
+                    console.log('= js =============')
+                    console.log(errJs)
+                }
+
+                try {
+                    this.fn = new Function(errJs);            
                 } catch (e) {
                     // this should NOT occur, something really went wrong
                     throw e
@@ -80,7 +79,9 @@ export default class SqrmDocument {
         try {
             this.fn(request,response)
         } catch (e) {
-            console.log(e)
+            // this is handled in the doc scripts try/catch
+            // it is re-thrown so includes can handle it
+            // this can be ignored
         }
 
         return response

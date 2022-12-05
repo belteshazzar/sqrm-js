@@ -42,8 +42,10 @@ describe("sqrmdb tests", function() {
             expect(all).to.not.be.null
             expect(all.length).to.equal(5)
 
-            const doc5 = db.find('default','document-5')
-            expect(doc5).to.not.be.undefined
+            const docs5 = db.find('default','document-5')
+            expect(docs5).to.not.be.undefined
+            expect(docs5.length).to.equal(1)
+            const doc5 = docs5[0]
             expect(doc5.collection).to.equal('default')
             expect(doc5.name).to.equal('document-5')
 

@@ -114,13 +114,18 @@ export default class SqrmDB {
     }
 
     call(collection,docName,args) {
-        let request = new SqrmRequest(args);
-        let response = new SqrmResponse(this);
-        let doc = this.find(collection,docName)
-        if (doc == null) {
+        const request = new SqrmRequest(args);
+        const response = new SqrmResponse(this);
+        const docs = this.find(collection,docName)
+        if (docs == null) {
             console.log(`-- failed to call ${docName}(${args}) : not found --`)
             return
         }
+        if (docs.length != 1) {
+            console.log(`-- failed to call ${docName}(${args}) : not 1 document --`)
+            return
+        }
+        const doc = docs[0]
         try {
             doc.execute(request,response);
         } catch (e) {

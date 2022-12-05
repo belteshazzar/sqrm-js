@@ -254,9 +254,11 @@ export default function sastToHast(sqrm) {
             let n = next()
 
             let props = {}
-            Object.keys(n.properties).forEach(k => {
-                props[k] = n.properties[k].value
-            })
+            if (n.properties) {
+                Object.keys(n.properties).forEach(k => {
+                    props[k] = n.properties[k].value
+                })
+            }
 
             if (n.tag == '!DOCTYPE') {
                 let doctype = { type: 'doctype', properties: props }
@@ -349,14 +351,6 @@ export default function sastToHast(sqrm) {
             return null
         }
 
-        function script() {
-            let n = next()
-            if (n==null || n.type != 'script') {
-                throw new Error('expected script but found ' + n.type);
-            }
-            return h('pre',{},[t(n.text)])
-        }
-
         function scriptError() {
             let n = next()
             if (n==null || n.type != 'script-error') {
@@ -420,12 +414,7 @@ export default function sastToHast(sqrm) {
             let ln = peek()
 
             if (ln.indent == undefined) {
-                switch (ln.type) {
-                    case 'blank': return blank();
-                    case 'script': return script();
-                    case 'script-error': return scriptError();
-                    default: throw new Error('expected blank or script, found: ' + ln.type);
-                }
+                return blank()
             }
     
             if (ln.indent < indent) {

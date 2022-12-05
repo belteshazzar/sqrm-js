@@ -2,6 +2,7 @@
 import qouted from './quoted-string.js'
 
 function escape(s) {
+    if (s===undefined) return ''
     return s.replaceAll('\\','\\\\').replaceAll('\`','\\\`').replaceAll('\\\\$','\\$')
 }
 
@@ -190,52 +191,42 @@ function stringifyA(arr) {
 
 }
 
-export default function sxastToJs(collection,name,sxast,error) {
-    let out = ''
-    
-    out += `const collection = ${qouted(collection)}\n`
-    out += `const name = ${qouted(name)}\n`
+function jsPreCode() {
+    return `
+const request = arguments[0]
+const response = arguments[1]
+
+const db = response.db
+
+const h = response.libs.h
+const t = response.libs.t
+const matches = response.libs.matches
+const select = response.libs.select
+const selectAll = response.libs.selectAll
+const processHast = response.libs.processHast
+
+let json = response.json
+
+const maybeYaml = response.libs.maybeYaml
+const inlineTag = response.libs.inlineTag
+const addTask = response.libs.addTask
+const appendToHtml = response.libs.appendToHtml
+const include = response.libs.include
+
+`
+}
+
+export function sxastToJs(collection,name,sxast) {
+
+    let out = jsPreCode()
+
     out += 'try {\n'
     out += '\n'
-    out += 'const request = arguments[0];\n'
-    out += 'const response = arguments[1];\n'
-    out += '\n'
-    out += 'const db = response.db;\n';
-    out += '\n'
-    out += 'const h = response.libs.h;\n'
-    out += 'const t = response.libs.t;\n'
-    out += 'const matches = response.libs.matches;\n'
-    out += 'const select = response.libs.select;\n'
-    out += 'const selectAll = response.libs.selectAll;\n'
-    out += 'const processHast = response.libs.processHast;\n'
-
-    out += 'let json = response.json;\n'
-//    out += 'const root = response.root;\n'
-//    out += 'const j = response.libs.j;\n'
-
-    out += 'const maybeYaml = response.libs.maybeYaml\n'
-    out += 'const inlineTag = response.libs.inlineTag\n'
-    out += 'const addTask = response.libs.addTask\n'
-    out += 'const appendToHtml = response.libs.appendToHtml\n'
-    out += 'const include = response.libs.include;\n'
-
-//    out += 'const append = response.libs.append;\n'
 
     for (let i=0 ; i<sxast.length ; i++) {
         let ln = sxast[i]
         if (ln.type == 'script') {
-            if (error === undefined) {
-                out += ln.code + '\n'
-            } else {
-                out += `appendToHtml(${stringify({type: 'script', text: ln.text})})\n`
-                if (i + 1 == error.errorLine) {
-                    let uline = ''
-                    for (let i=0 ; i<error.errorColumn ; i++) uline += ' ';
-    
-                    out += `appendToHtml(${stringify({type: 'script-error', text: uline+'^'})})\n`
-                    out += `appendToHtml(${stringify({type: 'script-error', text: uline+error.errorMessage})})\n`
-                }
-            }
+            out += ln.code + '\n'
         } else if (ln.type == 'yaml') {
             out += stringifyMaybeYaml(ln) // `maybeYaml(${ stringify(ln) })\n`
         } else if (ln.type == 'unordered-list-item' && ln.yaml !== undefined) {
@@ -249,13 +240,57 @@ export default function sxastToJs(collection,name,sxast,error) {
         }
     }
 
-    out += '\n} catch (e) {\n'
-    // TODO: create own exception class
-    out += '  e.collection = collection\n'
-    out += '  e.name = name\n'
-    out += '  throw e;\n'
+    out += '\n'
+    out += '} catch (e) {\n'
+
+    out += '  let m = e.stack.match(/<anonymous>:([0-9]+):([0-9]+)/)\n'
+    out += '  const errLine = m[1] - 26\n'
+    out += '  const errColumn = m[2] - 1\n'
+    out += `  const errMsg = e.stack.split('\\n')[0]\n`
+
+    out += `  let uline = ''\n`
+    out += `  for (let i=0 ; i<errColumn ; i++) uline += ' ';\n`
+    out += '  const lines = []\n'
+
+    for (let i=0 ; i<sxast.length ; i++) {
+        let ln = sxast[i]
+        out += `  lines.push( () => appendToHtml({type: 'paragraph', indent: 1, text: ${qouted('  '+ln.text)} }) )\n`
+    }
+
+    out += `  appendToHtml({type: 'div', indent: 0, tag: 'pre' })\n`
+
+    out += `  for (let i=0 ; i<lines.length ; i++) {\n`
+    out += '    lines[i]()\n'
+    out += '    if (i==errLine) {\n'
+    out += `      appendToHtml({ type: 'paragraph', indent: 1, text: '  '+uline+'^' })\n`
+    out += `      appendToHtml({ type: 'paragraph', indent: 1, text: '  '+uline+errMsg })\n`
+    out += '    }\n'
+    out += '  }\n'
+
+    out += '  throw e\n'
+
     out += '}\n'      
     
     return out
 }
 
+export function sxastToTextJs(collection,name,sxast,error) {
+
+    let out = jsPreCode()
+
+    out += `appendToHtml({type: 'div', indent: 0, tag: 'pre' })\n`
+    for (let i=0 ; i<sxast.length ; i++) {
+        let ln = sxast[i]
+
+        out += `appendToHtml({type: 'paragraph', indent: 1, text: ${qouted('  '+ln.text)}})\n`
+        if (i == error.errorLine - 2) {
+            let uline = ''
+            for (let i=0 ; i<error.errorColumn ; i++) uline += ' ';
+
+            out += `appendToHtml({type: 'paragraph', indent: 1, text: ${qouted('  '+uline+'^')} })\n`
+            out += `appendToHtml({type: 'paragraph', indent: 1, text: ${qouted('  '+uline+error.errorMessage)} })\n`
+        }
+    }
+
+    return out
+}
