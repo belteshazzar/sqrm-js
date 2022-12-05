@@ -2,7 +2,6 @@
 import {sxastToJs,sxastToTextJs} from './sxast-to-js.js'
 import SqrmRequest from './SqrmRequest.js'
 import SqrmResponse from './SqrmResponse.js'
-import util from 'util'
 import * as acorn from 'acorn'
 
 export default class SqrmDocument {

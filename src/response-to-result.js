@@ -3,7 +3,6 @@ import {toHtml} from 'hast-util-to-html'
 import sastToHast from './sast-to-hast.js';
 import toJson from './jast-to-json.js'
 import {visit} from 'unist-util-visit'
-import util from 'util';
 
 export default function responseToResult(response,options = {}) {
     let sast = response.root
