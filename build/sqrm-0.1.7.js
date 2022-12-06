@@ -34539,14 +34539,22 @@ function sxastToJs(collection,name,sxast) {
 
     out += '  let errLine,errColumn,errMsg\n';
     out += '  if (e.stack == undefined) {\n';
-    out += '    errLine = 1\n';
-    out += '    errColumn = 1\n';
+    out += '    errLine = 0\n';
+    out += '    errColumn = 0\n';
     out += '    errMsg = JSON.stringify(e)\n';
     out += '  } else {\n';
     out += '    let m = e.stack.match(/<anonymous>:([0-9]+):([0-9]+)/)\n';
-    out += '    errLine = m[1] - 27\n';
-    out += '    errColumn = m[2] - 1\n';
-    out += `    errMsg = e.stack.split('\\n')[0]\n`;
+    out += '    if (m) {\n';
+                    // nodejs
+    out += '      errLine = m[1] - 27\n';
+    out += '      errColumn = m[2] - 1\n';
+    out += `      errMsg = e.stack.split('\\n')[0]\n`;
+    out += '    } else {\n';
+                    // browser
+    out += '      errLine = 0\n';
+    out += '      errColumn = 0\n';
+    out += `      errMsg = e.message\n`;
+    out += '    }\n';
     out += '  }\n';
 
     out += `  let uline = ''\n`;
