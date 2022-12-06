@@ -2,12 +2,8 @@
 // TODO: yaml docs from https://www.cloudbees.com/blog/yaml-tutorial-everything-you-need-get-started
 
 import {expect} from 'chai';
-
-import * as fs from 'fs'//const fs = require("fs");
-
-//import JSON5 from 'json5'
+import * as fs from 'fs'
 import {h} from 'hastscript'
-//import {t} from '../src/hastscript-tools.js'
 import sqrm from '../src/sqrm.js'
 import SqrmDB from '../src/SqrmDB.js'
 
@@ -17,21 +13,27 @@ class TestSqrmDB extends SqrmDB {
     super(settings)
   }
 
-  find(collection,select,filter,skip,count) {
-    return [{
-      execute : (req,res) => {
-        res.libs.appendToHtml({type: 'paragraph', indent: 0, children: [this.settings.includeCallback(collection,select,req.args)] })
-      }
-    }]
+  find(collection,select,sort,skip,count) {
+    if (this.settings.includeCollection === collection 
+            && this.settings.includeDocument === select) {
+        return [{
+            execute : (req,res) => {
+                res.libs.appendToHtml({type: 'paragraph', indent: 0, children: [this.settings.includeCallback(collection,select,req.args)] })
+            }
+        }]
+    } else {
+        return super.find(collection,select,sort,skip,count)
+    }
   }
-
 }
 
-function test(name,source,expectedHtml,expectedJson={},includeCallback) {
+function test(name,source,expectedHtml,expectedJson={},includeCollection,includeDocument,includeCallback) {
     
     it(name+"", function() {
 
         const db = new TestSqrmDB({
+            includeCollection: includeCollection,
+            includeDocument: includeDocument,
             includeCallback: includeCallback,
             log_src: process.env.npm_config_src,
             log_lines: process.env.npm_config_lines,
@@ -469,6 +471,8 @@ describe("Non-file based tests", function() {
             'this is an image: #!image(my_image.png,200,200,alt text) inline',
             '<div class="p">this is an image: <div class="default.image"><div class="p"><img src="my_image.png,200,200,alt text" width="undefined" height="undefined" alt="undefined"></div></div>(my_image.png,200,200,alt text) inline</div>',
             {},
+            'default',
+            'image',
             function includeCallback(collection,name,args) {
                 return h('img',{
                     src: `${args[0]}`,
@@ -482,6 +486,8 @@ describe("Non-file based tests", function() {
             'this is an image: #!image("my_image.png",200,200,"alt text") inline',
             '<div class="p">this is an image: <div class="default.image"><div class="p"><img src="my_image.png" width="200" height="200" alt="alt text"></div></div> inline</div>',
             {},
+            'default',
+            'image',
             function includeCallback(collection,name,args) {
                 return h('img',{
                     src: `${args[0]}`,
@@ -496,6 +502,8 @@ describe("Non-file based tests", function() {
             'this is an image: #!image("my_image.png",200,400,"alt text",request.args,`-\\${i}-`,true,null, 5 * 3, Math.max(4,5)) inline',
             '<div class="p">this is an image: <div class="default.image"><div class="p"><img src="my_image.png" width="200" height="400" alt="alt text"></div></div> inline</div>',
             {},
+            'default',
+            'image',
             function includeCallback(collection,name,args) {
 
                 expect(args).to.not.be.null
@@ -524,6 +532,8 @@ describe("Non-file based tests", function() {
             'i: 3\nthis is an image: #!image("my_image.png",200,400,"alt text",request.args,`-${json.i}-`,true,null, 5 * 3, Math.max(4,5)) inline',
             '<div class="p">this is an image: <div class="default.image"><div class="p"><img src="my_image.png" width="200" height="400" alt="alt text"></div></div> inline</div>',
             {i:3},
+            'default',
+            'image',
             function includeCallback(collection,name,args) {
 
                 expect(args).to.not.be.null
@@ -552,6 +562,8 @@ describe("Non-file based tests", function() {
             '#!pages.page',
             '<div class="p"><div class="pages.page"><div class="p"><img></div></div></div>',
             {},
+            'pages',
+            'page',
             function includeCallback(collection,name,args) {
                 expect(collection).to.equal('pages')
                 expect(name).to.equal('page')
@@ -620,7 +632,7 @@ describe("file based tests", function() {
                 ? JSON.parse(fs.readFileSync(`./test/docs/${name}.json`, 'utf-8').toString())
                 : {} )
 
-            test(`file: ${file}`,src,expectedHtml,expectedJson,includeCallback)
+            test(`file: ${file}`,src,expectedHtml,expectedJson,'default','image',includeCallback)
 
         }
     });

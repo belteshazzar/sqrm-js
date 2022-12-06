@@ -110,7 +110,6 @@ export default class SqrmDB {
 
             return createdDocs
         }
-
     }
 
     call(collection,docName,args) {
@@ -163,10 +162,24 @@ export default class SqrmDB {
         if (select == undefined) {
             return cursorToDocs(this.db[collection].find())
         } else if (typeof select == "string") {
-            return [col.docs.get(select)]
+
+            const doc = col.docs.get(select)
+
+            // if single named doc can't be found return empty array
+            if (doc) return [doc]
+            else return []
+
         } else if (typeof select == 'object' && select == Object(select)) {
 
-            let c = this.db[collection].find(select)
+            let c
+            // mongo throws an object rather than an error.
+            // catch it to create a proper error so that a
+            // useful message can be provided to the user.
+            try {
+                c = this.db[collection].find(select)
+            } catch (e) {
+                throw new Error(e['$err'])
+            }
 
             if (sort !== undefined) {
                 c = c.sort(sort)

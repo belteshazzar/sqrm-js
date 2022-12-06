@@ -15,7 +15,7 @@ const _html = process.argv.indexOf('-html') > 0
 const color = process.argv.indexOf('-color') > 0
 
 function printUsage() {
-    console.log('Usage: node sqrm.js')
+    console.log('Usage: sqrm')
     console.log()
     console.log("Options:")
     console.log("  -f filename      Read the file, only in tty mode")
@@ -27,9 +27,9 @@ function printUsage() {
     console.log("Examples:")
     console.log()
     console.log("  sqrm -json -f my-file.sqrm")
-    console.log("  sqrm -json -f my-file.sqrm")
+    console.log("  ./bin/sqrm.js -json -f my-file.sqrm")
     console.log("  cat my-file.sqrm | sqrm -json")
-    console.log("  ./bin/sqrm.js -json < my-file.sqrm")
+    console.log("  sqrm -json < my-file.sqrm")
     console.log()
     process.exit(1)
 }
@@ -40,12 +40,12 @@ function callSqrm(src) {
 
     if ((_json && _html) || (!_json && !_html)) {
         console.log(util.inspect(res,false,null,true))
-    } else if (Array.isArray(res)) {
+    } else if (res.docs !== undefined && Array.isArray(res.docs)) {
 
         let html = ''
         let json = []
 
-        res.forEach((el) => {
+        res.docs.forEach((el) => {
             html += '\n' + el.html
             json.push(el.json)
         })

@@ -1,0 +1,30 @@
+
+name: steve
+age: 42
+
+---
+
+name: fred
+age: 78
+
+---
+
+name: bob
+age: 56
+
+---
+
+This is an example of multiple docs in a single file.
+
+List of people younger than 70:
+<%
+  let people = dbfind('default',{ $and: [ { name: {$exists: true }}, { age: { $lt: 70}} ]}, {name : 1})
+
+  people.forEach(doc => {
+    let id = doc.id
+    let res = doc.execute().json
+%>
+  - ${res.name} = ${res.age}
+<%
+  })  
+%>

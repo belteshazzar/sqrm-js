@@ -1,0 +1,20 @@
+<div class="p">This is an example of multiple docs in a single file.</div><div class="p">List of people younger than 70:</div><pre>
+
+This is an example of multiple docs in a single file.
+
+List of people younger than 70:
+&#x3C;%
+  let people = dbfind('default',{ $and: [ { name: {$exists: true }}, { age: { $lt: 70}} ]}, {name : 1})
+               ^
+               ReferenceError: dbfind is not defined
+
+  people.forEach(doc => {
+    let id = doc.id
+    let res = doc.execute().json
+%>
+  - ${res.name} = ${res.age}
+&#x3C;%
+  })  
+%>
+
+</pre>

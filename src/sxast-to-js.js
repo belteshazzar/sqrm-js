@@ -244,10 +244,17 @@ export function sxastToJs(collection,name,sxast) {
     out += '\n'
     out += '} catch (e) {\n'
 
-    out += '  let m = e.stack.match(/<anonymous>:([0-9]+):([0-9]+)/)\n'
-    out += '  const errLine = m[1] - 27\n'
-    out += '  const errColumn = m[2] - 1\n'
-    out += `  const errMsg = e.stack.split('\\n')[0]\n`
+    out += '  let errLine,errColumn,errMsg\n'
+    out += '  if (e.stack == undefined) {\n'
+    out += '    errLine = 1\n'
+    out += '    errColumn = 1\n'
+    out += '    errMsg = JSON.stringify(e)\n'
+    out += '  } else {\n'
+    out += '    let m = e.stack.match(/<anonymous>:([0-9]+):([0-9]+)/)\n'
+    out += '    errLine = m[1] - 27\n'
+    out += '    errColumn = m[2] - 1\n'
+    out += `    errMsg = e.stack.split('\\n')[0]\n`
+    out += '  }\n'
 
     out += `  let uline = ''\n`
     out += `  for (let i=0 ; i<errColumn ; i++) uline += ' ';\n`
