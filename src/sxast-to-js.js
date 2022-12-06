@@ -217,6 +217,30 @@ const include = response.libs.include
 `
 }
 
+export function sxastToDebugJs(sxast) {
+
+    let out = ''
+
+    for (let i=0 ; i<sxast.length ; i++) {
+        let ln = sxast[i]
+        if (ln.type == 'script') {
+            out += ln.code + '\n'
+        } else if (ln.type == 'yaml') {
+            out += stringifyMaybeYaml(ln) // `maybeYaml(${ stringify(ln) })\n`
+        } else if (ln.type == 'unordered-list-item' && ln.yaml !== undefined) {
+            out += stringifyMaybeYaml(ln) // `maybeYaml(${ stringify(ln) })\n`
+        } else {
+            out += `appendToHtml(${ stringify(ln) })\n`
+
+            if ((ln.type == 'ordered-list-item' || ln.type == 'unordered-list-item') && ln.task) {
+                out += `addTask(${stringify(ln.task)})\n`
+            }
+        }
+    }
+
+    return out
+}
+
 export function sxastToJs(collection,name,sxast) {
 
     let out = jsPreCode()
@@ -243,7 +267,8 @@ export function sxastToJs(collection,name,sxast) {
 
     out += '\n'
     out += '} catch (e) {\n'
-
+// out += 'console.log("==================")\n'
+// out += 'console.log(e)\n'
     out += '  let errLine,errColumn,errMsg\n'
     out += '  if (e.stack == undefined) {\n'
     out += '    errLine = 0\n'
@@ -263,7 +288,7 @@ export function sxastToJs(collection,name,sxast) {
     out += `      errMsg = e.message\n`
     out += '    }\n'
     out += '  }\n'
-
+// out += 'console.log(errLine,errColumn,errMsg)\n'
     out += `  let uline = ''\n`
     out += `  for (let i=0 ; i<errColumn ; i++) uline += ' ';\n`
     out += '  const lines = []\n'
@@ -299,7 +324,7 @@ export function sxastToTextJs(collection,name,sxast,error) {
         let ln = sxast[i]
 
         out += `appendToHtml({type: 'paragraph', indent: 1, text: ${qouted('  '+ln.text)}})\n`
-        if (i == error.errorLine - 3) {
+        if (i == error.errorLine - 1) {
             let uline = ''
             for (let i=0 ; i<error.errorColumn ; i++) uline += ' ';
 

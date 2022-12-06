@@ -1,5 +1,5 @@
 
-import {sxastToJs,sxastToTextJs} from './sxast-to-js.js'
+import {sxastToJs,sxastToDebugJs,sxastToTextJs} from './sxast-to-js.js'
 import SqrmRequest from './SqrmRequest.js'
 import SqrmResponse from './SqrmResponse.js'
 import * as acorn from 'acorn'
@@ -13,14 +13,15 @@ export default class SqrmDocument {
 
         const js = sxastToJs(collection,name,sxast)
 
-        if (this.db.settings.log_code) {
-            console.log('= js =============')
-            console.log(js)
-        }
-
         this.fn = null
         try {
             this.fn = new Function(js);
+
+            if (this.db.settings.log_code) {
+                console.log('= js =============')
+                console.log(js)
+            }
+    
         } catch (e) {
 
             // an error occured compiling the template
@@ -41,24 +42,26 @@ export default class SqrmDocument {
             // which this isn't doing at the moment!
 
             try {
-                const node = acorn.parse(js, {ecmaVersion: 2020})
+                const debugJs = sxastToDebugJs(sxast)
+                const node = acorn.parse(debugJs, {ecmaVersion: 2020})
             } catch (e) {
                 const errorMessage = e.message.replace(/\([0-9]+:[[0-9]+\)/,'')
                 // -1 for 1 based line number in error
                 // -21 for number of extra lines in function
-                const errorLine = e.loc.line - 21 - 1// TODO: magic number
+                const errorLine = e.loc.line// - 14// TODO: magic number
                 // -1 for 1 based column number in error
                 const errorColumn = e.loc.column// - 1
-            
-                const errJs = sxastToTextJs(collection,name,sxast,{errorMessage,errorLine,errorColumn})
 
-                if (this.db.settings.log_code) {
-                    console.log('= js =============')
-                    console.log(errJs)
-                }
+                const errJs = sxastToTextJs(collection,name,sxast,{errorMessage,errorLine,errorColumn})
 
                 try {
                     this.fn = new Function(errJs);            
+
+                    if (this.db.settings.log_code) {
+                        console.log('= js =============')
+                        console.log(errJs)
+                    }
+
                 } catch (e) {
                     // this should NOT occur, something really went wrong
                     throw e
