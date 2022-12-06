@@ -82,7 +82,7 @@ export default class SqrmDB {
             for (let i=0 ; i<sxasts.length ; i++) {
                 let sxast = sxasts[i]
     
-                const dn = `${docName}-${i+1}`
+                const dn = `${docName}_${i+1}`
 
                 let doc = new SqrmDocument(collection,dn,sxast,this)
                 col.docs.set(dn,doc)

@@ -42,12 +42,12 @@ describe("sqrmdb tests", function() {
             expect(all).to.not.be.null
             expect(all.length).to.equal(5)
 
-            const docs5 = db.find('default','document-5')
+            const docs5 = db.find('default','document_5')
             expect(docs5).to.not.be.undefined
             expect(docs5.length).to.equal(1)
             const doc5 = docs5[0]
             expect(doc5.collection).to.equal('default')
-            expect(doc5.name).to.equal('document-5')
+            expect(doc5.name).to.equal('document_5')
 
             expect(doc5.getIndexedJson()).to.deep.equal({})
             expect(doc5.getIndexedText()).to.equal('This is an example of multiple docs in a single file.\nList of people younger than 70:\nbob = 56\nsteve = 42\n')
