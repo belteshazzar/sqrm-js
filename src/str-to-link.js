@@ -52,11 +52,13 @@ export default function strToLink(s) {
                 const il = internalLink(addr)
                 if (il == null) {
                     return h('a',{'link-ref':addr.toLowerCase()},[t(addr)])
-                } else {
+                } else if (il[0] == '#') {
                     return h('a',{'href':il},[t(il)])
+                } else {
+                    return h('a',{'href':'#','onClick':'sqrmCB("href","'+il+'")'},[t(il)])
                 }
             } else {
-                return h('a',{'href':u},[t(u)])
+                return h('a',{'href':'#','onClick':'sqrmCB("href","'+u+'")'},[t(u)])
             }
         }
     } else {
@@ -67,11 +69,13 @@ export default function strToLink(s) {
             const il = internalLink(addr)
             if (il == null) {
                 return h('a',{'link-ref':addr.toLowerCase()},[t(txt)])
-            } else {
+            } else if (il[0] == '#') {
                 return h('a',{'href':il},[t(txt)])
+            } else {
+                return h('a',{'href':'#','onClick':'sqrmCB("href","'+il+'")'},[t(txt)])
             }
         } else {
-            return h('a',{'href':u},[t(txt)])
+            return h('a',{'href':'#','onClick':'sqrmCB("href","'+u+'")'},[t(txt)])
         }
     }
 }

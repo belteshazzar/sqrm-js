@@ -1,6 +1,6 @@
 {
   "name": "sqrm",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "sqrm (pronounced squirm and short for square embrace) is the illicit love child of markdown and yaml.",
   "main": "build/main.min.js",
   "bin": {

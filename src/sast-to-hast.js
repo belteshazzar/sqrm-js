@@ -321,17 +321,18 @@ export default function sastToHast(sqrm) {
             if (n==null || (n.type != 'unordered-list-item' && n.type != 'ordered-list-item')) {
                 throw new Error('expected list-item but found ' + n.type)
             }
-            const li = h('li',{}, n.children )
-            let el = li
+            const li = h('li',{ class: 'task-list-item' }, n.children )
+            // let el = li
             if (n.task) {
-                const form = h('form', {method: 'PUT'})
+                li.children = []
+                const form = h('form', {})
                 li.children.push(form)
-                const hidden = h('input',{type:'hidden',value:n.task.line})
-                form.children.push(hidden)
-                const checkbox = h('input',{type:'checkbox',onchange:'this.form.submit()'})
+                const checkbox = h('input',{id:'todo'+n.task.line,name:'v2',type:'checkbox',onChange:'sqrmCB("task",'+n.task.line+',this.checked)'})
                 if (n.task.done) checkbox.properties.checked = 'checked'
                 form.children.push(checkbox)
-                el = checkbox
+                const label = h('label',{for:'todo'+n.task.line},n.children)
+                form.children.push(label)
+                // el = checkbox
             }
             // n = peek()
             // while (n != null && n.indent == indent + 1 && n.type == 'text') {
@@ -517,7 +518,7 @@ export default function sastToHast(sqrm) {
                 delete node.properties['link-ref']
                 const href = ld.link.properties.href
                 const txt = ld.link.children[0].value
-                node.properties['href'] = ld.link.properties.href
+                node.properties['onClick'] = 'sqrmCB("href","'+ld.link.properties.href+'")'
                 if (href != txt) {
                     // if these are different the link definition contains link text
                     node.children = ld.link.children
