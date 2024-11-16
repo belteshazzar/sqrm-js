@@ -1,7 +1,0 @@
-This is **bold** text.
-
-<%
-  let people = {
-    fred: {
-  }
-%>

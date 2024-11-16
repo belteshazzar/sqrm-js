@@ -1,8 +1,0 @@
-{
-    "multi-line": "this is not a normal string it spans more than one line see? new lines are not maintained",
-    "with-new-lines": "this is not a normal string it\nspans more than\none line\nsee? new lines are maintained",
-    "an-array": [
-      { "multi-line": "fred was here and also here" },
-      { "with-new-lines": "fred was here\nand here\nas well" }
-    ]
-  }

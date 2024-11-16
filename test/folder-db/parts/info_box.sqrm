@@ -1,4 +1,0 @@
-
-The city of ${request.args[0].city} is in the country of ${request.args[0].country}.
-
-#!parts.map( request.args[0].coordinates )

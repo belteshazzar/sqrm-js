@@ -1,7 +1,0 @@
-
-
-alignment in a header cell applies to the column (from that point down)
-
-|!r   head 1   |!l   head 2   |!   not centered  |
-|    right     |    left      |!c  head 3        |
-

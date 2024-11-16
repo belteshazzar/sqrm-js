@@ -1,5 +1,0 @@
-
-This is page-find.
-<%
-  response.include({collection:'cities',name:'paris',args:[]})
-%>

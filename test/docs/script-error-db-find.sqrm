@@ -1,8 +1,0 @@
-This is **bold** text.
-
-<%
-  let people = find('people')
-  people.forEach(p => p.execute().json)
-%>
-
-This is __more__ text
