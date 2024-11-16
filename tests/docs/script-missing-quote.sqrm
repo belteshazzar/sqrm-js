@@ -1,0 +1,3 @@
+<%
+  let people = [ 'name, 'bob']
+%>

@@ -1,0 +1,63 @@
+= call back testing
+
+this file is used for call back testing from links and todo lists.
+
+== todo list
+
+an example todo list:
+
+- [ ] first item
+- [ ] second item
+- [X] third item
+- [ ] forth item
+
+== links
+
+link formats:
+- [ city ]
+- [ www.google.com ]
+- [ www.google.com | google ]
+- [ #internal | link to internal ]
+- [ /wiki ]
+- [ wiki style link ]
+- [ wiki style link | /WikiStyleLink ]
+- this is a footnote [ ^x ]
+
+[ city ] : sdf 
+
+[ ^ x ]  : this is a foot note
+
+s1df \[Link back to H2] fred
+
+s2df [Link back to H2\] fred
+
+s4df [ Link text | google.com ] fred
+
+s4df [ Link text | www.google.com ] fred
+
+s4df [ Link text | /fred ] fred
+
+s4df [ Link text | #heading-3 ] fred
+
+s4df [ www.google.com ] fred
+
+s4df [ fred@google.com ] fred
+
+s4df [ /fred ] fred
+
+s4df [ #heading-3 ] fred
+
+--
+
+markdown style link reference:
+- s5df [ Link text ] fred
+- s5df [Link text | ref ] fred
+- s6df [Link text | ref 2 ] fred
+- s7df [Link text | ref-x ] fred
+- s7df [google] fred
+
+[ link text ]: www.google.com
+[ref]: www.google.com
+[ ref 2]: www.google.com
+[ ref-x  ] : www.google.com
+[ google  ] : this is a link to google | www.google.com

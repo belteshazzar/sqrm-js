@@ -1,0 +1,4 @@
+
+name : Steve
+
+Hello, ${json.name} #name(bob) ${json.name}

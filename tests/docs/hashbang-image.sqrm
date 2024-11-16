@@ -1,0 +1,24 @@
+
+this is an image: #!image("first_image.png",1,200,"alt text") inline
+
+
+this is an image: #!image("second_image.png",2
+,200,"alt text") inline
+
+a list:
+- my image #!image("third_image.png",3,200,"alt text")
+- also my image #!image("forth_image.png",4,
+  200,"alt text") on this line
+- invalid continuation #!image("invalid.png",4,
+5,"alt text") this is just text
+
+in a table
+
+| my image in a table                                            |
+| text on #!image("fifth_image.png",5,200,"alt text") either side |
+
+in code
+
+<% include('image', 'sixth_image.png', 6, 200, 'alt text') %>
+
+in yaml ???

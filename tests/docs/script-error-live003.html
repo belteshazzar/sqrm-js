@@ -1,0 +1,9 @@
+<div class="p">before</div><pre>
+before
+&#x3C;%
+  let people = db.find('default',{ name: {$x: true }})
+                  ^
+                  Error: Can't canonicalize query: BadValue unknown operator: $x
+%>
+after
+</pre>

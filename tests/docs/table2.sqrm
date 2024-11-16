@@ -1,0 +1,37 @@
+
+individual cell formatting
+
+|!  th1          |!   th2         |!  th3           |
+|r right aligned |l  left aligned |c center aligned |
+|>   span 2                       |v  span down 2   |
+|     c1         |        c2      |
+
+table header
+
+|l a  |r b | 
+|-----|----|
+| 1   | 2  |
+
+multiple horizontal span
+
+| a | b | c | d | e |
+|>5    span 5       |
+
+multiple verital span
+
+| a |v4 b |
+| c |
+| d |
+| e |
+| f | g  |
+
+
+multiple directive in a cell
+
+|!r> heading, right aligned spanning 2 |
+|!l  heading left  |!r  heading right  |
+
+smallest table
+
+|a
+

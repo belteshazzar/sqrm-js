@@ -1,0 +1,23 @@
+
+<div id="toc"
+
+= heading 1
+
+= heading 2
+
+= heading 3
+
+= heading 4
+
+<%
+
+processHast((hast) => {
+    let toc = select('#toc',hast)
+
+    selectAll('h1',hast).forEach((h1,i) => {
+        toc.children.push(h('p',{},[h('a',{href:`#h${i}`}, [ ... h1.children ] )]))
+        h1.children.unshift(h('a',{name:`h${i}`}))
+    })
+})
+
+%>

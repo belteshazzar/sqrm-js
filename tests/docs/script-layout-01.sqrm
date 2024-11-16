@@ -1,0 +1,19 @@
+<%
+  let people = db.find('default',{ 
+    $and: [{
+      name: {$exists: true }
+    }, {
+       age: { $lt: 70}
+    }
+    ]}, {
+      name : 1
+    })
+
+  people.forEach(doc => {
+    let id = doc.id
+    let res = doc.execute().json
+%>
+  - ${res.name} = ${res.age}
+<%
+  })
+%>

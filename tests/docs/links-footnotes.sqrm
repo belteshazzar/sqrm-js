@@ -1,0 +1,15 @@
+
+foot notes  can be defined any where
+
+[^a]: this is a footnote, text with
+links [ google | www.google.com ] and anything else
+
+[^c]: this is an unused footnote
+
+this is a ref [  ^a] style link, it can be called anything [^  a] repeated
+and [^bb  ] used anywhere, this is not defined [^XX], boo
+
+[^bb]: this is the footnote with !!formatting!! and [ links ]
+
+foot notes, if defined get added to the bottom of a rendered document
+

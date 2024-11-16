@@ -1,0 +1,32 @@
+
+
+<pre
+  <code class="language-javascript"
+
+    let message = 'Hello world';
+    alert(message);
+
+    function x() {
+      test();
+    }
+
+
+<pre
+
+  pre-formatted
+  |  |
+  +--+
+     |
+
+
+<script
+
+  function x() {
+    woot();
+  }
+
+<style
+
+  html {
+    font-size: 12pt;
+  }
