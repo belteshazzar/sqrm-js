@@ -22,7 +22,7 @@ const RE_HR = /^\s*[-=_\*]+\s*$/d
 const RE_ListItem = /^\s*(?:(?:([-*+])|(\d+[\.)]))\s+(\S.*?))\s*$/d
 const RE_ListItemTask = /^\s*\[ *([xX]?) *\]\s+(.*?)\s*$/d
 const RE_Table = /^\s*(\|(.+?)\|?)\s*$/d
-const RE_TableHeader = /^\s*[-|]+$/d
+const RE_TableHeader = /^[-| ]+$/d
 
 const RE_ScriptEnd = /%>\s*$/d
 
@@ -148,8 +148,8 @@ function lineToSqrm(ln) {
     m = ln.value.match(RE_Table)
     if (m) {
 
-        // console.log(m)
-        // console.log(ln.value.match(RE_TableHeader))
+        console.log(m)
+        console.log(ln.value.match(RE_TableHeader))
 
         if (ln.value.match(RE_TableHeader) !== null) {
             return {
