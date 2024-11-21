@@ -147,10 +147,6 @@ function lineToSqrm(ln) {
 
     m = ln.value.match(RE_Table)
     if (m) {
-
-        console.log(m)
-        console.log(ln.value.match(RE_TableHeader))
-
         if (ln.value.match(RE_TableHeader) !== null) {
             return {
                 type: 'table-divider-line',
