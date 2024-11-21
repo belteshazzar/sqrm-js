@@ -3,6 +3,7 @@ import {h} from 'hastscript'
 import JsonTree from './json-tree.js'
 import sastTextToHast from './util/sast-text-to-hast.js';
 import sastTableToHast from './util/sast-table-to-hast.js';
+import util from 'node:util'
 
 export default class SqrmContext {
     constructor(db,jsonTree) {
@@ -92,6 +93,10 @@ export default class SqrmContext {
                         prev.sqrm.push({ type: 'text', value: '\n' })
                         prev.sqrm.push(... obj.children)
                         prev.children = sastTextToHast(prev.sqrm)
+                    } else if (this.blank == null && indentLevel.tagName == 'li') {
+                        indentLevel.sqrm.push({ type: 'text', value: '\n' })
+                        indentLevel.sqrm.push(... obj.children)
+                        indentLevel.children = sastTextToHast(indentLevel.sqrm)
                     } else {
                         let hast = h('p')
                         hast.sqrm = obj.children
@@ -110,18 +115,30 @@ export default class SqrmContext {
                     }
                 } else if (obj.type == 'ordered-list-item-line') {
                     if (prev && prev.tagName == 'ol') {
-                        prev.children.push(h('li',{},obj.children))
+                        let li = h('li')
+                        li.sqrm = obj.children
+                        li.children = sastTextToHast(obj.children)
+                        prev.children.push(li)
+                       this.indentStack.push(li)
                     } else {
-                        let li = h('li',{},obj.children)
+                        let li = h('li')
+                        li.sqrm = obj.children
+                        li.children = sastTextToHast(obj.children)
                         let ol = h('ol',{},[li]) //{ type: 'ordered-list', children: [toHast(obj)] }
                         indentLevel.children.push(ol)
                         this.indentStack.push(li)
                     }
                 } else if (obj.type == 'unordered-list-item-line') {
                     if (prev && prev.tagName == 'ul') {
-                        prev.children.push(h('li',{},obj.children))
+                        let li = h('li')
+                        li.sqrm = obj.children
+                        li.children = sastTextToHast(obj.children)
+                        prev.children.push(li)
+                       this.indentStack.push(li)
                     } else {
-                        let li = h('li',{},obj.children)
+                        let li = h('li')
+                        li.sqrm = obj.children
+                        li.children = sastTextToHast(obj.children)
                         let ul = h('ul',{},[li]) //{ type: 'ordered-list', children: [toHast(obj)] }
                         indentLevel.children.push(ul)
                         this.indentStack.push(li)
