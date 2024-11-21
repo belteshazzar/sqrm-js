@@ -1,19 +1,19 @@
 
-```info
+<div class="info"
   information block
   its rendered as grey
 
 
-```tip
+<div class="tip"
   tip text
   its rendered as green
 
 
-```note
+<div class="note"
   some interesting notes
   its renered as yellow
 
 
-```warning
+<div class="warning"
   this is a warning
   its rendered as red

@@ -3,7 +3,7 @@ import { unified } from 'unified';
 import * as fs from 'fs'
 import parseIndentedLines from '../src/unified/parse-indented-lines.js'
 import indentedLinesToSxast from '../src/unified/plugin-ilines-to-sast.js';
-// import sqrmLinesToSxast from '../src/unified/plugin-sxlines-to-sxast.js'
+// import sqrmLinesToSxast from '../../src/unified/plugin-sxlines-to-sxast.js'
 import resqrmToEsast from '../src/unified/plugin-sxast-to-esast.js'
 import compileEcma from '../src/unified/compile-ecma.js'
 import sastToHast from '../src/unified/plugin-sast-to-hast.js'
@@ -32,21 +32,28 @@ const logSqrm = process.env.SQRM || logilines
       
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-export default function(testName,filename) {
+export default function(testName,folder) {
 
-    const sqrm = fs.readFileSync(`${__dirname}/docs/${filename}.sqrm`, 'utf-8').toString()
-    const expectedHtml = (
-        fs.existsSync(`${__dirname}/docs/${filename}.html`)
-        ? fs.readFileSync(`${__dirname}/docs/${filename}.html`, 'utf-8').toString()//.replaceAll(/\r/g,'')
-        : '' )
-    const expectedJson = (
-        fs.existsSync(`${__dirname}/docs/${filename}.json`)
-        ? JSON.parse(fs.readFileSync(`${__dirname}/docs/${filename}.json`, 'utf-8').toString())
-        : {} )
+
+    const filenames = fs.readdirSync(folder)
+        .filter(s => s.endsWith('.sqrm'))
+        .map(s => folder+s.replace('.sqrm',''))
 
   describe(`suite ${testName}`, () => {
 
-    test(`test ${testName}`,() => {
+    for (let filename of filenames) {
+
+    const sqrm = fs.readFileSync(`${filename}.sqrm`, 'utf-8').toString()
+    const expectedHtml = (
+        fs.existsSync(`${filename}.html`)
+        ? fs.readFileSync(`${filename}.html`, 'utf-8').toString()//.replaceAll(/\r/g,'')
+        : '' )
+    const expectedJson = (
+        fs.existsSync(`${filename}.json`)
+        ? JSON.parse(fs.readFileSync(`${filename}.json`, 'utf-8').toString())
+        : {} )
+
+    test(`test ${testName} - ${filename}`,() => {
 
         if (logSqrm) console.log(sqrm)
 
@@ -137,5 +144,6 @@ export default function(testName,filename) {
         expect(html).toBe(expectedHtml)
         expect(self.json.toJSON()).toEqual(expectedJson || {})
     })
+    }
   })
 }

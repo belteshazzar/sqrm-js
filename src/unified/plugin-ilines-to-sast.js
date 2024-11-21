@@ -202,12 +202,22 @@ function lineToSqrm(ln) {
 
     m = ln.value.match(RE_LinkDefinition);
     if (m) {
-        return { type: 'link-definition-line', indent: ln.indent, id: m[1].trim().toLowerCase(), link: link(m[2]) }
+        return {
+            type: 'link-definition-line',
+            indent: ln.indent, 
+            id: m[1].trim().toLowerCase(), 
+            link: link(m[2]) 
+        }
     }
 
     m = ln.value.match(RE_CodeBlock);
     if (m) {
-        return {type:'code-block-line',indent: ln.indent, language: m[1],line:ln.line}
+        return {
+            type:'code-block-line',
+            indent: ln.indent, 
+            language: m[1],
+            line:ln.line
+        }
     }
 
     // children = text and is converted to hast in post-process

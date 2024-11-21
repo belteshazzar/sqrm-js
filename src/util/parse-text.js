@@ -1,6 +1,6 @@
 
 //import {h} from 'hastscript'
-//import {t} from './hastscript-tools.js'
+import {t} from './hastscript-tools.js'
 import {functionParamsToEsast} from './str-to-esast.js'
 import link from './str-to-link.js'
 
@@ -104,7 +104,7 @@ s = s.trim()
                     str += a
                 } else {
                     if (str!='') {
-                        elements.push({ type: 'text', value: str })
+                        elements.push(t(str))
                         str = ''
                     }
                     elements.push(ln)
@@ -117,7 +117,7 @@ s = s.trim()
                 if (s.charAt(index).match(ch0)) {
 
                     if (str != '') {
-                        elements.push({ type: 'text', value: str })
+                        elements.push(t(str))
                         str = ''
                     }
 
@@ -189,7 +189,7 @@ s = s.trim()
                     }
 
                     if (str != '') {
-                        elements.push({ type: 'text', value: str })
+                        elements.push(t(str))
                         str = ''
                     }
 
@@ -236,7 +236,7 @@ s = s.trim()
                 //     elements.push(t(str))
                 //     continue//return index; //{index: index, str: strs};
                 // } else {
-                    elements.push({ type: 'text', value: str })
+                    elements.push(t(str))
                     str = '';
                     const el = { type: 'format', style: styleFor(a) }
                     elements.push(el)
@@ -250,7 +250,7 @@ s = s.trim()
         // check if there is any text left over
         if (str != '' ) {
             // console.log('got to end')
-            elements.push({ type: 'text', value: str });//strs.push(str)
+            elements.push(t(str));//strs.push(str)
         }
 //        continue// index;//{index: index,str: strs};
 //    }

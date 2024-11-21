@@ -31,11 +31,14 @@ export default class SqrmContext {
         }
 
         if (this.preIndent > 0 && (obj.type == 'blank-line' || obj.indent >= this.preIndent)) {
+
             if (obj.type == 'element-line' 
                     && obj.tag == 'code'
                     && this.indentStack[this.preIndent].tagName == 'pre') {
+
                 const code = h('code',obj.properties,[{type:'text',value:'\n'}])
-                this.indentStack[this.preIndent].children.push(code)
+                const pre = this.indentStack[this.preIndent]
+                pre.children.push(code)
                 this.indentStack.push(code)
                 this.preIndent++
             } else {
@@ -51,6 +54,8 @@ export default class SqrmContext {
                 this.blank += '\n'
             }
         } else {
+
+            this.preIndent = -1
 
             if (obj.type == 'yaml-line') {
 
@@ -125,6 +130,19 @@ export default class SqrmContext {
                     indentLevel.children.push(h('hr'))
                 } else if (obj.type == 'heading-line') {
                     indentLevel.children.push(h('h'+obj.level,{},obj.children))
+
+                } else if (obj.type == 'code-block-line') {
+
+                    let cls = 'language-' + (obj.language ? obj.language : 'text' )
+                    this.preIndent = indent + 1
+                    let code = h('code',{ class: cls },[{type:'text',value:'\n'}])
+                    let pre = h('pre',{},[code])
+                    pre.children.push = function(el) {
+                        code.children.push(el)
+                    }
+                    indentLevel.children.push(pre)
+                    this.indentStack.push(pre)
+
                 } else if (obj.type == 'element-line') {
                     let hast
                     if (obj.tag == '!doctype') {
