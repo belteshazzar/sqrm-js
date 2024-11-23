@@ -108,7 +108,7 @@ export default function(testName,folder) {
             console.error(e)
         }
 
-
+        self.processFootnotes()
 
         expect(self.hast).not.toBeNull()
         expect(self.json).not.toBeNull()

@@ -90,26 +90,44 @@ s = s.trim()
                 let curr
                 let foundLink = false
                 let k = index
+                let linkText = ''
                 for ( ; k < s.length; k++) {
                     curr = s.charAt(k)
-                    if (curr == ']' && prev !='\\')	{
-                        foundLink = true
-                        break
+                    if (curr == ']') {
+                        if (prev == '\\') {
+                            linkText = linkText.substring(0,linkText.length-1) + curr
+                        } else if (prev != '\\') {
+                            foundLink = true
+                            break
+                        }
+                    } else {
+                        linkText += curr
                     }
+                    
+                    prev = curr
                 }
 
-                const ln = link(s.substring(index,k))
+                if (!foundLink) {
+                    str += a
+  //                  index++;
+                    continue
+                }
+
+                const ln = link(linkText)
 
                 if (ln == null) {
                     str += a
-                } else {
-                    if (str!='') {
-                        elements.push(t(str))
-                        str = ''
-                    }
-                    elements.push(ln)
-                    index = k+1
+//                    index++;
+                    continue
                 }
+
+                if (str!='') {
+                    elements.push(t(str))
+                    str = ''
+                }
+                elements.push(ln)
+                index = k+1
+
             } else if (a == '@') {
                 const ch0 = /^[a-zA-Z]$/
                 const chx = /^[a-zA-Z\d_]$/

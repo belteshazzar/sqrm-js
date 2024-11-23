@@ -92,6 +92,8 @@ export default function(testName,testData) {
           console.error(e)
         }
 
+        self.processFootnotes()
+        
         expect(self.hast).not.toBeNull()
         expect(self.json).not.toBeNull()
 

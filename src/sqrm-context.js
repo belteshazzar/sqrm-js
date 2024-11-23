@@ -3,6 +3,7 @@ import {h} from 'hastscript'
 import JsonTree from './json-tree.js'
 import sastTextToHast from './util/sast-text-to-hast.js';
 import sastTableToHast from './util/sast-table-to-hast.js';
+import sastFootnotesToHast from './util/sast-footnotes-to-hast.js';
 import util from 'node:util'
 
 export default class SqrmContext {
@@ -21,6 +22,7 @@ export default class SqrmContext {
         this.json = this.jsonTree.json
         this.blank = null;
         this.preIndent = -1;
+        this.footnotes = []
     }
 
     addLine(obj) {
@@ -90,11 +92,11 @@ export default class SqrmContext {
                 if (obj.type == 'text-line') {
 
                     if (this.blank == null && prev && prev.tagName == 'p') {
-                        prev.sqrm.push({ type: 'text', value: '\n' })
+                        if (prev.sqrm.length>0) prev.sqrm.push({ type: 'text', value: '\n' })
                         prev.sqrm.push(... obj.children)
                         prev.children = sastTextToHast(prev.sqrm)
                     } else if (this.blank == null && indentLevel.tagName == 'li') {
-                        indentLevel.sqrm.push({ type: 'text', value: '\n' })
+                        if (indentLevel.sqrm.length>0) indentLevel.sqrm.push({ type: 'text', value: '\n' })
                         indentLevel.sqrm.push(... obj.children)
                         indentLevel.children = sastTextToHast(indentLevel.sqrm)
                     } else {
@@ -166,15 +168,19 @@ export default class SqrmContext {
                         hast = { type: 'doctype' }
                     } else {
                         hast = h(obj.tag,obj.properties)
+                        hast.sqrm = []
 
                         if (obj.tag=='pre' || obj.tag=='script' || obj.tag=='style') {
                             //console.log('=============== ' + (indent+1));
                             this.preIndent = indent + 1
                             hast.children.push({type:'text',value:'\n'})
+                            hast.sqrm.push(... hast.children)
                         }
                     }
                     indentLevel.children.push(hast);
                     this.indentStack.push(hast)
+                } else if (obj.type == 'footnote-line') {
+                    this.footnotes.push(obj)
                 } else {
                     throw new Error('not implemented obj.type='+obj.type)
                 }
@@ -182,6 +188,10 @@ export default class SqrmContext {
                 this.blank = null;
             }
         }
+    }
+
+    processFootnotes() {
+        sastFootnotesToHast(this.hast,this.footnotes)
     }
 
     appendToDoc(obj) {

@@ -43,7 +43,7 @@ testRunner('divs',[
         docs: 1,
         'sxast-children': 8,
         statements: 8,
-        html: '<ol><li><p>one</p></li><li><p>two</p></li></ol><ul><li><p>woot</p></li></ul>',
+        html: '<ol><li>one</li><li>two</li></ol><ul><li>woot</li></ul>',
         json: {}
     },
     {
