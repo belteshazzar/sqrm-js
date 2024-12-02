@@ -1,5 +1,7 @@
 
 import {h} from 'hastscript'
+import {t} from './util/hastscript-tools.js'
+
 import JsonTree from './json-tree.js'
 import sastTextToHast from './util/sast-text-to-hast.js';
 import sastTableToHast from './util/sast-table-to-hast.js';
@@ -371,6 +373,28 @@ export default class SqrmContext {
     //         }
     //     }
     // }
+
+    inlineTag({type,name,args,$js,text}) {
+        // console.log({type,name,$js,text})
+        return h('a',{ href: '/tags/' + name },[t(text)])
+    }
+
+    inlineMention({type,value}) {
+        // console.log({type,value})
+        return h('a',{ href: '/users/' + value },[t('@'+value)])
+
+    }
+
+    include(args) {
+        this.indentStack[this.indentStack.length-1].children.push(this.inlineInclude(args))
+    }
+
+    inlineInclude({type,collection ='default',name,args,text,$js}) {
+        return {
+            type: 'comment',
+            value: `failed to include single doc: ${collection}.${name}( ${args} )`
+        }
+    }
 
     // todo: move to json-tree.js
     jsonTag({indent=1,isArrayElement=false,name,colon=true,value}) {

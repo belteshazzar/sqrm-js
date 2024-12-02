@@ -1,0 +1,6 @@
+
+in code
+
+<% this.include({name:'image', args: ['sixth_image.png', 6, 200, 'alt text']}) %>
+
+in yaml ???

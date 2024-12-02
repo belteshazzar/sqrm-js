@@ -68,7 +68,6 @@ function c(id,_init) {
 }
 
 function inlineTag(tag) {
-
     return {
         "type": "CallExpression",
         "callee": {
@@ -81,58 +80,129 @@ function inlineTag(tag) {
             "body": {
                 "type": "BlockStatement",
                 "body": [{
-                    "type": "ExpressionStatement",
-                    "expression": {
-                      "type": "CallExpression",
-                      "callee": {
-                        "type": "MemberExpression",
-                        "object": {
-                          "type": "ThisExpression",
-                        },
-                        "property": {
-                          "type": "Identifier",
-                          "name": "jsonTag"
-                        },
-                        "computed": false,
-                        "optional": false
-                      },
-                      "arguments": [{
-                          "type": "ObjectExpression",
-                          "properties": [
-                            prop(id('type'),literal('"tag"')),
-                            prop(id('name'),literal(quoted(tag.name))),
-                            prop(id('value'),p.parser(`${tag.value}`).body[0].expression) ////////////////////////////////////////
-                          ]//props(tag)
-                      }],
-                      "optional": false
-                    }
-                  },{
                     "type": "ReturnStatement",
                     "argument": {
-                        "type": "ObjectExpression",
-                        "properties": [
-                            prop(id('type'),literal('"element"')),
-                            prop(id('tagName'),literal('"a"')),
-                            prop(id('properties'),{
-                                type: 'ObjectExpression',
-                                properties: [
-                                    prop(id('href'),literal('"#"')),
-                                    prop(id('"data-sqrm-type"'),literal('"tag"')),
-                                    prop(id('"data-sqrm-value"'),literal("JSON.stringify("+(tag.value==null?true:tag.value)+")")),
-                                    prop(id('onClick'),literal('"sqrmCB(this)"'))
-                                ]
-                            }),
-                            prop(id('children'), {
-                                type: 'ArrayExpression',
-                                elements: [{
-                                    type: 'ObjectExpression',
-                                    properties: [
-                                        prop(id('type'),literal('"text"')),
-                                        prop(id('value'),literal(quoted(tag.text)))
-                                    ]
-                                }]
-                            })
-                        ]
+                        "type": "ExpressionStatement",
+                        "expression": {
+                          "type": "CallExpression",
+                          "callee": {
+                            "type": "MemberExpression",
+                            "object": {
+                              "type": "ThisExpression",
+                            },
+                            "property": {
+                              "type": "Identifier",
+                              "name": "inlineTag"
+                            },
+                            "computed": false,
+                            "optional": false
+                          },
+                          "arguments": [{
+                              "type": "ObjectExpression",
+                              "properties": props(tag)//[
+    //                            prop(id('type'),literal('"tag"')),
+                            //     prop(id('name'),literal(quoted(tag.name))),
+                            //     prop(id('value'),p.parser(`${tag.value}`).body[0].expression) ////////////////////////////////////////
+                            //   ]//props(tag)
+                          }],
+                          "optional": false
+                        }
+                    },
+                }]
+            }},
+            "arguments": [],
+            "optional": false
+    }
+}
+
+function inlineInclude(o) {
+    return {
+        "type": "CallExpression",
+        "callee": {
+            "type": "ArrowFunctionExpression",
+            "id": null,
+            "expression": false,
+            "generator": false,
+            "async": false,
+            "params": [],
+            "body": {
+                "type": "BlockStatement",
+                "body": [{
+                    "type": "ReturnStatement",
+                    "argument": {
+                        "type": "ExpressionStatement",
+                        "expression": {
+                          "type": "CallExpression",
+                          "callee": {
+                            "type": "MemberExpression",
+                            "object": {
+                              "type": "ThisExpression",
+                            },
+                            "property": {
+                              "type": "Identifier",
+                              "name": "inlineInclude"
+                            },
+                            "computed": false,
+                            "optional": false
+                          },
+                          "arguments": [{
+                              "type": "ObjectExpression",
+                              "properties": props(o)//[
+                            //     prop(id('type'),literal('"tag"')),
+                            //     prop(id('name'),literal(quoted(o.name))),
+                            //     prop(id('value'),p.parser(`${o.value}`).body[0].expression) ////////////////////////////////////////
+                            //   ]//props(tag)
+                          }],
+                          "optional": false
+                        }
+                    },
+                }]
+            }},
+            "arguments": [],
+            "optional": false
+    }
+}
+
+function inlineMention(o) {
+    return {
+        "type": "CallExpression",
+        "callee": {
+            "type": "ArrowFunctionExpression",
+            "id": null,
+            "expression": false,
+            "generator": false,
+            "async": false,
+            "params": [],
+            "body": {
+                "type": "BlockStatement",
+                "body": [{
+                    "type": "ReturnStatement",
+                    "argument": {
+                        "type": "ExpressionStatement",
+                        "expression": {
+                          "type": "CallExpression",
+                          "callee": {
+                            "type": "MemberExpression",
+                            "object": {
+                              "type": "ThisExpression",
+                            },
+                            "property": {
+                              "type": "Identifier",
+                              "name": "inlineMention"
+                            },
+                            "computed": false,
+                            "optional": false
+                          },
+                          "arguments": [{
+                              "type": "ObjectExpression",
+                              "properties": props(o)//[
+                                // prop(id('type'),literal('"tag"')),
+                                // prop(id('name'),literal(quoted(o.value))),
+                                // prop(id('value'),p.parser(`${o.value}`).body[0].expression) ////////////////////////////////////////
+                            //   ]//props(tag)
+                          }],
+                          "optional": false
+                        }
                     }
                 }]
             }},
@@ -143,9 +213,13 @@ function inlineTag(tag) {
 
 function object(o) {
 
-    if (o.type && o.value && o.type=='tag') {
+    if (o.type && o.type=='tag') {
         return inlineTag(o)
-    } else if (o.type && o.value && o.type=='text') {
+    } else if (o.type && o.type=='include') {
+        return inlineInclude(o)
+    } else if (o.type && o.type=='mention') {
+        return inlineMention(o)
+    } else if (o.type && o.type=='text') {
 
         return {
             type: "ObjectExpression",
@@ -326,17 +400,17 @@ function this_addLine(line) {
 export default function resqrmToEsast(options = {}) {
 
     return (root,file) => {
-        const p = program()
+        const prog = program()
 
         for (let child of root.children) {
             if (child.type == "script-line") {
-                p.body.push(child.code)
+                prog.body.push(p.parser(child.code).body[0])
             } else {
-                p.body.push(this_addLine(child))
+                prog.body.push(this_addLine(child))
             }
         }
 
-        return p
+        return prog
     }
 
 };

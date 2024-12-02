@@ -1,0 +1,6 @@
+
+in a table
+
+| my image in a table                                            |
+| text on #!image("fifth_image.png",5,200,"alt text") either side |
+

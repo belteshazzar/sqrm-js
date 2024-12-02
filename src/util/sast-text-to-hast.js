@@ -62,9 +62,29 @@ export default function sastTextToHast(children) {
         switch (children[i].type) {
             case 'text':
             case 'element':
+            case 'comment':
                 stack[stack.length-1].children.push(children[i])
                 // console.log('text, stack now',util.inspect(stack,false,null,true))
                 break;
+            case 'link':
+                let link = children[i]
+                stack[stack.length-1].children.push(h('a',{
+                    href: link.ref,
+                },[t(link.text)]))
+                break;
+            // case 'include':
+            //     let inc = children[i]
+            //     stack[stack.length-1].children.push(h('span',{
+            //         class: inc.name,
+            //         args: inc.args
+            //     },[]))               
+            //     break;
+            // case 'mention':
+            //     let m = children[i]
+            //     stack[stack.length-1].children.push(h('a',{
+            //         href: '/users/' + m.value,
+            //     },[t( '@' + m.value)]))
+            //     break;
             case 'format':
                 if (!closedOpenStyle(children[i].style)) {
                     openStyle(children[i].style)

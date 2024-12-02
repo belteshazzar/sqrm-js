@@ -3,6 +3,7 @@
 import {t} from './hastscript-tools.js'
 import {functionParamsToEsast} from './str-to-esast.js'
 import link from './str-to-link.js'
+import {yamlToEsast} from '../util/str-to-esast.js'
 
 function styleFor(c) {
     switch (c) {
@@ -74,16 +75,23 @@ s = s.trim()
 
 
             if (a == '\\') {
+//                console.log(a,b)
                 if (b == '$') {
                     str += '\\$';
                     index++;
                     continue;
                 }
-                let punc = /^[-!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]$/
+                let punc = /^[-!\"#%&'()*+,-./:;<=>?@[\]^_`{|}~]$/
                 if (b.match(punc)) {
+
+//                    console.log(punc)
                     str += b//escapeChar(b);
                     index++;
                     continue;    
+                } else {
+//                    console.log('\\\\')
+                    str += '\\\\'
+                    continue
                 }
             } else if (a == '[') {
                 let prev = a;
@@ -114,7 +122,7 @@ s = s.trim()
                 }
 
                 const ln = link(linkText)
-
+console.log(ln)
                 if (ln == null) {
                     str += a
 //                    index++;
@@ -219,6 +227,7 @@ s = s.trim()
                         }
                         if (tagValueStr) {
                             includeOpts.args = tagValueStr
+                            includeOpts.$js = yamlToEsast(tagValueStr)
                         }
                         if (res.groups.part2) {
                             includeOpts.collection = res.groups.part1
@@ -229,7 +238,8 @@ s = s.trim()
                         elements.push({
                             type:'tag',
                             name: res.groups.part1,
-                            value: tagValueStr || 'true',
+                            args: tagValueStr || 'true',
+                            $js: yamlToEsast(tagValueStr || 'true'),
                             text: tagStr 
                         })
                     }

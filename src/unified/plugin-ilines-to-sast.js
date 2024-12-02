@@ -12,7 +12,7 @@ const RE_DocumentSeparator = /^---$/d
 const RE_BlankLine = /^\s*$/d
 const RE_Tag = /^\s*(([a-zA-Z_$][-a-zA-Z\d_$]*)\s*:(\s+(.*?))?)\s*$/d
 const RE_ListItemTag = /^\s*-\s+([a-zA-Z_$][-a-zA-Z\d_$]*)(\s*:(\s+(.*?))?)?\s*$/d
-const RE_Script = /^(\s*)<%(.*?)\s*$/d
+const RE_Script = /^(\s*)<%(.*?)\s*(%>\s*)?$/d
 const RE_Footnote = /^\s*\[ *\^ *(\S+) *\] *: *(.+?) *$/d
 const RE_LinkDefinition = /^\s*\[ *([^\]]+) *\] *: *(.+?) *$/d
 const RE_CodeBlock = /^\s*``` *(([a-zA-Z]+)?)\s*$/d
@@ -119,7 +119,8 @@ function lineToSqrm(ln) {
 
     m = ln.value.match(RE_Script)
     if (m) {
-        return {type:'script-line',indent: ln.indent, code: m[1] + '  ' + m[2], line:ln.line}
+//        console.log(m)
+        return {type:'script-line',indent: ln.indent, code: m[1] + '  ' + m[2], line:ln.line, endScript: m[3] != undefined}
     }
 
     m = ln.value.match(RE_Element)
