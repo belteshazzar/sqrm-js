@@ -4,9 +4,9 @@ import * as fs from 'fs'
 import parseIndentedLines from '../src/unified/parse-indented-lines.js'
 import indentedLinesToSxast from '../src/unified/plugin-ilines-to-sast.js';
 // import sqrmLinesToSxast from '../../src/unified/plugin-sxlines-to-sxast.js'
-import resqrmToEsast from '../src/unified/plugin-sxast-to-esast.js'
+import resqrmToEsast from '../src/unified/plugin-sast-to-esast.js'
 import compileEcma from '../src/unified/compile-ecma.js'
-import sastToHast from '../src/unified/plugin-sast-to-hast.js'
+// import sastToHast from '../src/unified/plugin-sast-to-hast.js'
 import {visit} from 'unist-util-visit'
 import { inspect } from "unist-util-inspect";
 import util from 'node:util'

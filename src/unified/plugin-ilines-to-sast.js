@@ -1,12 +1,4 @@
 
-import {map} from 'unist-util-map'
-import {visit} from 'unist-util-visit'
-//import { inspect } from "unist-util-inspect";
-import util from 'util'
-import lineToSxast from '../util/parse-text.js'
-import {yamlToEsast} from '../util/str-to-esast.js'
-import link from '../util/str-to-link.js'
-import parseTableRow from '../util/parse-table-row.js'
 const RE_DocumentSeparator = /^---$/d
 
 const RE_BlankLine = /^\s*$/d
@@ -68,8 +60,7 @@ function lineToSqrm(ln) {
             type:'heading-line',
             indent: ln.indent,
             level: m[2].length,
-            children: lineToSxast(m[3]),
-            // position: textPos,
+            text: m[3]
         }
     }
 
@@ -81,10 +72,10 @@ function lineToSqrm(ln) {
             if (t) {
                 let task = { line: ln.line, done: t[1]!='', text: t[2] }
                 // children = text and is converted to hast in post-process
-                return {type:'unordered-list-item-line', indent: ln.indent, marker:m[1],children:lineToSxast(t[2]),line:ln.line, task: task}
+                return {type:'unordered-list-item-line', indent: ln.indent, marker:m[1], text: t[2],line:ln.line, task: task}
             } else {
                 // children = text and is converted to hast in post-process
-                let uli = {type:'unordered-list-item-line', indent: ln.indent, marker:m[1],children:lineToSxast(m[3]),line:ln.line}
+                let uli = {type:'unordered-list-item-line', indent: ln.indent, marker:m[1],text: m[3],line:ln.line}
 
                 // let yaml = ln.value.match(RE_ListItemTag)
                 // if (yaml) {
@@ -109,10 +100,10 @@ function lineToSqrm(ln) {
             if (t) {
                 let task = { line: ln.line, done: t[1]!='', text: t[2] }
                 // children = text and is converted to hast in post-process
-                return {type:'ordered-list-item-line', indent: ln.indent, number:m[2],children:lineToSxast(t[2]),line:ln.line, task : task}
+                return {type:'ordered-list-item-line', indent: ln.indent, number:m[2], text: t[2],line:ln.line, task : task}
             } else {
                 // children = text and is converted to hast in post-process
-                return {type:'ordered-list-item-line', indent: ln.indent, number:m[2],children:lineToSxast(m[3]),line:ln.line}
+                return {type:'ordered-list-item-line', indent: ln.indent, number:m[2], text: m[3],line:ln.line}
             }
         }
     }
@@ -158,8 +149,7 @@ function lineToSqrm(ln) {
             return {
                 type: 'table-row-line',
                 indent: ln.indent,
-                children: parseTableRow(m[2]),
-                text: ln.value
+                text: m[2]
              }
         }
     }
@@ -184,7 +174,7 @@ function lineToSqrm(ln) {
             text: ln.value
         }
         if (m[4]) {
-            tag.$js  = yamlToEsast(m[4],false)
+            tag.text  = m[4]
             // console.log(m[4],' = ',tag.value)
         }
 
@@ -194,7 +184,7 @@ function lineToSqrm(ln) {
 
     m = ln.value.match(RE_Footnote);
     if (m) {
-        return { type: 'footnote-line', indent: ln.indent, id: m[1], children: lineToSxast(m[2]) }
+        return { type: 'footnote-line', indent: ln.indent, id: m[1], text: m[2] }
     }
 
     m = ln.value.match(RE_LinkDefinition);
@@ -203,7 +193,7 @@ function lineToSqrm(ln) {
             type: 'link-definition-line',
             indent: ln.indent, 
             id: m[1].trim().toLowerCase(), 
-            link: link(m[2]) 
+            text: m[2] 
         }
     }
 
@@ -221,8 +211,6 @@ function lineToSqrm(ln) {
     return {
         type: 'text-line',
         indent: ln.indent,
-        // position: ln.position,
-        children: lineToSxast(ln.value),
         text: ln.value
     }
 
@@ -237,7 +225,11 @@ export default function indentedLinesToSxast(options = {}) {
         };
 
         for (let iline of tree.children) {
-            root.children.push(lineToSqrm(iline))
+            let ln = lineToSqrm(iline)
+            if (ln.type == 'script-line' && !ln.endScript) {
+                throw "script still ..."
+            }
+            root.children.push(ln)
         }
 
         return root
