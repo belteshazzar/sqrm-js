@@ -4,6 +4,25 @@ import * as acorn from 'acorn'
 import quoted from './quoted-string.js'
 import util from 'node:util'
 
+export function templateOrString(str) {
+
+    try {
+        console.log(str)
+        let ast = acorn.parse("`" + str + "`", {ecmaVersion: 2020})
+        console.log(ast.body[0].expression)
+        return ast.body[0].expression
+    } catch (e) {
+        return {
+            type: "Literal",
+            start: -1,
+            end: -1,
+            value: quoted(str),
+            raw: quoted(str)
+        }
+    }
+}
+
+
 export function yamlToEsast(str,throwOnInvalid = false) {
 
     // console.log(str)

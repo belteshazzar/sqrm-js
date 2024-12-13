@@ -55,7 +55,7 @@ export default function sastTextToHast(children) {
     // console.log('init stack',util.inspect(stack,false,null,true))
     // console.log('init hast',util.inspect(hast,false,null,true))
 
-    for (let i=0 ; i<children.length ; i++) {
+    if (children) for (let i=0 ; i<children.length ; i++) {
 
         // console.log('next child: ',util.inspect(children[i],false,null,true))
 

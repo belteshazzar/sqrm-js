@@ -2,6 +2,7 @@
 import parseEcma from './parse-ecma.js'
 import quoted from '../util/quoted-string.js';
 import util from 'util'
+import {templateOrString} from '../util/str-to-esast.js'
 
 let p = new parseEcma()
 
@@ -243,7 +244,7 @@ function object(o) {
                 shorthand: false,
                 computed: false,
                 key: id('value'),
-                value: p.parser("`"+o.value+"`").body[0].expression,
+                value: templateOrString(o.value),
                 kind: "init"
             }]
         };
