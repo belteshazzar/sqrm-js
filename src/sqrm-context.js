@@ -64,9 +64,10 @@ export default class SqrmContext {
             this.preIndent = -1
 
             if (obj.yaml) {
-                // console.log(obj.yaml)
+                console.log(obj.yaml)
                 let addedYaml = this.jsonTree.addLine(obj.yaml) != null
-                // console.log(addedYaml)
+                console.log(addedYaml)
+                console.log(JSON.stringify(this.json))
                 
                 if (addedYaml) {
 

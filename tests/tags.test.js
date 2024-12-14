@@ -52,7 +52,7 @@ testRunner('tags',[
 === fredy
   \t
   text with a #tag
-  a: 5
+a: 5
   was ~~here~~ !!woot!! but a = \${this.json.a} __yes?__   
 `,
         ilines: 7,
