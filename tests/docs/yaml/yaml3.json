@@ -1,5 +1,5 @@
-[
-    {
+{
+    "List_of_Cars": [{
         "car_registration_number": 9,
         "car_name": "Civic",
         "owner_of_car": "Zaim Khan",
@@ -14,5 +14,5 @@
         "model_number": "xyzasd21",
         "price": "10 lacs",
         "color": "white"
-    }
-  ]
+    }]
+}

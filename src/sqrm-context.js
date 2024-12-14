@@ -6,6 +6,7 @@ import JsonTree from './json-tree.js'
 import sastTextToHast from './util/sast-text-to-hast.js';
 import sastTableToHast from './util/sast-table-to-hast.js';
 import sastFootnotesToHast from './util/sast-footnotes-to-hast.js';
+
 import util from 'node:util'
 
 export default class SqrmContext {
@@ -62,16 +63,26 @@ export default class SqrmContext {
 
             this.preIndent = -1
 
-            if (obj.type == 'yaml-line') {
+            if (obj.yaml) {
+                // console.log(obj.yaml)
+                let addedYaml = this.jsonTree.addLine(obj.yaml) != null
+                // console.log(addedYaml)
+                
+                if (addedYaml) {
 
-                if (this.blank = null) {
-                    this.blank = '\n'
-                } else {
-                    this.blank += '\n'
+                    if (this.blank = null) {
+                        this.blank = '\n'
+                    } else {
+                        this.blank += '\n'
+                    }
+    
+                    return
                 }
-                this.jsonTag(obj)
+            }
 
-            } else {
+
+            // if (obj.type != 'yaml-line' || (obj.type == 'yaml-line' && !addedYaml))  {
+
                 const indent = obj.indent
 
                 while (this.indentStack.length - 1 < indent) {
@@ -184,11 +195,12 @@ export default class SqrmContext {
                 } else if (obj.type == 'footnote-line') {
                     this.footnotes.push(obj)
                 } else {
+                    console.error(obj)
                     throw new Error('not implemented obj.type='+obj.type)
                 }
 
                 this.blank = null;
-            }
+            // }
         }
     }
 
@@ -196,64 +208,64 @@ export default class SqrmContext {
         sastFootnotesToHast(this.hast,this.footnotes)
     }
 
-    appendToDoc(obj) {
+    // appendToDoc(obj) {
 
-        if (this.yamlNotAllowedIndent != -1 && obj.type != 'blank-line') {
-            if (obj.indent < this.yamlNotAllowedIndent) {
-                this.yamlNotAllowedIndent = -1
-            }
-        }
+    //     if (this.yamlNotAllowedIndent != -1 && obj.type != 'blank-line') {
+    //         if (obj.indent < this.yamlNotAllowedIndent) {
+    //             this.yamlNotAllowedIndent = -1
+    //         }
+    //     }
 
-        if (this.yamlNotAllowedIndent == -1 && obj.type == 'div-line') {
-            switch (obj.tag) {
-                case 'pre':
-                case 'script':
-                case 'style':
-                case '!--':
-                    this.yamlNotAllowedIndent = obj.indent + 1
-            }
-        }
+    //     if (this.yamlNotAllowedIndent == -1 && obj.type == 'div-line') {
+    //         switch (obj.tag) {
+    //             case 'pre':
+    //             case 'script':
+    //             case 'style':
+    //             case '!--':
+    //                 this.yamlNotAllowedIndent = obj.indent + 1
+    //         }
+    //     }
 
-        let wasAppended = false
-        if (this.appendTextToNode != null && obj.type == 'text-line') {
-            if (this.appendTextToNode.minIndent !== undefined) {
-                if (this.appendTextToNode.minIndent <= obj.indent) {
-                    delete this.appendTextToNode.minIndent
-                    this.appendTextToNode.indent = obj.indent
-                    const ls = obj.text.split('\n')
-                    for (let i=0 ; i<ls.length ; i++) {
-                        if (this.appendTextToNode.jsonNode.value != '') {
-                            if (this.appendTextToNode.mode == '|') {
-                                this.appendTextToNode.jsonNode.value += '\n'
-                            } else {
-                                this.appendTextToNode.jsonNode.value += ' '
-                            }
-                        }
-                        this.appendTextToNode.jsonNode.value += ls[i].trim() // obj.text.trim()
-                    }
-                    wasAppended = true
-                }
-            } else if (this.appendTextToNode.indent == obj.indent) {
-                const ls = obj.text.split('\n')
-                for (let i=0 ; i<ls.length ; i++) {
-                    if (this.appendTextToNode.jsonNode.value != '') {
-                        if (this.appendTextToNode.mode == '|') {
-                            this.appendTextToNode.jsonNode.value += '\n'
-                        } else {
-                            this.appendTextToNode.jsonNode.value += ' '
-                        }
-                    }
-                    this.appendTextToNode.jsonNode.value += ls[i].trim() // obj.text.trim()
-                }
-                wasAppended = true
-            }
-        }
+    //     let wasAppended = false
+    //     if (this.appendTextToNode != null && obj.type == 'text-line') {
+    //         if (this.appendTextToNode.minIndent !== undefined) {
+    //             if (this.appendTextToNode.minIndent <= obj.indent) {
+    //                 delete this.appendTextToNode.minIndent
+    //                 this.appendTextToNode.indent = obj.indent
+    //                 const ls = obj.text.split('\n')
+    //                 for (let i=0 ; i<ls.length ; i++) {
+    //                     if (this.appendTextToNode.jsonNode.value != '') {
+    //                         if (this.appendTextToNode.mode == '|') {
+    //                             this.appendTextToNode.jsonNode.value += '\n'
+    //                         } else {
+    //                             this.appendTextToNode.jsonNode.value += ' '
+    //                         }
+    //                     }
+    //                     this.appendTextToNode.jsonNode.value += ls[i].trim() // obj.text.trim()
+    //                 }
+    //                 wasAppended = true
+    //             }
+    //         } else if (this.appendTextToNode.indent == obj.indent) {
+    //             const ls = obj.text.split('\n')
+    //             for (let i=0 ; i<ls.length ; i++) {
+    //                 if (this.appendTextToNode.jsonNode.value != '') {
+    //                     if (this.appendTextToNode.mode == '|') {
+    //                         this.appendTextToNode.jsonNode.value += '\n'
+    //                     } else {
+    //                         this.appendTextToNode.jsonNode.value += ' '
+    //                     }
+    //                 }
+    //                 this.appendTextToNode.jsonNode.value += ls[i].trim() // obj.text.trim()
+    //             }
+    //             wasAppended = true
+    //         }
+    //     }
 
-        if (!wasAppended) {
-            this.appendTextToNode = null
-            this.doc.children.push(obj)
-        }
-    }
+    //     if (!wasAppended) {
+    //         this.appendTextToNode = null
+    //         this.doc.children.push(obj)
+    //     }
+    // }
 
     maybeYaml(obj) {
 // console.log('maybeYaml',obj)
@@ -375,8 +387,22 @@ export default class SqrmContext {
     // }
 
     inlineTag({type,name,args,$js,text}) {
-        // console.log({type,name,$js,text})
-        return h('a',{ href: '/tags/' + name },[t(text)])
+
+        let query = ''
+
+        if ($js && Array.isArray($js) && ($js.length != 1 || $js[0] !== true)) {
+            query = '?args=' + encodeURIComponent(JSON.stringify($js))
+        }
+
+        if ($js && Array.isArray($js)) {
+            if ($js.length == 1) {
+                this.json[name] = $js[0]
+            } else {
+                this.json[name] = $js
+            }
+        }
+
+        return h('a',{ href: '/tags/' + name  + query},[t(text)])
     }
 
     inlineMention({type,value}) {
@@ -386,139 +412,20 @@ export default class SqrmContext {
     }
 
     include(args) {
+        args.text = JSON.stringify(args.args)
+        args.$js = args.args
+        // console.log(args)
         this.indentStack[this.indentStack.length-1].children.push(this.inlineInclude(args))
     }
 
     inlineInclude({type,collection ='default',name,args,text,$js}) {
         return {
             type: 'comment',
-            value: `failed to include single doc: ${collection}.${name}( ${args} )`
+            value: `failed to include single doc: ${collection}.${name}( ${JSON.stringify($js)} )`
         }
     }
 
     // todo: move to json-tree.js
-    jsonTag({indent=1,isArrayElement=false,name,colon=true,value}) {
-
-        if (value != undefined && value.length == 1) {
-            value = value[0]
-        }
-
-        let parent = null
-        if (isArrayElement) {
-            // if this is an array element: look for unknown or array
-
-            this.jsonTree.iterateLikeStack((el) => {
-                if (el.type=='unknown' && el.minChildIndent<=indent) {
-                    parent = el
-                    return false
-                } else if (el.type=='array' && el.childrenIndent==indent) {
-                    parent = el
-                    return false
-                }
-            })
-
-        } else {
-            // if this is not an array element: look fo unknown or object
-// console.log(util.inspect(this.jsonTree,false,null,true))
-            this.jsonTree.iterateLikeStack((el) => {
-                if (el.type=='unknown' && el.minChildIndent<=indent) {
-                    parent = el
-                    return false
-                } else if (el.type=='object' && el.childrenIndent==indent) {
-                    parent = el
-                    return false
-                }                
-            })
-        }
-// console.log('parent=',parent)
-        if (parent == null) {
-            return null
-        }
-
-        if (parent.type == 'unknown' && !isArrayElement) {
-            if (parent.minChildIndent > indent) throw new Error()
-
-            parent.type = 'object'
-            parent.childrenIndent = indent
-            delete parent.minChildIndent
-
-            if (colon && value === undefined) {
-                parent.children = [ { minChildIndent: indent, type: 'unknown', name: name } ]
-            } else {
-                parent.children = [ { type: 'value', name: name, value: value } ]
-            }
-
-            // this.updateJson()
-            return parent.children[0]
-        }
-
-        if (parent.type == 'unknown' && isArrayElement) {
-            if (parent.minChildIndent > indent) throw new Error()
-
-            parent.type = 'array'
-            parent.childrenIndent = indent
-            delete parent.minChildIndent
-
-            let jsonNode = null
-            if (colon && value === undefined) {
-                jsonNode = { minChildIndent: indent+1, type:'unknown',name:name }
-                const arrayElement = { childrenIndent: indent+1, type: 'object', children: [jsonNode]}
-                parent.children = [arrayElement]
-            } else if (colon) {
-                jsonNode = { childrenIndent: indent+1, type:'value', name:name, value:value}
-                const arrayElement = { childrenIndent: indent+1, type: 'object', children: [jsonNode]}
-                parent.children = [arrayElement]
-            } else if (!colon) {
-                jsonNode = { type: 'value', value: value }
-                parent.children = [ jsonNode ]
-            }
-
-            // this.updateJson()
-            return jsonNode
-        }
-
-        if (parent.type == 'object' && !isArrayElement) {
- 
-            let child = null
-            if (colon && value === undefined) {
-                child = { minChildIndent: indent, type: 'unknown', name: name }
-            } else {
-                child = { type: 'value', name: name, value: value }
-            }
-
-            for (let i=0 ; i<parent.children.length ; i++) {
-                if (parent.children[i].name == name) {
-                    parent.children[i] = child
-                    return parent.children[i]
-                }
-            }
-
-            parent.children.push(child)
-            return parent.children[parent.children.length-1]
-        }
-
-        if (parent.type == 'array' && isArrayElement) {
-
-            let jsonNode = null
-            if (colon && value === undefined) {
-                jsonNode = { minChildIndent: indent+1, type:'unknown',name:name }
-                const arrayElement = { childrenIndent: indent+1, type: 'object', children: [jsonNode]}
-                parent.children.push(arrayElement)
-            } else if (colon) {
-                jsonNode = { childrenIndent: indent+1, type:'value',name:name,value:value}
-                const arrayElement = { childrenIndent: indent+1, type: 'object', children: [jsonNode]}
-                parent.children.push(arrayElement)
-            } else if (!colon) {
-                jsonNode = { type: 'value', value: value }
-                parent.children.push(jsonNode)
-            }
-
-            // this.updateJson()
-            return jsonNode
-        }
-
-        return null
-    }
 
     // append(ln) {
     //     this.lines.push(ln)

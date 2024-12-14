@@ -1,19 +1,28 @@
 {
-  "name": "resqrm",
+  "name": "sqrm",
   "version": "1.0.0",
   "type": "module",
-  "main": "src/resqrm-lines.js",
+  "main": "src/sqrm.js",
+  "bin": {
+    "sqrm": "bin/sqrm.js"
+  },
   "scripts": {
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "build": "rollup --config"
   },
   "author": "",
-  "license": "ISC",
+  "license": "BSD-2",
   "description": "",
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.1",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.3.0",
+    "@rollup/plugin-terser": "^0.4.4",
     "jest": "^29.7.0",
     "rehype-stringify": "^10.0.0",
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.0",
+    "rollup": "^4.28.1",
     "unified": "^11.0.5",
     "unist-builder": "^4.0.0",
     "unist-util-inspect": "^8.1.0",

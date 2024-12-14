@@ -2,17 +2,17 @@ doe: "a deer, a female deer"
 ray: "a drop of golden sun"
 pi: 3.14159
 xmas: true
-french-hens: 3
-calling-birds:
+french_hens: 3
+calling_birds:
   - huey
   - dewey
   - louie
   - fred
-xmas-fifth-day:
-  calling-birds: four
-  french-hens: 3
-  golden-rings: 5
+xmas_fifth_day:
+  calling_birds: four
+  french_hens: 3
+  golden_rings: 5
   partridges:
     count: 1
     location: "a pear tree"
-  turtle-doves: two
+  turtle_doves: two

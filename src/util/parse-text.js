@@ -3,7 +3,7 @@
 import {t} from './hastscript-tools.js'
 import {functionParamsToEsast} from './str-to-esast.js'
 import link from './str-to-link.js'
-import {yamlToEsast} from '../util/str-to-esast.js'
+import {yamlToEsast,yamlToEsastArray} from '../util/str-to-esast.js'
 
 function styleFor(c) {
     switch (c) {
@@ -104,7 +104,7 @@ s = s.trim()
                     if (curr == ']') {
                         if (prev == '\\') {
                             linkText = linkText.substring(0,linkText.length-1) + curr
-                        } else if (prev != '\\') {
+                        } else {
                             foundLink = true
                             break
                         }
@@ -122,7 +122,7 @@ s = s.trim()
                 }
 
                 const ln = link(linkText)
-console.log(ln)
+// console.log(ln)
                 if (ln == null) {
                     str += a
 //                    index++;
@@ -161,7 +161,7 @@ console.log(ln)
             } else if (a == '#') {
                 const tagAt = index-1
 
-                const tagRegex = /#(?<bang>!)?(?<part1>[a-zA-Z][a-zA-Z\d_]{2,})(\.(?<part2>[a-zA-Z][a-zA-Z\d_]{2,}))?/y // must start at specified start index
+                const tagRegex = /#(?<bang>!)?(?<part1>[a-zA-Z][a-zA-Z\d_]*)(\.(?<part2>[a-zA-Z][a-zA-Z\d_]*))?/y // must start at specified start index
                 tagRegex.lastIndex = tagAt
                 let res = tagRegex.exec(s)
 
@@ -188,7 +188,7 @@ console.log(ln)
                                 // console.log(tagStr,tagValueStr)
                                 tagValueStr = tagValueStr.trim()
                                 if (tagValueStr=='') tagValueStr = 'true'
-                                tagValueStr = '['+tagValueStr+']'
+//                                tagValueStr = '['+tagValueStr+']'
                                 // console.log(`"${tagValueStr}"`)
                                 index = k + 1
                                 break
@@ -207,11 +207,11 @@ console.log(ln)
                         // if ')' was never found tagValueStr == null
                         if (tagStr == null) {
                             tagStr = s.substring(tagAt,index)
-                            tagValueStr = '[true]'//'true'//functionParamsToEsast('true',false)
+                            tagValueStr = 'true'//'true'//functionParamsToEsast('true',false)
                         }
                     } else {
                         tagStr = s.substring(tagAt,index)
-                        tagValueStr = '[true]'//'true'//functionParamsToEsast('true',false)
+                        tagValueStr = 'true'//'true'//functionParamsToEsast('true',false)
                     }
 
                     if (str != '') {
@@ -227,7 +227,7 @@ console.log(ln)
                         }
                         if (tagValueStr) {
                             includeOpts.args = tagValueStr
-                            includeOpts.$js = yamlToEsast(tagValueStr)
+                            includeOpts.$js = yamlToEsastArray(tagValueStr)
                         }
                         if (res.groups.part2) {
                             includeOpts.collection = res.groups.part1
@@ -239,7 +239,7 @@ console.log(ln)
                             type:'tag',
                             name: res.groups.part1,
                             args: tagValueStr || 'true',
-                            $js: yamlToEsast(tagValueStr || 'true'),
+                            $js: yamlToEsastArray(tagValueStr || 'true'),
                             text: tagStr 
                         })
                     }

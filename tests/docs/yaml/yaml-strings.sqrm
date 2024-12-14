@@ -1,12 +1,12 @@
 
-multi-line:    >    
+multi-line: >    
   this is not a normal string it
   spans more than
   one line
   see? new lines are not maintained
 
 
-with-new-lines:    |   
+with-new-lines: |   
   this is not a normal string it
   spans more than
   one line

@@ -7,9 +7,7 @@ import util from 'node:util'
 export function templateOrString(str) {
 
     try {
-        console.log(str)
         let ast = acorn.parse("`" + str + "`", {ecmaVersion: 2020})
-        console.log(ast.body[0].expression)
         return ast.body[0].expression
     } catch (e) {
         return {
@@ -25,36 +23,45 @@ export function templateOrString(str) {
 
 export function yamlToEsast(str,throwOnInvalid = false) {
 
-    // console.log(str)
+    // console.log('yamlToEsast',str)
 
     const src = '(() => { try { return ' + str + '; } catch (e) { return `' + str + '`; } })()'
 
     try {
-        const rawNode = acorn.parse(str, {ecmaVersion: 2020})
-        if (rawNode.body[0].type == "ExpressionStatement") {
-            if (rawNode.body[0].expression.type == "TemplateLiteral"
-                    || rawNode.body[0].expression.type == "Literal") {
-                return rawNode.body[0].expression
-            } else {
-                // console.log(util.inspect(rawNode,false,null,true))
-                const srcNode = acorn.parse(src, {ecmaVersion: 2020})
-                // console.log(util.inspect(srcNode,false,null,true))
-                return srcNode.body[0].expression
-            }
-        } else {
-            // console.log(util.inspect(rawNode,false,null,true))
-        }
+        const node = acorn.parse(src, {ecmaVersion: 2020})
+        return node.body[0].expression
     } catch (e) {
-        // console.log(e)
+        return {
+            type: "Literal",
+            start: -1,
+            end: -1,
+            value: quoted(str),
+            raw: quoted(str)
+        }
     }
 
-    return {
-        type: "Literal",
-        start: -1,
-        end: -1,
-        value: quoted(str),
-        raw: quoted(str)
+}
+
+export function yamlToEsastArray(str) {
+
+//    console.log('yamlToEsastArray',str)
+
+    const src = '(() => { try { return [' + str + ']; } catch (e) { return [`' + str + '`]; } })()'
+
+    try {
+        const node = acorn.parse(src, {ecmaVersion: 2020})
+        return node.body[0].expression
+    } catch (e) {
+        return {
+            type: "Literal",
+            start: -1,
+            end: -1,
+            value: quoted(str),
+            raw: quoted(str)
+        }
     }
+
+
 }
 
 //   Node {

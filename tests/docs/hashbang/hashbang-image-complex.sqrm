@@ -19,6 +19,6 @@ in a table
 
 in code
 
-<% include('image', 'sixth_image.png', 6, 200, 'alt text') %>
+<% this.include({name:'image', args: ['sixth_image.png', 6, 200, 'alt text']}) %>
 
 in yaml ???

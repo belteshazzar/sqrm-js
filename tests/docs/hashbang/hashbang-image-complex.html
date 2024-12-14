@@ -1,24 +1,3 @@
-
-this is an image: #!image("first_image.png",1,200,"alt text") inline
-
-
-this is an image: #!image("second_image.png",2
-,200,"alt text") inline
-
-a list:
-- my image #!image("third_image.png",3,200,"alt text")
-- also my image #!image("forth_image.png",4,
-  200,"alt text") on this line
-- invalid continuation #!image("invalid.png",4,
-5,"alt text") this is just text
-
-in a table
-
-| my image in a table                                            |
-| text on #!image("fifth_image.png",5,200,"alt text") either side |
-
-in code
-
-<% include('image', 'sixth_image.png', 6, 200, 'alt text') %>
-
-in yaml ???
+<p>this is an image: <!--failed to include single doc: default.image( ["first_image.png",1,200,"alt text"] )--> inline</p><p>this is an image: <!--failed to include single doc: default.image( [true] )-->("second_image.png",2
+,200,"alt text") inline</p><p>a list:</p><ul><li>my image <!--failed to include single doc: default.image( ["third_image.png",3,200,"alt text"] )--></li><li>also my image <!--failed to include single doc: default.image( [true] )-->("forth_image.png",4,
+200,"alt text") on this line</li><li>invalid continuation <!--failed to include single doc: default.image( [true] )-->("invalid.png",4,</li></ul><p>5,"alt text") this is just text</p><p>in a table</p><table><tbody><tr><td>my image in a table</td></tr><tr><td>text on <!--failed to include single doc: default.image( ["fifth_image.png",5,200,"alt text"] )--> either side</td></tr></tbody></table><p>in code</p><!--failed to include single doc: default.image( ["sixth_image.png",6,200,"alt text"] )--><p>in yaml ???</p>

@@ -7,8 +7,8 @@ import parseTableRow from '../util/parse-table-row.js'
 const RE_DocumentSeparator = /^---$/d
 
 const RE_BlankLine = /^\s*$/d
-const RE_Tag = /^\s*(([a-zA-Z_$][-a-zA-Z\d_$]*)\s*:(\s+(.*?))?)\s*$/d
-const RE_ListItemTag = /^\s*-\s+([a-zA-Z_$][-a-zA-Z\d_$]*)(\s*:(\s+(.*?))?)?\s*$/d
+const RE_Tag = /^\s*(([a-zA-Z_$][a-zA-Z\d_$]*)\s*:(\s+(.*?))?)\s*$/d
+const RE_ListItemTag = /^\s*-\s+([a-zA-Z_$][a-zA-Z\d_$]*)(\s*:(\s+(.*?))?)?\s*$/d
 const RE_Script = /^(\s*)<%(.*?)\s*(%>\s*)?$/d
 const RE_Footnote = /^\s*\[ *\^ *(\S+) *\] *: *(.+?) *$/d
 const RE_LinkDefinition = /^\s*\[ *([^\]]+) *\] *: *(.+?) *$/d
@@ -96,21 +96,21 @@ function lineToSqrm(ln) {
                     line: ln.line
                 }
 
-                // let yaml = ln.value.match(RE_ListItemTag)
-                // if (yaml) {
-                //     uli.yaml = { indent: ln.indent, isArrayElement: true }
-                //     if (yaml[4]) {
-                //         uli.yaml.name = yaml[1]
-                //         uli.yaml.$js = yamlToEsast(yaml[4],false)
-                //         uli.yaml.colon = true
-                //     } else if (yaml[2]) {
-                //         uli.yaml.name = yaml[1]
-                //         uli.yaml.colon = true
-                //     } else {
-                //         uli.yaml.$js = yamlToEsast(yaml[1],false)
-                //         uli.yaml.colon = false
-                //     }
-                // }
+                let yaml = ln.value.match(RE_ListItemTag)
+                if (yaml) {
+                    uli.yaml = { indent: ln.indent, isArrayElement: true }
+                    if (yaml[4]) {
+                        uli.yaml.name = yaml[1]
+                        uli.yaml.$js = yamlToEsast(yaml[4],false)
+                        uli.yaml.colon = true
+                    } else if (yaml[2]) {
+                        uli.yaml.name = yaml[1]
+                        uli.yaml.colon = true
+                    } else {
+                        uli.yaml.$js = yamlToEsast(yaml[1],false)
+                        uli.yaml.colon = false
+                    }
+                }
 
                 return uli
             }
@@ -205,26 +205,6 @@ function lineToSqrm(ln) {
         }
     }
 
-    m = ln.value.match(RE_Tag);
-    if (m) {
-        let tag = {
-            type: 'yaml-line',
-            indent: ln.indent, 
-            name: m[2], 
-            colon: true, 
-            isArrayElement: false, 
-            line: ln.line,
-            text: ln.value
-        }
-        if (m[4]) {
-            tag.$js  = yamlToEsast(m[4],false)
-            // console.log(m[4],' = ',tag.value)
-        }
-
-        // console.log(tag.name + " = " + util.inspect(tag.$js,false,null,true))
-        return tag
-    }
-
     m = ln.value.match(RE_Footnote);
     if (m) {
         return {
@@ -256,13 +236,29 @@ function lineToSqrm(ln) {
     }
 
     // children = text and is converted to hast in post-process
-    return {
+    let text = {
         type: 'text-line',
         indent: ln.indent,
         // position: ln.position,
         children: lineToSxast(ln.value),
         text: ln.value
     }
+
+    m = ln.value.match(RE_Tag);
+    if (m) {
+        text.yaml = {
+            indent: ln.indent, 
+            name: m[2], 
+            colon: true, 
+            isArrayElement: false, 
+        }
+        if (m[4]) {
+            text.yaml.$js  = yamlToEsast(m[4],false)
+            // console.log(m[4],' = ',tag.value)
+        }
+    }
+
+    return text
 
 }
 
@@ -280,7 +276,7 @@ export default function indentedLinesToSxast(options = {}) {
             root.children.push(sast)
             if (sast.type == 'script-line' && !sast.endScript) {
                 for (i++ ; i<tree.children.length ; i++) {
-                    iline = tree.children[j]
+                    iline = tree.children[i]
                     sast = {
                         type: 'script-line',
                         indent: iline.indent,

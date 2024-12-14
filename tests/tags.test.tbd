@@ -10,7 +10,7 @@ testRunner('tags',[
         docs: 1,
         'sxast-children': 1,
         statements: 1,
-        html: '<p>inline <a href=\"#\" data-sqrm-type=\"tag\" data-sqrm-value=\"[true]\" onclick=\"sqrmCB(this)\">#tag</a></p>',
+        html: `<p>inline <a href="/tags/tag">#tag</a></p>`,
         json: { tag : true }
     },
     {
@@ -21,7 +21,7 @@ testRunner('tags',[
         docs: 1,
         'sxast-children': 1,
         statements: 1,
-        html: '<p>inline2 <a href="#" data-sqrm-type="tag" data-sqrm-value="[1]" onclick="sqrmCB(this)">#tag(1)</a></p>',
+        html: `<p>inline2 <a href="/tags/tag?args=%5B1%5D">#tag(1)</a></p>`,
         json: { tag : 1 }
     },
     {
@@ -32,7 +32,7 @@ testRunner('tags',[
         docs: 1,
         'sxast-children': 1,
         statements: 1,
-        html: '<p>inline3 <a href=\"#\" data-sqrm-type=\"tag\" data-sqrm-value=\"[1,3.141592653589793]\" onclick=\"sqrmCB(this)\">#tag(1,Math.PI)</a></p>',
+        html: `<p>inline3 <a href="/tags/tag?args=%5B1%2C3.141592653589793%5D">#tag(1,Math.PI)</a></p>`,
         json: { tag : [1,Math.PI] }
     },
     {
@@ -43,7 +43,7 @@ testRunner('tags',[
         docs: 1,
         'sxast-children': 1,
         statements: 1,
-        html: '<p>inline4 <a href=\"#\" data-sqrm-type=\"tag\" data-sqrm-value=\"[[&#x22;a&#x22;,&#x22;b&#x22;]]\" onclick=\"sqrmCB(this)\">#tag([\'a\',\'b\'])</a></p>',
+        html: `<p>inline4 <a href="/tags/tag?args=%5B%5B%22a%22%2C%22b%22%5D%5D">#tag(['a','b'])</a></p>`,
         json: { tag : ['a','b'] }
     },
     {
@@ -60,7 +60,7 @@ testRunner('tags',[
         docs: 1,
         'sxast-children': 7,
         statements: 7,
-        html: '<h3>fredy</h3><div><p>text with a <a href=\"#\" data-sqrm-type=\"tag\" data-sqrm-value=\"[true]\" onclick=\"sqrmCB(this)\">#tag</a></p><p>was <i>here</i> <b>woot</b> but a = 5 <u>yes?</u></p></div>',
+        html: `<h3>fredy</h3><div><p>text with a <a href="/tags/tag">#tag</a></p><p>was <i>here</i> <b>woot</b> but a = 5 <u>yes?</u></p></div>`,
         json: { a : 5, tag: true }
     },
 ])

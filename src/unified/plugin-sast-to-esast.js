@@ -391,7 +391,8 @@ function this_addLine(line) {
             "arguments": [{
                 "type": "ObjectExpression",
                 "properties": Object.keys(line)
-                    .map(k => k=='$js'?prop(id('value'),line[k]):prop(id(k),value(line[k])))
+                    // .map(k => k=='$js'?prop(id('value'),line[k]):prop(id(k),value(line[k])))
+                    .map(k => k=='$js'?prop(id('$js'),line[k]):prop(id(k),value(line[k])))
             }],
             "optional": false
         }
