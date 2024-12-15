@@ -102,7 +102,7 @@ function lineToSqrm(ln) {
                     uli.yaml = { type: 'yaml', indent: ln.indent, isArrayElement: true }
                     if (yaml[4]) {
                         uli.yaml.name = yaml[1]
-                        uli.yaml.vale = yaml[4]// = yamlToEsast(yaml[4],false)
+                        uli.yaml.value = yaml[4]// = yamlToEsast(yaml[4],false)
                         uli.yaml.colon = true
                     } else if (yaml[2]) {
                         uli.yaml.name = yaml[1]
