@@ -4,8 +4,9 @@ import {visit} from 'unist-util-visit'
 import {t} from '../util/hastscript-tools.js'
 import lineToSxast from '../util/parse-text.js'
 import util from 'util'
+import sastTextToHast from './sast-text-to-hast.js';
 
-export default function sastTableToHast(rows) {
+export default function sastTableToHast(rows,context) {
     let head = []
     let body = []
     let foot = []
@@ -86,7 +87,7 @@ export default function sastTableToHast(rows) {
             for (let j=0 ; j<head[i].children.length ; j++) {
                 const th = cell(head[i],j,true)
                 tr.children.push(th)
-                th.children = head[i].children[j].children
+                th.children = sastTextToHast(head[i].children[j].children,context)
             }
         }
     }
@@ -99,7 +100,7 @@ export default function sastTableToHast(rows) {
         for (let j=0 ; j<body[i].children.length ; j++) {
             const td = cell(body[i],j)
             tr.children.push(td)
-            td.children = body[i].children[j].children
+            td.children = sastTextToHast(body[i].children[j].children,context)
         }
     }
 
@@ -112,7 +113,7 @@ export default function sastTableToHast(rows) {
             for (let j=0 ; j<foot[i].children.length ; j++) {
                 const td = cell(foot[i],j)
                 tr.children.push(td)
-                td.children = foot[i].children[j].children
+                td.children = sastTextToHast(foot[i].children[j].children,context)
             }
         }
     }

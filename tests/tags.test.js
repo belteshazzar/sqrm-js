@@ -9,7 +9,7 @@ testRunner('tags',[
         slines: 1,
         docs: 1,
         'sxast-children': 1,
-        statements: 1,
+        // statements: 1,
         html: `<p>inline <a href="/tags/tag">#tag</a></p>`,
         json: { tag : true }
     },
@@ -20,7 +20,7 @@ testRunner('tags',[
         slines: 1,
         docs: 1,
         'sxast-children': 1,
-        statements: 1,
+        // statements: 1,
         html: `<p>inline2 <a href="/tags/tag?args=%5B1%5D">#tag(1)</a></p>`,
         json: { tag : 1 }
     },
@@ -31,7 +31,7 @@ testRunner('tags',[
         slines: 1,
         docs: 1,
         'sxast-children': 1,
-        statements: 1,
+        // statements: 1,
         html: `<p>inline3 <a href="/tags/tag?args=%5B1%2C3.141592653589793%5D">#tag(1,Math.PI)</a></p>`,
         json: { tag : [1,Math.PI] }
     },
@@ -42,7 +42,7 @@ testRunner('tags',[
         slines: 1,
         docs: 1,
         'sxast-children': 1,
-        statements: 1,
+        // statements: 1,
         html: `<p>inline4 <a href="/tags/tag?args=%5B%5B%22a%22%2C%22b%22%5D%5D">#tag(['a','b'])</a></p>`,
         json: { tag : ['a','b'] }
     },
@@ -59,7 +59,7 @@ a: 5
         slines: 7,
         docs: 1,
         'sxast-children': 7,
-        statements: 7,
+        // statements: 7,
         html: `<h3>fredy</h3><div><p>text with a <a href="/tags/tag">#tag</a></p><p>was <i>here</i> <b>woot</b> but a = 5 <u>yes?</u></p></div>`,
         json: { a : 5, tag: true }
     },

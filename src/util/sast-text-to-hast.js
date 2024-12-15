@@ -21,6 +21,7 @@ function tagForStyle(s) {
 }
 
 export default function sastTextToHast(children,context) {
+// console.log(children)
 
     let hast = []
 
@@ -61,6 +62,7 @@ export default function sastTextToHast(children,context) {
         if (child instanceof Function) {
             try {
                 child = child.call(context)
+                // console.log(child)
             } catch (e) {
                 console.log(child)
                 throw e
@@ -106,6 +108,6 @@ export default function sastTextToHast(children,context) {
         // console.log('hast',util.inspect(hast,false,null,true))
 
     }
-
+// console.log(hast)
     return hast
 }

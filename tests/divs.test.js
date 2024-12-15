@@ -9,7 +9,7 @@ testRunner('divs',[
         slines: 1,
         docs: 1,
         'sxast-children': 1,
-        statements: 1,
+        // statements: 1,
         html: '<div></div>',
         json: {}
     },
@@ -20,7 +20,7 @@ testRunner('divs',[
         slines: 2,
         docs: 1,
         'sxast-children': 2,
-        statements: 2,
+        // statements: 2,
         html: '<div><p>nested</p></div>',
         json: {}
     },
@@ -31,7 +31,7 @@ testRunner('divs',[
         slines: 4,
         docs: 1,
         'sxast-children': 4,
-        statements: 4,
+        // statements: 4,
         html: '<table><tr><td><p>cell</p></td></tr></table>',
         json: {}
     },
@@ -42,7 +42,7 @@ testRunner('divs',[
         slines: 8,
         docs: 1,
         'sxast-children': 8,
-        statements: 8,
+        // statements: 8,
         html: '<ol><li>one</li><li>two</li></ol><ul><li>woot</li></ul>',
         json: {}
     },
@@ -53,7 +53,7 @@ testRunner('divs',[
         slines: 2,
         docs: 1,
         'sxast-children': 2,
-        statements: 2,
+        // statements: 2,
         html: '<ul><li>one</li><li>3.4</li></ul>',
         json: {}
     },

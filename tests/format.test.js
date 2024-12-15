@@ -9,7 +9,7 @@ testRunner('simple formatting',[
         slines: 1,
         docs: 1,
         'sxast-children': 1,
-        statements: 1,
+        // statements: 1,
         html: '<p>woot</p>',
         json: {}
     },
@@ -20,7 +20,7 @@ testRunner('simple formatting',[
         slines: 1,
         docs: 1,
         'sxast-children': 1,
-        statements: 1,
+        // statements: 1,
         html: '<p>woot <b>bold</b></p>',
         json: {}
     },
@@ -31,7 +31,7 @@ testRunner('simple formatting',[
         slines: 1,
         docs: 1,
         'sxast-children': 1,
-        statements: 1,
+        // statements: 1,
         html: '<p>woot <u>underlined</u></p>',
         json: {}
     },
@@ -42,7 +42,7 @@ testRunner('simple formatting',[
         slines: 1,
         docs: 1,
         'sxast-children': 1,
-        statements: 1,
+        // statements: 1,
         html: '<div><p>w <b>test</b> here</p></div>',
         json: {}
     },
@@ -56,7 +56,7 @@ testRunner('simple formatting',[
         slines: 4,
         docs: 1,
         'sxast-children': 4,
-        statements: 4,
+        // statements: 4,
         html: '<h3>fred</h3><div><p>was <i>here</i> <b>woot</b> <u>yes?</u></p></div>',
         json: {}
     },

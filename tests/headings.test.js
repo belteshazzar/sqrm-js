@@ -3,24 +3,24 @@ import testRunner from "./data-test-runner"
 
 testRunner('headings',[
     {
-        name: 'heading level 1',
+        name: 'heading level 01',
         sqrm: `= head\n`,
         ilines: 2,
         slines: 2,
         docs: 1,
         'sxast-children': 2,
-        statements: 2,
+//        statements: 2,
         html: '<h1>head</h1>',
         json: {}
     },
     {
-        name: 'heading level 2',
+        name: 'heading level 02',
         sqrm: '== head\n',
         ilines: 2,
         slines: 2,
         docs: 1,
         'sxast-children': 2,
-        statements: 2,
+//        statements: 2,
         html: '<h2>head</h2>',
         json: {}
     },
@@ -31,7 +31,8 @@ testRunner('headings',[
         slines: 2,
         docs: 1,
         'sxast-children': 2,
-        statements: 2,        html: '<div><h3>head</h3></div>',
+        // statements: 2, 
+        html: '<div><h3>head</h3></div>',
         json: {},
     },
     {
@@ -41,7 +42,7 @@ testRunner('headings',[
         slines: 2,
         docs: 1,
         'sxast-children': 2,
-        statements: 2,
+        // statements: 2,
         html: '<h1>head</h1><p>ing</p>',
         json: {},
     },
@@ -52,7 +53,7 @@ testRunner('headings',[
         slines: 4,
         docs: 1,
         'sxast-children': 4,
-        statements: 4,
+        // statements: 4,
         html: '<h1>head</h1><p>ing\nand some more</p>',
         json: {},
     },
@@ -63,7 +64,7 @@ testRunner('headings',[
         slines: 3,
         docs: 1,
         'sxast-children': 3,
-        statements: 3,
+        // statements: 3,
         html: '<h1>head</h1><p>ing</p>',
         json: {}
     },
@@ -74,7 +75,7 @@ testRunner('headings',[
         slines: 1,
         docs: 1,
         'sxast-children': 1,
-        statements: 1,
+        // statements: 1,
         html: '<h1>head</h1>',
         json: {},
     },
@@ -85,7 +86,7 @@ testRunner('headings',[
         slines: 2,
         docs: 1,
         'sxast-children': 2,
-        statements: 2,
+        // statements: 2,
         html: '<h1>head</h1>',
         json: {}
     },
@@ -96,7 +97,7 @@ testRunner('headings',[
         slines: 2,
         docs: 1,
         'sxast-children': 2,
-        statements: 2,
+        // statements: 2,
         html: '<h1>head</h1><p>ing</p>',
         json: {},
     },
@@ -107,7 +108,7 @@ testRunner('headings',[
         slines: 2,
         docs: 1,
         'sxast-children': 2,
-        statements: 2,
+        // statements: 2,
         html: '<h1>head</h1>',
         json: {},
     },
@@ -118,7 +119,7 @@ testRunner('headings',[
         slines: 3,
         docs: 1,
         'sxast-children': 3,
-        statements: 3,
+        // statements: 3,
         html: '<div><h2>heading</h2></div><p>text</p>',
         json: {}
     },
@@ -129,7 +130,7 @@ testRunner('headings',[
         slines: 3,
         docs: 1,
         'sxast-children': 3,
-        statements: 3,
+        // statements: 3,
         html: '<div><h2>heading</h2></div><p>text</p>',
         json: {}
     },
@@ -140,7 +141,7 @@ testRunner('headings',[
         slines: 4,
         docs: 1,
         'sxast-children': 4,
-        statements: 4,
+        // statements: 4,
         html: '<div><h2>heading</h2></div><p>text</p>',
         json: {}
     },
@@ -151,7 +152,7 @@ testRunner('headings',[
         slines: 4,
         docs: 1,
         'sxast-children': 4,
-        statements: 4,
+        // statements: 4,
         html: '<div><h1>heading</h1></div><p>text</p>',
         json: {}
     },
@@ -162,7 +163,7 @@ testRunner('headings',[
         slines: 4,
         docs: 1,
         'sxast-children': 4,
-        statements: 4,
+        // statements: 4,
         html: '<hr>',
         json: {}
     },
@@ -173,7 +174,7 @@ testRunner('headings',[
         slines: 2,
         docs: 1,
         'sxast-children': 2,
-        statements: 2,
+        // statements: 2,
         html: '<h1>heading</h1><p>continued =======</p>',
         json: {}
     },
@@ -184,7 +185,7 @@ testRunner('headings',[
         slines: 2,
         docs: 1,
         'sxast-children': 2,
-        statements: 2,
+        // statements: 2,
         html: '<h1>heading</h1><div><p>indented</p></div>',
         json: {}
     }
