@@ -23,4 +23,3 @@ sdf [ Link text | url ] fred
 sdf [Link ba\|ck to H2] fred
 sdf [Link ba\]ck to H2] fred
 sdf [Link ba\ck to H2] fred
-sdf [Link ba\\ck to H2] fred

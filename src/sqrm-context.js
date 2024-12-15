@@ -426,10 +426,10 @@ export default class SqrmContext {
         this.indentStack[this.indentStack.length-1].children.push(this.inlineInclude(args))
     }
 
-    inlineInclude({type,collection ='default',name,args,text,$js}) {
+    inlineInclude({collection ='default',name,args,text}) {
         return {
             type: 'comment',
-            value: `failed to include single doc: ${collection}.${name}( ${JSON.stringify($js)} )`
+            value: `failed to include single doc: ${collection}.${name}( ${JSON.stringify(args)} )`
         }
     }
 

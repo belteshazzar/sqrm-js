@@ -1,7 +1,7 @@
 
 import parseEcma from './parse-ecma.js'
 import quoted from '../util/quoted-string.js';
-import {sastToHastTextFunction,sastTagFunction,sastFormatFunction,sastYaml} from '../util/str-to-esast.js'
+import {sastIncludeFunction,sastToHastTextFunction,sastTagFunction,sastFormatFunction,sastYaml} from '../util/str-to-esast.js'
 import { inspect } from "unist-util-inspect";
 
 
@@ -214,7 +214,7 @@ function object(o) {
     if (o.type && o.type=='tag') {
         return sastTagFunction(o)
     } else if (o.type && o.type=='include') {
-        return inlineInclude(o)
+        return sastIncludeFunction(o)
     } else if (o.type && o.type=='mention') {
         return inlineMention(o)
     } else if (o.type && o.type=='text') {

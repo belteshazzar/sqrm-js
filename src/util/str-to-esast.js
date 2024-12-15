@@ -35,6 +35,41 @@ throw e;
 
 }
 
+export function sastIncludeFunction(inc) {
+
+    inc.collection = inc.collection || 'default'
+
+    try {
+        const src = `() => {
+            return this.inlineInclude({
+                collection: "${inc.collection}",
+                name: "${inc.name}",
+                args: (() => {
+                    try {
+                        return [${inc.args}];
+                    } catch (e) {
+                        return [\`${inc.args}\`];
+                    }
+                })(),
+                text: ${quoted(inc.text)}
+            })
+        }`
+        const node = acorn.parse(src, {ecmaVersion: 2020})
+        return node.body[0].expression
+    } catch (e) {
+        const src = `() => {
+            return this.inlineInclude({
+                collection: "${inc.collection}",
+                name: "${inc.name}",
+                args: [${quoted(inc.args)}],
+                text: ${quoted(inc.text)}
+            })
+        }`
+        const node = acorn.parse(src, {ecmaVersion: 2020})
+        return node.body[0].expression
+    }
+}
+
 
 export function sastTagFunction(tag) {
 
