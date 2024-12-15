@@ -113,6 +113,17 @@ testRunner('simple yaml',[
         json: { a: 'a string with a value null ' }
     },
     {
+        name: 'yaml implicit template string',
+        sqrm: `a: a string with a value \${this.json.b} `,
+        ilines: 1,
+        slines: 1,
+        docs: 1,
+        'sxast-children': 1,
+        statements: 1,
+        html: '',
+        json: { a: 'a string with a value null' }
+    },
+    {
         name: 'yaml invalid javascript to string',
         sqrm: `a: something random + 4`,
         ilines: 1,

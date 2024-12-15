@@ -10,9 +10,9 @@ process.on('SIGINT', function() {
     process.exit();
 });
 
-const _json = process.argv.indexOf('-json') > 0
-const _html = process.argv.indexOf('-html') > 0
-const color = process.argv.indexOf('-color') > 0
+const _json = process.argv.indexOf('--json') > 0 || process.argv.indexOf('-j') > 0
+const _html = process.argv.indexOf('--html') > 0 || process.argv.indexOf('-h') > 0
+const color = process.argv.indexOf('--color') > 0 || process.argv.indexOf('-c') > 0
 
 function printUsage() {
     console.log('Usage: sqrm')
@@ -20,16 +20,16 @@ function printUsage() {
     console.log("Options:")
     console.log("  -f filename      Read the file, only in tty mode")
     console.log("                   Must be provided in tty mode")
-    console.log("  -json            Output JSON")
-    console.log("  -html            Output HTML")
-    console.log("  -color           Display JSON with color")
+    console.log("  -j --json        Output JSON")
+    console.log("  -h --html        Output HTML")
+    console.log("  -c --color       Display JSON with color")
     console.log()
     console.log("Examples:")
     console.log()
     console.log("  sqrm -json -f my-file.sqrm")
-    console.log("  ./bin/sqrm.js -json -f my-file.sqrm")
-    console.log("  cat my-file.sqrm | sqrm -json")
-    console.log("  sqrm -json < my-file.sqrm")
+    console.log("  ./bin/sqrm.js --json -f my-file.sqrm")
+    console.log("  cat my-file.sqrm | sqrm --json")
+    console.log("  sqrm -j < my-file.sqrm")
     console.log()
     process.exit(1)
 }

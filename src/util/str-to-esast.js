@@ -7,7 +7,11 @@ import qouted from './quoted-string.js'
 
 export function sastYaml(yaml) {
 
+    // check if it can be parsed
+
     try {
+        acorn.parse(`let x = ${yaml.value}`, {ecmaVersion: 2020})
+
         const src = `() => {
             return {
                 indent: ${yaml.indent},
@@ -18,11 +22,33 @@ export function sastYaml(yaml) {
                     try {
                         return ${yaml.value};
                     } catch (e) {
-                        try {
-                            return \`${yaml.value}\`;
-                        } catch (f) {
-                            return ${qouted(yaml.value)};
-                        }
+                        return ${qouted(yaml.value)};
+                    }
+                })()
+            }
+        }`
+        const ast = acorn.parse(src, {ecmaVersion: 2020})
+        return ast.body[0].expression
+    } catch (e) {
+    }
+
+    // check if it can be parsed as a template
+
+    try {
+
+        acorn.parse(`let x = \`${yaml.value}\``, {ecmaVersion: 2020})
+
+        const src = `() => {
+            return {
+                indent: ${yaml.indent},
+                name: "${yaml.name}",
+                colon: ${yaml.colon},
+                isArrayElement: ${yaml.isArrayElement},
+                value: (() => {
+                    try {
+                        return \`${yaml.value}\`;
+                    } catch (e) {
+                        return ${qouted(yaml.value)};
                     }
                 })()
             }
@@ -30,9 +56,21 @@ export function sastYaml(yaml) {
         const ast = acorn.parse(src, {ecmaVersion: 2020})
         return ast.body[0].expression
     } catch(e) {
-throw e;
     }
 
+    // not valid as raw or a template, treat as a string
+
+    const src = `() => {
+        return {
+            indent: ${yaml.indent},
+            name: "${yaml.name}",
+            colon: ${yaml.colon},
+            isArrayElement: ${yaml.isArrayElement},
+            value: ${qouted(yaml.value)}
+        }
+    }`
+    const ast = acorn.parse(src, {ecmaVersion: 2020})
+    return ast.body[0].expression
 }
 
 export function sastIncludeFunction(inc) {
