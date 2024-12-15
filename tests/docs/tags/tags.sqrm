@@ -1,20 +1,20 @@
 
 
 <% 
-  this.addLine({type:'paragraph',indent: 0, children: [t('fr\'"`ed%>')] })
-  this.addLine({type:'paragraph',indent: 0, children: [t("fr\"'`ed%>")] })
-  this.addLine({type:'paragraph',indent: 0, children: [t(`fr\`'"ed%>`)] })
-  this.addLine({type:'paragraph',indent: 0, children: [t('this is a list')] })
+  this.addLine({type:'text-line',indent: 0, children: [t('fr\'"`ed%>')] })
+  this.addLine({type:'text-line',indent: 0, children: [t("fr\"'`ed%>")] })
+  this.addLine({type:'text-line',indent: 0, children: [t(`fr\`'"ed%>`)] })
+  this.addLine({type:'text-line',indent: 0, children: [t('this is a list')] })
 
   const ul = h('ul')
   for (let i=1 ; i<=10; i++) {
       ul.children.push(h('li',{},[t(i + ' apples')]))
   }
-  this.addLine({type:'paragraph',indent: 0, children: ul })
+  this.addLine({type:'text-line',indent: 0, children: [ul] })
 
 %>
 
-    <% this.addLine({type:'paragraph',indent: 0, children: [t('fred')] }) %>
+    <% this.addLine({type:'text-line',indent: 0, children: [t('fred')] }) %>
 
 #value( 42 )
 

@@ -3,29 +3,157 @@
 import * as acorn from 'acorn'
 import quoted from './quoted-string.js'
 import util from 'node:util'
+import qouted from './quoted-string.js'
 
-export function templateOrString(str) {
+export function sastYaml(yaml) {
 
     try {
-        let ast = acorn.parse("`" + str + "`", {ecmaVersion: 2020})
+        const src = `() => {
+            return {
+                indent: ${yaml.indent},
+                name: "${yaml.name}",
+                colon: ${yaml.colon},
+                isArrayElement: ${yaml.isArrayElement},
+                value: (() => {
+                    try {
+                        return ${yaml.value};
+                    } catch (e) {
+                        try {
+                            return \`${yaml.value}\`;
+                        } catch (f) {
+                            return ${qouted(yaml.value)};
+                        }
+                    }
+                })()
+            }
+        }`
+        const ast = acorn.parse(src, {ecmaVersion: 2020})
         return ast.body[0].expression
+    } catch(e) {
+throw e;
+    }
+
+}
+
+
+export function sastTagFunction(tag) {
+
+    try {
+        const src = `() => {
+            return this.inlineTag({
+                name: "${tag.name}",
+                args: (() => {
+                    try {
+                        return [${tag.args}];
+                    } catch (e) {
+                        return [\`${tag.args}\`];
+                    }
+                })(),
+                text: ${quoted(tag.text)}
+            })
+        }`
+        const node = acorn.parse(src, {ecmaVersion: 2020})
+        return node.body[0].expression
     } catch (e) {
-        return {
-            type: "Literal",
-            start: -1,
-            end: -1,
-            value: quoted(str),
-            raw: quoted(str)
-        }
+        const src = `() => {
+            return this.inlineTag({
+                name: "${tag.name}",
+                args: [${quoted(tag.args)}],
+                text: ${quoted(tag.text)}
+            })
+        }`
+        const node = acorn.parse(src, {ecmaVersion: 2020})
+        return node.body[0].expression
     }
 }
 
+export function sastFormatFunction(format) {
+
+    const src = `() => {
+        return {
+            type: "${format.type}",
+            style: "${format.style}"
+        }
+    }`
+    const node = acorn.parse(src, {ecmaVersion: 2020})
+    return node.body[0].expression
+}
+
+export function sastToHastTextFunction(o) {
+
+    // try as template
+    // if its not a valid template acorn will throw an exception
+    // then return as a plain string
+    try {
+        const src = `() => {
+            return {
+                type: "text",
+                value: (() => {
+                    try {
+                        return \`${o.value}\`;
+                    } catch (e) {
+                        return ${quoted(o.value)};
+                    }
+                })()
+            }
+        }`
+
+        let ast = acorn.parse(src, {ecmaVersion: 2020})
+        return ast.body[0].expression
+    } catch (e) {
+        const src = `() => {
+            return {
+                type: "text",
+                value: ${quoted(o.value)}
+            }
+        }`
+
+        let ast = acorn.parse(src, {ecmaVersion: 2020})
+        return ast.body[0].expression
+    }
+
+}
+
+export function esastStr(str) {
+
+    // try as template
+    try {
+        const src = `() => try { return \`${str}\`; } catch (e) { return ${quoted(str)}; }`
+        // console.log(src)
+        let ast = acorn.parse(src, {ecmaVersion: 2020})
+        return ast.body[0].expression
+    } catch (e) {
+    }
+
+    // fallback as plain string
+    return {
+        type: "Literal",
+        start: -1,
+        end: -1,
+        value: quoted(str),
+        raw: quoted(str)
+    }
+}
+
+export function esastValue(str) {
+
+    // try as raw
+    try {
+        const src = `() => { try { return ${str}; } catch (e) { return ${quoted(str)}; }}`
+        // console.log(src)
+        let ast = acorn.parse(src, {ecmaVersion: 2020})
+        return ast.body[0].expression
+    } catch (e) {
+    }
+
+    return esastStr(str)
+}
 
 export function yamlToEsast(str,throwOnInvalid = false) {
 
     // console.log('yamlToEsast',str)
 
-    const src = '(() => { try { return ' + str + '; } catch (e) { return `' + str + '`; } })()'
+    const src = '() => { try { return ' + str + '; } catch (e) { return `' + str + '`; } }'
 
     try {
         const node = acorn.parse(src, {ecmaVersion: 2020})
@@ -46,7 +174,7 @@ export function yamlToEsastArray(str) {
 
 //    console.log('yamlToEsastArray',str)
 
-    const src = '(() => { try { return [' + str + ']; } catch (e) { return [`' + str + '`]; } })()'
+    const src = '() => { try { return [' + str + ']; } catch (e) { return [`' + str + '`]; } }'
 
     try {
         const node = acorn.parse(src, {ecmaVersion: 2020})

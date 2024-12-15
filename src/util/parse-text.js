@@ -1,9 +1,6 @@
 
-//import {h} from 'hastscript'
 import {t} from './hastscript-tools.js'
-import {functionParamsToEsast} from './str-to-esast.js'
 import link from './str-to-link.js'
-import {yamlToEsast,yamlToEsastArray} from '../util/str-to-esast.js'
 
 function styleFor(c) {
     switch (c) {
@@ -227,7 +224,7 @@ s = s.trim()
                         }
                         if (tagValueStr) {
                             includeOpts.args = tagValueStr
-                            includeOpts.$js = yamlToEsastArray(tagValueStr)
+                            // includeOpts.value = yamlToEsastArray(tagValueStr)
                         }
                         if (res.groups.part2) {
                             includeOpts.collection = res.groups.part1
@@ -239,7 +236,7 @@ s = s.trim()
                             type:'tag',
                             name: res.groups.part1,
                             args: tagValueStr || 'true',
-                            $js: yamlToEsastArray(tagValueStr || 'true'),
+                            // $js: yamlToEsastArray(tagValueStr || 'true'),
                             text: tagStr 
                         })
                     }

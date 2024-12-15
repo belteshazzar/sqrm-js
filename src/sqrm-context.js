@@ -11,6 +11,9 @@ import util from 'node:util'
 
 export default class SqrmContext {
     constructor(db,jsonTree) {
+
+        this.libs = {h,t};
+
         this.db = db
 
         this.hast = {
@@ -29,6 +32,8 @@ export default class SqrmContext {
     }
 
     addLine(obj) {
+
+        // console.log('addLine',obj)
 
         function spaces(i) {
             let ss = ''
@@ -65,11 +70,13 @@ export default class SqrmContext {
 
             if (obj.yaml) {
                 console.log(obj.yaml)
-                let addedYaml = this.jsonTree.addLine(obj.yaml) != null
-                console.log(addedYaml)
-                console.log(JSON.stringify(this.json))
+                const yaml = obj.yaml.call(this);
+                console.log(yaml);
+                let addedYaml = this.jsonTree.addLine(yaml,this) != null
+                // console.log(addedYaml)
                 
                 if (addedYaml) {
+                    // console.log('json updated from yaml',this.json.toJSON())
 
                     if (this.blank = null) {
                         this.blank = '\n'
@@ -108,38 +115,38 @@ export default class SqrmContext {
                     if (this.blank == null && prev && prev.tagName == 'p') {
                         if (prev.sqrm.length>0) prev.sqrm.push({ type: 'text', value: '\n' })
                         prev.sqrm.push(... obj.children)
-                        prev.children = sastTextToHast(prev.sqrm)
+                        prev.children = sastTextToHast(prev.sqrm,this)
                     } else if (this.blank == null && indentLevel.tagName == 'li') {
                         if (indentLevel.sqrm.length>0) indentLevel.sqrm.push({ type: 'text', value: '\n' })
                         indentLevel.sqrm.push(... obj.children)
-                        indentLevel.children = sastTextToHast(indentLevel.sqrm)
+                        indentLevel.children = sastTextToHast(indentLevel.sqrm,this)
                     } else {
                         let hast = h('p')
                         hast.sqrm = obj.children
-                        hast.children = sastTextToHast(obj.children)
+                        hast.children = sastTextToHast(obj.children,this)
                         indentLevel.children.push(hast);
                     }
                 } else if (obj.type == 'table-row-line' || obj.type == 'table-divider-line') {
                     if (this.blank == null && prev && prev.tagName == 'table') {
                         prev.sqrm.push(obj);
-                        prev.children = sastTableToHast(prev.sqrm).children
+                        prev.children = sastTableToHast(prev.sqrm,this).children
                     } else {
                         let hast = h('table')
                         hast.sqrm = [obj]
-                        hast.children = sastTableToHast(hast.sqrm).children
+                        hast.children = sastTableToHast(hast.sqrm,this).children
                         indentLevel.children.push(hast);
                     }
                 } else if (obj.type == 'ordered-list-item-line') {
                     if (prev && prev.tagName == 'ol') {
                         let li = h('li')
                         li.sqrm = obj.children
-                        li.children = sastTextToHast(obj.children)
+                        li.children = sastTextToHast(obj.children,this)
                         prev.children.push(li)
                        this.indentStack.push(li)
                     } else {
                         let li = h('li')
                         li.sqrm = obj.children
-                        li.children = sastTextToHast(obj.children)
+                        li.children = sastTextToHast(obj.children,this)
                         let ol = h('ol',{},[li]) //{ type: 'ordered-list', children: [toHast(obj)] }
                         indentLevel.children.push(ol)
                         this.indentStack.push(li)
@@ -148,13 +155,13 @@ export default class SqrmContext {
                     if (prev && prev.tagName == 'ul') {
                         let li = h('li')
                         li.sqrm = obj.children
-                        li.children = sastTextToHast(obj.children)
+                        li.children = sastTextToHast(obj.children,this)
                         prev.children.push(li)
                        this.indentStack.push(li)
                     } else {
                         let li = h('li')
                         li.sqrm = obj.children
-                        li.children = sastTextToHast(obj.children)
+                        li.children = sastTextToHast(obj.children,this)
                         let ul = h('ul',{},[li]) //{ type: 'ordered-list', children: [toHast(obj)] }
                         indentLevel.children.push(ul)
                         this.indentStack.push(li)
@@ -162,7 +169,7 @@ export default class SqrmContext {
                 } else if (obj.type == 'hr-line') {
                     indentLevel.children.push(h('hr'))
                 } else if (obj.type == 'heading-line') {
-                    indentLevel.children.push(h('h'+obj.level,{},obj.children))
+                    indentLevel.children.push(h('h'+obj.level,{},sastTextToHast(obj.children,this)))
 
                 } else if (obj.type == 'code-block-line') {
 
@@ -387,19 +394,19 @@ export default class SqrmContext {
     //     }
     // }
 
-    inlineTag({type,name,args,$js,text}) {
+    inlineTag({type,name,args,text}) {
 
         let query = ''
 
-        if ($js && Array.isArray($js) && ($js.length != 1 || $js[0] !== true)) {
-            query = '?args=' + encodeURIComponent(JSON.stringify($js))
+        if (args && Array.isArray(args) && (args.length != 1 || args[0] !== true)) {
+            query = '?args=' + encodeURIComponent(JSON.stringify(args))
         }
 
-        if ($js && Array.isArray($js)) {
-            if ($js.length == 1) {
-                this.json[name] = $js[0]
+        if (args && Array.isArray(args)) {
+            if (args.length == 1) {
+                this.json[name] = args[0]
             } else {
-                this.json[name] = $js
+                this.json[name] = args
             }
         }
 

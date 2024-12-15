@@ -110,8 +110,15 @@ export default function(testName,testData) {
           // .use(rehypeStringify)
           // .runSync(self.doc)
 
-        if (loghast) console.log(inspect(self.hast))
-
+        if (loghast) {
+          try {
+            console.log(inspect(self.hast))
+          } catch(e) {
+            console.error(e)
+            console.log(util.inspect(self.hast,false,null,true))
+          }
+        }
+        
         const html = unified()
           .use(rehypeStringify)
           .stringify(self.hast)

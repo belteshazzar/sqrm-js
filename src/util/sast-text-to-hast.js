@@ -20,7 +20,7 @@ function tagForStyle(s) {
     }
 }
 
-export default function sastTextToHast(children) {
+export default function sastTextToHast(children,context) {
 
     let hast = []
 
@@ -57,41 +57,49 @@ export default function sastTextToHast(children) {
 
     if (children) for (let i=0 ; i<children.length ; i++) {
 
-        // console.log('next child: ',util.inspect(children[i],false,null,true))
+        let child = children[i]
+        if (child instanceof Function) {
+            try {
+                child = child.call(context)
+            } catch (e) {
+                console.log(child)
+                throw e
+            }
+        }
 
-        switch (children[i].type) {
+        switch (child.type) {
             case 'text':
             case 'element':
             case 'comment':
-                stack[stack.length-1].children.push(children[i])
+                stack[stack.length-1].children.push(child)
                 // console.log('text, stack now',util.inspect(stack,false,null,true))
                 break;
             case 'link':
-                let link = children[i]
+                let link = child
                 stack[stack.length-1].children.push(h('a',{
                     href: link.ref,
                 },[t(link.text)]))
                 break;
             // case 'include':
-            //     let inc = children[i]
+            //     let inc = child
             //     stack[stack.length-1].children.push(h('span',{
             //         class: inc.name,
             //         args: inc.args
             //     },[]))               
             //     break;
             // case 'mention':
-            //     let m = children[i]
+            //     let m = child
             //     stack[stack.length-1].children.push(h('a',{
             //         href: '/users/' + m.value,
             //     },[t( '@' + m.value)]))
             //     break;
             case 'format':
-                if (!closedOpenStyle(children[i].style)) {
-                    openStyle(children[i].style)
+                if (!closedOpenStyle(child.style)) {
+                    openStyle(child.style)
                 }
                 break;
             default:
-                throw new Error('not implemented: ' + JSON.stringify(children[i]))
+                throw new Error('not implemented: ' + JSON.stringify(child))
         }
 
         // console.log('stack',util.inspect(stack,false,null,true))

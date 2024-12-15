@@ -128,7 +128,7 @@ export default function(testName,folder) {
 
 //        console.log(toHtml(hast))
 
-        // if (loghast) console.log('hast -------------\n',inspect(hast))
+        if (loghast) console.log('hast -------------\n',inspect(hast))
 
         const html = unified()
             .use(rehypeStringify,{

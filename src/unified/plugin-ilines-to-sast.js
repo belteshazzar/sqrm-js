@@ -1,8 +1,9 @@
 
 import lineToSxast from '../util/parse-text.js'
-import {yamlToEsast} from '../util/str-to-esast.js'
+//import {yamlToEsast} from '../util/str-to-esast.js'
 import link from '../util/str-to-link.js'
 import parseTableRow from '../util/parse-table-row.js'
+// import {esastValue} from '../util/str-to-esast.js'
 
 const RE_DocumentSeparator = /^---$/d
 
@@ -98,16 +99,16 @@ function lineToSqrm(ln) {
 
                 let yaml = ln.value.match(RE_ListItemTag)
                 if (yaml) {
-                    uli.yaml = { indent: ln.indent, isArrayElement: true }
+                    uli.yaml = { type: 'yaml', indent: ln.indent, isArrayElement: true }
                     if (yaml[4]) {
                         uli.yaml.name = yaml[1]
-                        uli.yaml.$js = yamlToEsast(yaml[4],false)
+                        uli.yaml.vale = yaml[4]// = yamlToEsast(yaml[4],false)
                         uli.yaml.colon = true
                     } else if (yaml[2]) {
                         uli.yaml.name = yaml[1]
                         uli.yaml.colon = true
                     } else {
-                        uli.yaml.$js = yamlToEsast(yaml[1],false)
+                        uli.yaml.value = yaml[1]//yamlToEsast(yaml[1],false)
                         uli.yaml.colon = false
                     }
                 }
@@ -247,14 +248,14 @@ function lineToSqrm(ln) {
     m = ln.value.match(RE_Tag);
     if (m) {
         text.yaml = {
+            type: 'yaml',
             indent: ln.indent, 
             name: m[2], 
             colon: true, 
             isArrayElement: false, 
         }
         if (m[4]) {
-            text.yaml.$js  = yamlToEsast(m[4],false)
-            // console.log(m[4],' = ',tag.value)
+            text.yaml.value = m[4]
         }
     }
 

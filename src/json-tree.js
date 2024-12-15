@@ -95,6 +95,13 @@ let handler = {
             console.log(target,property,value)
             throw new Error('set on json not array or object not-implemented')
         }
+        for (let i=0 ; i<target.children.length ; i++) {
+            if (target.children[i].name == property) {
+                target.children[i].type = 'value'
+                target.children[i].value = value
+                return true
+            }
+        }
         target.children.push({ type: 'value', name: property, value: value })
         return true;
     },
@@ -125,12 +132,14 @@ export default class JsonTree {
         }
     }
 
-    addLine({indent=1,isArrayElement=false,name,colon=true,$js}) {
+    addLine({indent=1,isArrayElement=false,name,colon=true,value,$value},context) {
 
-// console.log(indent,isArrayElement,name,colon,$js)
+        if ($value !== undefined) {
+            value = $value.call(context)
+        }
 
-        if ($js != undefined && $js.length == 1) {
-            $js = $js[0]
+        if (value != undefined && value.length == 1) {
+            value = value[0]
         }
 
         let parent = null
@@ -172,10 +181,10 @@ export default class JsonTree {
             parent.childrenIndent = indent
             delete parent.minChildIndent
 
-            if (colon && $js === undefined) {
+            if (colon && value === undefined) {
                 parent.children = [ { minChildIndent: indent, type: 'unknown', name: name } ]
             } else {
-                parent.children = [ { type: 'value', name: name, value: $js } ]
+                parent.children = [ { type: 'value', name: name, value: value } ]
             }
 
             // this.updateJson()
@@ -190,16 +199,16 @@ export default class JsonTree {
             delete parent.minChildIndent
 
             let jsonNode = null
-            if (colon && $js === undefined) {
+            if (colon && value === undefined) {
                 jsonNode = { minChildIndent: indent+1, type:'unknown',name:name }
                 const arrayElement = { childrenIndent: indent+1, type: 'object', children: [jsonNode]}
                 parent.children = [arrayElement]
             } else if (colon) {
-                jsonNode = { childrenIndent: indent+1, type:'value', name:name, value:$js}
+                jsonNode = { childrenIndent: indent+1, type:'value', name:name, value:value}
                 const arrayElement = { childrenIndent: indent+1, type: 'object', children: [jsonNode]}
                 parent.children = [arrayElement]
             } else if (!colon) {
-                jsonNode = { type: 'value', value: $js }
+                jsonNode = { type: 'value', value: value }
                 parent.children = [ jsonNode ]
             }
 
@@ -210,10 +219,10 @@ export default class JsonTree {
         if (parent.type == 'object' && !isArrayElement) {
  
             let child = null
-            if (colon && $js === undefined) {
+            if (colon && value === undefined) {
                 child = { minChildIndent: indent, type: 'unknown', name: name }
             } else {
-                child = { type: 'value', name: name, value: $js }
+                child = { type: 'value', name: name, value: value }
             }
 
             for (let i=0 ; i<parent.children.length ; i++) {
@@ -230,16 +239,16 @@ export default class JsonTree {
         if (parent.type == 'array' && isArrayElement) {
 
             let jsonNode = null
-            if (colon && $js === undefined) {
+            if (colon && value === undefined) {
                 jsonNode = { minChildIndent: indent+1, type:'unknown',name:name }
                 const arrayElement = { childrenIndent: indent+1, type: 'object', children: [jsonNode]}
                 parent.children.push(arrayElement)
             } else if (colon) {
-                jsonNode = { childrenIndent: indent+1, type:'value',name:name,value:$js}
+                jsonNode = { childrenIndent: indent+1, type:'value',name:name,value:value}
                 const arrayElement = { childrenIndent: indent+1, type: 'object', children: [jsonNode]}
                 parent.children.push(arrayElement)
             } else if (!colon) {
-                jsonNode = { type: 'value', value: $js }
+                jsonNode = { type: 'value', value: value }
                 parent.children.push(jsonNode)
             }
 

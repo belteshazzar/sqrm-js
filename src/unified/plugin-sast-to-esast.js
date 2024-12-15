@@ -1,8 +1,9 @@
 
 import parseEcma from './parse-ecma.js'
 import quoted from '../util/quoted-string.js';
-import util from 'util'
-import {templateOrString} from '../util/str-to-esast.js'
+import {sastToHastTextFunction,sastTagFunction,sastFormatFunction,sastYaml} from '../util/str-to-esast.js'
+import { inspect } from "unist-util-inspect";
+
 
 let p = new parseEcma()
 
@@ -70,8 +71,6 @@ function c(id,_init) {
 
 function inlineTag(tag) {
     return {
-        "type": "CallExpression",
-        "callee": {
             "type": "ArrowFunctionExpression",
             "id": null,
             "expression": false,
@@ -110,9 +109,7 @@ function inlineTag(tag) {
                         }
                     },
                 }]
-            }},
-            "arguments": [],
-            "optional": false
+            }
     }
 }
 
@@ -215,40 +212,17 @@ function inlineMention(o) {
 function object(o) {
 
     if (o.type && o.type=='tag') {
-        return inlineTag(o)
+        return sastTagFunction(o)
     } else if (o.type && o.type=='include') {
         return inlineInclude(o)
     } else if (o.type && o.type=='mention') {
         return inlineMention(o)
     } else if (o.type && o.type=='text') {
-
-        return {
-            type: "ObjectExpression",
-            start: 0,
-            end: 0,
-            properties: [{
-                type: "Property",
-                start: 0,
-                end: 0,
-                method: false,
-                shorthand: false,
-                computed: false,
-                key: id('type'),
-                value: literal('"text"'),
-                kind: "init"
-            },{
-                type: "Property",
-                start: 0,
-                end: 0,
-                method: false,
-                shorthand: false,
-                computed: false,
-                key: id('value'),
-                value: templateOrString(o.value),
-                kind: "init"
-            }]
-        };
-
+        return sastToHastTextFunction(o);
+    } else if (o.type && o.type == 'format') {
+        return sastFormatFunction(o)
+    } else if (o.type && o.type == 'yaml') {
+        return sastYaml(o)
     } else {
         return {
             type: "ObjectExpression",
@@ -292,23 +266,7 @@ function prop(k,v) {
 }
 function props(o) {
     return Object.keys(o).map((k) => {
-        if (k=='$js') {
-            // console.log(o[k])
-            return prop(id(k),o[k])
-        } else {
-            return prop(id(k),value(o[k]))
-        }
-        // return {
-        //     type: "Property",
-        //     start: 0,
-        //     end: 0,
-        //     method: false,
-        //     shorthand: false,
-        //     computed: false,
-        //     key: id(k),
-        //     value: value(o[k]),
-        //     kind: "init"
-        // }
+        return k.charAt(0) == '$' ? prop(id(k),o[k]) : prop(id(k),value(o[k]))
     })
 }
 
@@ -388,12 +346,7 @@ function this_addLine(line) {
                 "computed": false,
                 "optional": false
             },
-            "arguments": [{
-                "type": "ObjectExpression",
-                "properties": Object.keys(line)
-                    // .map(k => k=='$js'?prop(id('value'),line[k]):prop(id(k),value(line[k])))
-                    .map(k => k=='$js'?prop(id('$js'),line[k]):prop(id(k),value(line[k])))
-            }],
+            "arguments": [object(line)],
             "optional": false
         }
       }
@@ -402,15 +355,44 @@ function this_addLine(line) {
 export default function resqrmToEsast(options = {}) {
 
     return (root,file) => {
-        const prog = program()
 
-        for (let child of root.children) {
-            if (child.type == "script-line") {
-                prog.body.push(p.parser(child.code).body[0])
+        let src = `const h = this.libs.h;\nconst t = this.libs.t;\nconst json = this.json;\nconst hast = this.hast;\n`
+        
+        for (let i=0 ; i<root.children.length ; i++) {
+            let child = root.children[i]
+            if (i>0) src += '\n'
+            if (child.type == 'script-line') {
+                src += child.code
             } else {
-                prog.body.push(this_addLine(child))
+                src += `sqrm(${i});`
             }
         }
+
+        // console.log(src);
+
+        const prog = p.parser(src);
+
+        // console.log(inspect(prog))
+
+        for (let i=0 ; i<prog.body.length ; i++) {
+            const progLine = prog.body[i]
+            if (progLine.expression
+                    && progLine.expression.callee
+                    && progLine.expression.callee.name == 'sqrm') {
+
+                const sqrmLine = progLine.expression.arguments[0].value
+                prog.body[i] = this_addLine(root.children[sqrmLine])
+            }
+//            console.log(progLine)
+        }
+
+        // for (let child of root.children) {
+        //     if (child.type == "script-line") {
+        //         prog.body.push(p.parser(child.code).body[0])
+        //     } else {
+        //         prog.body.push(this_addLine(child))
+        //     }
+        // }
 
         return prog
     }
