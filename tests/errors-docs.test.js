@@ -1,4 +1,4 @@
 
 import testRunner from './file-test-runner.js'
 
-testRunner('file based tests', './tests/docs/errors/')
+testRunner('errors file based tests', './tests/docs/errors/')

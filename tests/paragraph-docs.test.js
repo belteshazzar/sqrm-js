@@ -1,4 +1,4 @@
 
 import testRunner from './file-test-runner.js'
 
-testRunner('file based paragraph tests', './tests/docs/paragraph/')
+testRunner('paragraph doc tests', './tests/docs/paragraph/')
