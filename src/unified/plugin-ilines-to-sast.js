@@ -24,7 +24,7 @@ const RE_TableHeader = /^[-| ]+$/d
 
 const RE_ScriptEnd = /^(.*?)\s*%>\s*$/d
 
-function lineToSqrm(ln) {
+function lineToSqrm(lineNumber,ln) {
 
     if (ln.value.length==0) {
         return {
@@ -77,14 +77,14 @@ function lineToSqrm(ln) {
         if (m[1]!==undefined) {
             let t = m[3].match(RE_ListItemTask)
             if (t) {
-                let task = { line: ln.line, done: t[1]!='', text: t[2] }
+                let task = { line: lineNumber, done: t[1]!='', text: t[2] }
                 // children = text and is converted to hast in post-process
                 return {
                     type: 'unordered-list-item-line',
                     indent: ln.indent, 
                     marker: m[1],
                     children: lineToSxast(t[2]),
-                    line: ln.line,
+                    line: lineNumber,
                     task: task
                 }
             } else {
@@ -94,7 +94,7 @@ function lineToSqrm(ln) {
                     indent: ln.indent,
                     marker: m[1],
                     children: lineToSxast(m[3]),
-                    line: ln.line
+                    line: lineNumber
                 }
 
                 let yaml = ln.value.match(RE_ListItemTag)
@@ -119,7 +119,7 @@ function lineToSqrm(ln) {
             let t = m[3].match(RE_ListItemTask)
             if (t) {
                 let task = {
-                    line: ln.line, 
+                    line: lineNumber, 
                     done: t[1]!='', 
                     text: t[2]
                 }
@@ -129,7 +129,7 @@ function lineToSqrm(ln) {
                     indent: ln.indent,
                     number: m[2],
                     children: lineToSxast(t[2]),
-                    line: ln.line,
+                    line: lineNumber,
                     task: task
                 }
             } else {
@@ -139,7 +139,7 @@ function lineToSqrm(ln) {
                     indent: ln.indent,
                     number: m[2],
                     children: lineToSxast(m[3]),
-                    line: ln.line
+                    line: lineNumber
                 }
             }
         }
@@ -152,7 +152,7 @@ function lineToSqrm(ln) {
             type: 'script-line',
             indent: ln.indent,
             code: m[1] + '  ' + m[2],
-            line: ln.line,
+            line: lineNumber,
             endScript: m[3] != undefined
         }
     }
@@ -175,7 +175,7 @@ function lineToSqrm(ln) {
             indent: ln.indent,
             tag: (m[2]?m[2].toLowerCase():'div'),
             properties: properties,
-            line:ln.line,
+            line:lineNumber,
             text: ln.value
         }
     }
@@ -232,7 +232,7 @@ function lineToSqrm(ln) {
             type:'code-block-line',
             indent: ln.indent, 
             language: m[1],
-            line:ln.line
+            line:lineNumber
         }
     }
 
@@ -273,7 +273,7 @@ export default function indentedLinesToSxast(options = {}) {
 
         for (let i=0 ; i<tree.children.length ; i++) {
             let iline = tree.children[i]
-            let sast = lineToSqrm(iline)
+            let sast = lineToSqrm(i+1,iline)
             root.children.push(sast)
             if (sast.type == 'script-line' && !sast.endScript) {
                 for (i++ ; i<tree.children.length ; i++) {

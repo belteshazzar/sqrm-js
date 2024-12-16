@@ -3,7 +3,9 @@ import parseEcma from './parse-ecma.js'
 import quoted from '../util/quoted-string.js';
 import {sastIncludeFunction,sastToHastTextFunction,sastTagFunction,sastFormatFunction,sastYaml} from '../util/str-to-esast.js'
 import { inspect } from "unist-util-inspect";
-
+import util from 'util';
+import {CONTINUE, EXIT, SKIP, visit} from 'unist-util-visit'
+import estraverse from 'estraverse' 
 
 let p = new parseEcma()
 
@@ -368,31 +370,15 @@ export default function resqrmToEsast(options = {}) {
             }
         }
 
-        // console.log(src);
+        let prog = p.parser(src);
 
-        const prog = p.parser(src);
-
-        // console.log(inspect(prog))
-
-        for (let i=0 ; i<prog.body.length ; i++) {
-            const progLine = prog.body[i]
-            if (progLine.expression
-                    && progLine.expression.callee
-                    && progLine.expression.callee.name == 'sqrm') {
-
-                const sqrmLine = progLine.expression.arguments[0].value
-                prog.body[i] = this_addLine(root.children[sqrmLine])
+        prog = estraverse.replace(prog, {
+            enter: function (node) {
+                if (node.type == 'CallExpression' && node.callee.name == 'sqrm') {
+                    return this_addLine(root.children[node.arguments[0].value])
+                }
             }
-//            console.log(progLine)
-        }
-
-        // for (let child of root.children) {
-        //     if (child.type == "script-line") {
-        //         prog.body.push(p.parser(child.code).body[0])
-        //     } else {
-        //         prog.body.push(this_addLine(child))
-        //     }
-        // }
+        });
 
         return prog
     }

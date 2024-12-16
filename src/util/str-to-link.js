@@ -46,7 +46,7 @@ export default function strToLink(s) {
 
         if (u[0] == '^') {
             u = u.substring(1).trim();
-            return { type: 'link', ref: `#footnote-${u}`, text: u }
+            return { type: 'link', class: 'footnote', ref: `#footnote-${u}`, text: u }
         } else {
             const addr = parts[0].trim().replace(/\]/g,']');
             const u = url(addr)

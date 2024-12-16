@@ -78,9 +78,15 @@ export default function sastTextToHast(children,context) {
                 break;
             case 'link':
                 let link = child
-                stack[stack.length-1].children.push(h('a',{
-                    href: link.ref,
-                },[t(link.text)]))
+                if (link.class == 'footnote') {
+                    stack[stack.length-1].children.push(h('sup',{},[h('a',{
+                        href: link.ref
+                    },[t('['+link.text+']')])]))
+                } else {
+                    stack[stack.length-1].children.push(h('a',{
+                        href: link.ref
+                    },[t(link.text)]))
+                }
                 break;
             // case 'include':
             //     let inc = child

@@ -6,12 +6,12 @@
         "text": "this is task one"
       },
       {
-        "line": 6,
+        "line": 7,
         "done": true,
         "text": "task has been done"
       },
       {
-        "line": 7,
+        "line": 8,
         "done": false,
         "text": "this is still pending"
       }

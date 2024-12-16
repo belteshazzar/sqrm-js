@@ -1,0 +1,6 @@
+
+footnotes [^fn1] look like links
+
+[^fn1] : foot notes are shown at the end of the document
+
+foot notes appear after all other text

@@ -29,6 +29,7 @@ export default class SqrmContext {
         this.blank = null;
         this.preIndent = -1;
         this.footnotes = []
+        this.linkDefinitions = []
     }
 
     addLine(obj) {
@@ -78,11 +79,11 @@ export default class SqrmContext {
                 if (addedYaml) {
                     // console.log('json updated from yaml',this.json.toJSON())
 
-                    if (this.blank = null) {
-                        this.blank = '\n'
-                    } else {
-                        this.blank += '\n'
-                    }
+                    // if (this.blank = null) {
+                    //     this.blank = '\n'
+                    // } else {
+                    //     this.blank += '\n'
+                    // }
     
                     return
                 }
@@ -111,7 +112,6 @@ export default class SqrmContext {
                 }
 
                 if (obj.type == 'text-line') {
-
                     if (this.blank == null && prev && prev.tagName == 'p') {
                         if (prev.sqrm.length>0) prev.sqrm.push({ type: 'text', value: '\n' })
                         prev.sqrm.push(... obj.children)
@@ -119,7 +119,15 @@ export default class SqrmContext {
                     } else if (this.blank == null && indentLevel.tagName == 'li') {
                         if (indentLevel.sqrm.length>0) indentLevel.sqrm.push({ type: 'text', value: '\n' })
                         indentLevel.sqrm.push(... obj.children)
-                        indentLevel.children = sastTextToHast(indentLevel.sqrm,this)
+
+                        if (indentLevel.children.length>0
+                                && indentLevel.children[0].type == 'element'
+                                && indentLevel.children[0].tagName == 'input') {
+                            indentLevel.children.length = 1
+                        } else {
+                            indentLevel.children.length = 0
+                        }
+                        indentLevel.children.push(...sastTextToHast(indentLevel.sqrm,this))
                     } else {
                         let hast = h('p')
                         hast.sqrm = obj.children
@@ -152,16 +160,34 @@ export default class SqrmContext {
                         this.indentStack.push(li)
                     }
                 } else if (obj.type == 'unordered-list-item-line') {
+
+                    let input = null
+                    if (obj.task) {
+                        input = h('input',{
+                            type: 'checkbox',
+                            checked: obj.task.done,
+                            'data-line': obj.line
+                        })
+
+                        if (!this.json.tasks) {
+                            this.json.tasks = []
+                        }
+
+                        this.json.tasks.push(obj.task)
+                    }
+
                     if (prev && prev.tagName == 'ul') {
                         let li = h('li')
                         li.sqrm = obj.children
                         li.children = sastTextToHast(obj.children,this)
+                        if (input) li.children.unshift(input)
                         prev.children.push(li)
-                       this.indentStack.push(li)
+                        this.indentStack.push(li)
                     } else {
                         let li = h('li')
                         li.sqrm = obj.children
                         li.children = sastTextToHast(obj.children,this)
+                        if (input) li.children.unshift(input)
                         let ul = h('ul',{},[li]) //{ type: 'ordered-list', children: [toHast(obj)] }
                         indentLevel.children.push(ul)
                         this.indentStack.push(li)
@@ -202,18 +228,22 @@ export default class SqrmContext {
                     this.indentStack.push(hast)
                 } else if (obj.type == 'footnote-line') {
                     this.footnotes.push(obj)
+                } else if (obj.type == 'link-definition-line') {
+                    this.linkDefinitions.push(obj)
                 } else {
                     console.error(obj)
                     throw new Error('not implemented obj.type='+obj.type)
                 }
 
-                this.blank = null;
+                if (obj.type != 'footnote-line' && obj.type != 'link-definition-line') {
+                    this.blank = null;
+                }
             // }
         }
     }
 
     processFootnotes() {
-        sastFootnotesToHast(this.hast,this.footnotes)
+        sastFootnotesToHast(this)
     }
 
     // appendToDoc(obj) {
