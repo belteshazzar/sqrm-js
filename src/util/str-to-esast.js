@@ -2,7 +2,6 @@
 
 import * as acorn from 'acorn'
 import quoted from './quoted-string.js'
-import util from 'node:util'
 import qouted from './quoted-string.js'
 
 export function sastYaml(yaml) {
@@ -323,7 +322,6 @@ export function functionParamsToEsast(str,throwOnInvalid = false) {
     console.log(str)
     try {
         const node = acorn.parse(str, {ecmaVersion: 2020})
-        console.log(util.inspect(node,false,null,true))
 
         if (node.body[0].type == "ExpressionStatement") {
             if (node.body[0].expression.type == 'SequenceExpression') {
@@ -338,7 +336,7 @@ export function functionParamsToEsast(str,throwOnInvalid = false) {
                 }
             }          
         } else {
-            console.log(util.inspect(node,false,null,true))
+            console.log(node)
         }
     } catch (e) {
         console.log(e)

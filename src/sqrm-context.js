@@ -7,8 +7,6 @@ import sastTextToHast from './util/sast-text-to-hast.js';
 import sastTableToHast from './util/sast-table-to-hast.js';
 import sastFootnotesToHast from './util/sast-footnotes-to-hast.js';
 
-import util from 'node:util'
-
 export default class SqrmContext {
     constructor(db,jsonTree) {
 

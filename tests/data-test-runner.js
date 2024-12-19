@@ -49,11 +49,15 @@ export default function(testName,testData) {
         })
         .use(indentedLinesToSxast)
         .use((options = {}) => {
-          return (tree, file) => {
-            expect(tree).not.toBeNull()
-            if (logsast) console.log(inspect(tree))
-            expect(tree.children).not.toBeNull()
-            expect(tree.children.length).toBe(data.slines)
+          return (docs, file) => {
+            // assuming single document
+            expect(docs).not.toBeNull()
+            if (logsast) console.log(inspect(docs))
+            expect(docs.children).not.toBeNull()
+            expect(docs.children.length).toBe(1)
+            const doc = docs.children[0]
+            expect(doc).not.toBeNull()
+            expect(doc.children.length).toBe(data.slines)
           };
         })
         // .use(sqrmLinesToSxast)
@@ -67,11 +71,13 @@ export default function(testName,testData) {
         // })
         .use(resqrmToEsast)
         .use((options = {}) => {
-          return (program, file) => {
-            expect(program).not.toBeNull()
-            if (logecma) console.log(inspect(program))
-            expect(program.body).not.toBeNull()
-//            expect(program.body.length).toBe(data.statements)
+          return (programs, file) => {
+            expect(programs).not.toBeNull()
+            if (logecma) console.log(inspect(programs))
+            expect(programs.children).not.toBeNull()
+            programs.children.forEach(program => {
+              expect(program.body).not.toBeNull();
+            });
           };
         })
         .use(compileEcma)
@@ -79,9 +85,12 @@ export default function(testName,testData) {
 
         expect(file).not.toBeNull()
 
-        if (logjs) console.log(file.result.value)
+        // multiple docs not supported
+        expect(file.result.length).toBe(1)
 
-        const f = new Function(file.result.value)
+        if (logjs) console.log(file.result[0].value)
+
+        const f = new Function(file.result[0].value)
 
         const self = new SqrmContext()
         const req = {};
@@ -123,14 +132,13 @@ export default function(testName,testData) {
           .use(rehypeStringify)
           .stringify(self.hast)
 
-          if (loghtml) console.log(html)
+        if (loghtml) console.log(html)
 
-          expect(html).toBe(data.html)
-          // console.log(util.inspect(self.jsonTree,false,null,true))
-          // console.log(util.inspect(self.jsonTree.json,false,null,true))
-          // console.log(JSON.stringify(self.jsonTree.json))
-          expect(self.json.toJSON()).toEqual(data.json)
-
+        expect(html).toBe(data.html)
+        // console.log(util.inspect(self.jsonTree,false,null,true))
+        // console.log(util.inspect(self.jsonTree.json,false,null,true))
+        // console.log(JSON.stringify(self.jsonTree.json))
+        expect(self.json.toJSON()).toEqual(data.json)
     })
   })
 }

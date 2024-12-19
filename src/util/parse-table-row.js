@@ -1,12 +1,8 @@
 
 
 import lineToSxast from './parse-text.js'
-import {yamlToEsast} from './str-to-esast.js'
-import link from './str-to-link.js'
-import util from 'node:util'
 
 const RE_ScriptEnd = /%>\s*$/
-
 
 export default function parseTableRow(text) {
 

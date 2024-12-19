@@ -266,36 +266,56 @@ function lineToSqrm(lineNumber,ln) {
 export default function indentedLinesToSxast(options = {}) {
     return (tree,file) => {
 
-        const root = {
-            type: 'sast-root',
+        const docs = {
+            type: 'sast-doc-collection',
+            children: []
+        }
+
+        let doc = {
+            type: 'sast-doc',
             children: [],
         };
+
+        docs.children.push(doc)
 
         for (let i=0 ; i<tree.children.length ; i++) {
             let iline = tree.children[i]
             let sast = lineToSqrm(i+1,iline)
-            root.children.push(sast)
-            if (sast.type == 'script-line' && !sast.endScript) {
-                for (i++ ; i<tree.children.length ; i++) {
-                    iline = tree.children[i]
-                    sast = {
-                        type: 'script-line',
-                        indent: iline.indent,
-                        line: iline.line
-                    }
-                    root.children.push(sast)
-                    let m = iline.value.match(RE_ScriptEnd)
-                    if (m) {
-                        sast.code = m[1]
-                        break;
-                    } else {
-                        sast.code = iline.value
+
+            if (sast.type == 'document-separator-line') {
+
+                doc = {
+                    type: 'sast-doc',
+                    children: [],
+                };
+        
+                docs.children.push(doc)
+        
+            } else {
+                doc.children.push(sast)
+
+                if (sast.type == 'script-line' && !sast.endScript) {
+                    for (i++ ; i<tree.children.length ; i++) {
+                        iline = tree.children[i]
+                        sast = {
+                            type: 'script-line',
+                            indent: iline.indent,
+                            line: iline.line
+                        }
+                        doc.children.push(sast)
+                        let m = iline.value.match(RE_ScriptEnd)
+                        if (m) {
+                            sast.code = m[1]
+                            break;
+                        } else {
+                            sast.code = iline.value
+                        }
                     }
                 }
             }
         }
 
-        return root
+        return docs
     }
 }
 

@@ -2,9 +2,6 @@
 import parseEcma from './parse-ecma.js'
 import quoted from '../util/quoted-string.js';
 import {sastIncludeFunction,sastToHastTextFunction,sastTagFunction,sastFormatFunction,sastYaml} from '../util/str-to-esast.js'
-import { inspect } from "unist-util-inspect";
-import util from 'util';
-import {CONTINUE, EXIT, SKIP, visit} from 'unist-util-visit'
 import estraverse from 'estraverse' 
 
 let p = new parseEcma()
@@ -356,31 +353,39 @@ function this_addLine(line) {
 
 export default function resqrmToEsast(options = {}) {
 
-    return (root,file) => {
+    return (docs,file) => {
 
-        let src = `const h = this.libs.h;\nconst t = this.libs.t;\nconst json = this.json;\nconst hast = this.hast;\n`
-        
-        for (let i=0 ; i<root.children.length ; i++) {
-            let child = root.children[i]
-            if (i>0) src += '\n'
-            if (child.type == 'script-line') {
-                src += child.code
-            } else {
-                src += `sqrm(${i});`
-            }
-        }
+        return {
+            type: 'document-scripts',
+            children: docs.children.map(doc => {
 
-        let prog = p.parser(src);
-
-        prog = estraverse.replace(prog, {
-            enter: function (node) {
-                if (node.type == 'CallExpression' && node.callee.name == 'sqrm') {
-                    return this_addLine(root.children[node.arguments[0].value])
+                let src = `const h = this.libs.h;\nconst t = this.libs.t;\nconst json = this.json;\nconst hast = this.hast;\n`
+                
+                for (let i=0 ; i<doc.children.length ; i++) {
+                    let child = doc.children[i]
+                    if (i>0) src += '\n'
+                    if (child.type == 'script-line') {
+                        src += child.code
+                    } else {
+                        src += `sqrm(${i});`
+                    }
                 }
-            }
-        });
 
-        return prog
+                let prog = p.parser(src);
+
+                prog = estraverse.replace(prog, {
+                    enter: function (node) {
+                        if (node.type == 'CallExpression' && node.callee.name == 'sqrm') {
+                            return this_addLine(doc.children[node.arguments[0].value])
+                        }
+                    }
+                });
+
+                return prog
+
+            })
+
+        }
     }
 
 };

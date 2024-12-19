@@ -84,10 +84,14 @@ export default function(testName,folder) {
             // })
             .use(resqrmToEsast)
             .use((options = {}) => {
-                return (program, file) => {
-                    expect(program).not.toBeNull()
-                    if (logecma) console.log(inspect(program))
-                    expect(program.body).not.toBeNull()
+                return (programs, file) => {
+                    expect(programs).not.toBeNull()
+                    if (logecma) console.log(inspect(programs))
+                    expect(programs.children).not.toBeNull()
+                    programs.children.forEach(program => {
+                      expect(program.body).not.toBeNull();
+                    });
+        
                 };
             })
             .use(compileEcma)
@@ -95,9 +99,12 @@ export default function(testName,folder) {
 
         expect(file).not.toBeNull()
 
-        if (logjs) console.log(file.result.value)
+        // multiple docs not supported
+        expect(file.result.length).toBe(1)
 
-        const f = new Function(file.result.value)
+        if (logjs) console.log(file.result[0].value)
+
+        const f = new Function(file.result[0].value)
 
         const self = new SqrmContext()
         const req = {};

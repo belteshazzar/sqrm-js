@@ -60,7 +60,8 @@ a: 5
         docs: 1,
         'sxast-children': 7,
         // statements: 7,
-        html: `<h3>fredy</h3><div><p>text with a <a href="/tags/tag">#tag</a></p><p>was <i>here</i> <b>woot</b> but a = 5 <u>yes?</u></p></div>`,
+        html: `<h3>fredy</h3><div><p>text with a <a href="/tags/tag">#tag</a>
+was <i>here</i> <b>woot</b> but a = 5 <u>yes?</u></p></div>`,
         json: { a : 5, tag: true }
     },
 ])

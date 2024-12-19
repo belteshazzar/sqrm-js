@@ -8,8 +8,6 @@ import resqrmToEsast from '../src/unified/plugin-sast-to-esast.js'
 import compileEcma from '../src/unified/compile-ecma.js'
 // import sastToHast from '../src/unified/plugin-sast-to-hast.js'
 import {visit} from 'unist-util-visit'
-import { inspect } from "unist-util-inspect";
-import util from 'node:util'
 import rehypeStringify from 'rehype-stringify'
 // import rehypeParse from 'rehype-parse'
 import SqrmContext from '../src/sqrm-context.js';

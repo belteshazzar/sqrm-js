@@ -1,9 +1,5 @@
 
 import {h} from 'hastscript'
-import {visit} from 'unist-util-visit'
-import {t} from '../util/hastscript-tools.js'
-import lineToSxast from '../util/parse-text.js'
-import util from 'util'
 import sastTextToHast from './sast-text-to-hast.js';
 
 export default function sastTableToHast(rows,context) {

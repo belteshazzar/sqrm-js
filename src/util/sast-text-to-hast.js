@@ -1,10 +1,6 @@
 
 import {h} from 'hastscript'
-import {visit} from 'unist-util-visit'
 import {t} from '../util/hastscript-tools.js'
-import lineToSxast from '../util/parse-text.js'
-import util from 'util'
-
 
 function tagForStyle(s) {
     switch (s) {

@@ -1,0 +1,8 @@
+{
+  "tasks": [
+    { "line": 9, "done": false, "text": "first item" },
+    { "line": 10, "done": false, "text": "second item" },
+    { "line": 11, "done": true, "text": "third item" },
+    { "line": 12, "done": false, "text": "forth item" }
+  ]
+}
