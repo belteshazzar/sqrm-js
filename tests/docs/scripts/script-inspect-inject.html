@@ -1,1 +1,23 @@
-<div id="toc"><p><a href="#h0">heading 1</a></p><p><a href="#h1">heading 2</a></p><p><a href="#h2">heading 3</a></p><p><a href="#h3">heading 4</a></p></div><h1><a name="h0"></a>heading 1</h1><h1><a name="h1"></a>heading 2</h1><h1><a name="h2"></a>heading 3</h1><h1><a name="h3"></a>heading 4</h1>
+<div class="sqrm-error"><pre><code class="language-sqrm">
+&#x3C;div id="toc"
+
+= heading 1
+
+= heading 2
+
+= heading 3
+
+= heading 4
+
+&#x3C;%
+
+processHast((hast) => {
+    let toc = select('#toc',hast)
+
+    selectAll('h1',hast).forEach((h1,i) => {
+        toc.children.push(h('p',{},[h('a',{href:`#h${i}`}, [ ... h1.children ] )]))
+        h1.children.unshift(h('a',{name:`h${i}`}))
+    })
+})
+
+%></code></pre></div>

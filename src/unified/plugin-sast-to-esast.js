@@ -371,17 +371,22 @@ export default function resqrmToEsast(options = {}) {
                     }
                 }
 
-                let prog = p.parser(src);
+                try {
+                    let prog = p.parser(src);
 
-                prog = estraverse.replace(prog, {
-                    enter: function (node) {
-                        if (node.type == 'CallExpression' && node.callee.name == 'sqrm') {
-                            return this_addLine(doc.children[node.arguments[0].value])
+                    prog = estraverse.replace(prog, {
+                        enter: function (node) {
+                            if (node.type == 'CallExpression' && node.callee.name == 'sqrm') {
+                                return this_addLine(doc.children[node.arguments[0].value])
+                            }
                         }
-                    }
-                });
+                    });
 
-                return prog
+                    return prog
+                } catch (e) {
+
+                    return p.parser(`throw "${e.message}";`)
+                }
 
             })
 

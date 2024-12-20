@@ -51,13 +51,13 @@ function callSqrm(src) {
         })
 
         if (_json) {
-            console.log(util.inspect(json,false,null,color))
+            console.log(JSON.stringify(json))
         } else {
             console.log(html)
         }
     } else {
         if (_json) {
-            console.log(util.inspect(res.json,false,null,color))
+            console.log(JSON.stringify(res.json))
         } else {
             console.log(res.html)
         }

@@ -16,7 +16,9 @@ import SqrmContext from '../src/sqrm-context.js';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import {toHtml} from 'hast-util-to-html'
+import {h} from 'hastscript'
 
+import {t} from '../src/util/hastscript-tools.js'
 const logilines = process.env.ILINES
 const logsast = process.env.SAST
 const logecma = process.env.ECMA
@@ -99,57 +101,94 @@ export default function(testName,folder) {
 
         expect(file).not.toBeNull()
 
-        // multiple docs not supported
-        expect(file.result.length).toBe(1)
 
-        if (logjs) console.log(file.result[0].value)
+        const hastResult = h('div',{class: 'sqrm-docs'})
+        const jsonResult = []
 
-        const f = new Function(file.result[0].value)
+        for (let i=0 ; i<file.result.length ; i++) {
 
-        const self = new SqrmContext()
-        const req = {};
+            if (logjs) console.log('js -------------\n',file.result[i].value)
 
-        try {
-            f.call(self,req)
-        } catch (e) {
-            console.error(e)
+            let f = null
+            try {
+                f = new Function(file.result[i].value)
+            } catch (e) {
+                hastResult.children.push(h('div',{
+                    class: 'sqrm-error'
+                },[h('pre',{},[h('code',{class: 'language-sqrm'},[t(sqrm)])])]))
+                jsonResult.push({ error: e.message})
+                continue
+            }
+
+            const self = new SqrmContext()
+            const req = {};
+
+            try {
+                f.call(self,req)
+            } catch (e) {
+                hastResult.children.push(h('div',{
+                    class: 'sqrm-error'
+                },[h('pre',{},[h('code',{class: 'language-sqrm'},[t(sqrm)])])]))
+                jsonResult.push({ error: e.message})
+                continue
+            }
+
+            self.processFootnotes()
+
+            expect(self.hast).not.toBeNull()
+            expect(self.json).not.toBeNull()
+
+            visit(self.hast, (node) => {
+                delete node.sqrm
+            })
+            
+            if (loghast) console.log('hast -------------\n',inspect(self.hast,false,null,true))
+
+            if (logjson) console.log('json -------------\n',util.inspect(json,false,null,true))
+
+            // const hast = self.hast //unified()
+    //             .use(sastToHast)
+    // //            .use(rehypeStringify)
+    //             .runSync(self.doc)
+
+    //        console.log(toHtml(hast))
+
+            hastResult.children.push(self.hast)
+            jsonResult.push(self.json.toJSON())
         }
 
-        self.processFootnotes()
+        if (hastResult.children.length == 1) {
 
-        expect(self.hast).not.toBeNull()
-        expect(self.json).not.toBeNull()
+            const html = unified()
+                .use(rehypeStringify,{
+                    closeEmptyElements: true,
+                    closeSelfClosing: true,
+                    tightSelfClosing: true,
+                    upperDoctype: true
+                })
+                .stringify(hastResult.children[0])
 
-        visit(self.hast, (node) => {
-            delete node.sqrm
-          })
-          
-        if (loghast) console.log('hast -------------\n',inspect(self.hast,false,null,true))
+            if (loghtml) console.log(html)
 
-        if (logjson) console.log('json -------------\n',util.inspect(json,false,null,true))
+            expect(html).toBe(expectedHtml)
+            expect(jsonResult[0]).toEqual(expectedJson || {})
+        } else {
 
-        // const hast = self.hast //unified()
-//             .use(sastToHast)
-// //            .use(rehypeStringify)
-//             .runSync(self.doc)
+            const html = unified()
+                .use(rehypeStringify,{
+                    closeEmptyElements: true,
+                    closeSelfClosing: true,
+                    tightSelfClosing: true,
+                    upperDoctype: true
+                })
+                .stringify(hastResult)
 
-//        console.log(toHtml(hast))
+            if (loghtml) console.log(html)
 
-        if (loghast) console.log('hast -------------\n',inspect(hast))
+            expect(html).toBe(expectedHtml)
+            expect(jsonResult).toEqual(expectedJson || {})
 
-        const html = unified()
-            .use(rehypeStringify,{
-                closeEmptyElements: true,
-                closeSelfClosing: true,
-                tightSelfClosing: true,
-                upperDoctype: true
-            })
-            .stringify(self.hast)
-
-        if (loghtml) console.log(html)
-
-        expect(html).toBe(expectedHtml)
-        expect(self.json.toJSON()).toEqual(expectedJson || {})
+        }
     })
     }
   })

@@ -1,4 +1,4 @@
-Copyright (c) 2015-2022, belteshazzar pty ltd, and [others]
+Copyright (c) 2015-2024, belteshazzar pty ltd, and [others]
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

@@ -9520,36 +9520,56 @@ function lineToSqrm(lineNumber,ln) {
 function indentedLinesToSxast(options = {}) {
     return (tree,file) => {
 
-        const root = {
-            type: 'sast-root',
+        const docs = {
+            type: 'sast-doc-collection',
+            children: []
+        };
+
+        let doc = {
+            type: 'sast-doc',
             children: [],
         };
+
+        docs.children.push(doc);
 
         for (let i=0 ; i<tree.children.length ; i++) {
             let iline = tree.children[i];
             let sast = lineToSqrm(i+1,iline);
-            root.children.push(sast);
-            if (sast.type == 'script-line' && !sast.endScript) {
-                for (i++ ; i<tree.children.length ; i++) {
-                    iline = tree.children[i];
-                    sast = {
-                        type: 'script-line',
-                        indent: iline.indent,
-                        line: iline.line
-                    };
-                    root.children.push(sast);
-                    let m = iline.value.match(RE_ScriptEnd);
-                    if (m) {
-                        sast.code = m[1];
-                        break;
-                    } else {
-                        sast.code = iline.value;
+
+            if (sast.type == 'document-separator-line') {
+
+                doc = {
+                    type: 'sast-doc',
+                    children: [],
+                };
+        
+                docs.children.push(doc);
+        
+            } else {
+                doc.children.push(sast);
+
+                if (sast.type == 'script-line' && !sast.endScript) {
+                    for (i++ ; i<tree.children.length ; i++) {
+                        iline = tree.children[i];
+                        sast = {
+                            type: 'script-line',
+                            indent: iline.indent,
+                            line: iline.line
+                        };
+                        doc.children.push(sast);
+                        let m = iline.value.match(RE_ScriptEnd);
+                        if (m) {
+                            sast.code = m[1];
+                            break;
+                        } else {
+                            sast.code = iline.value;
+                        }
                     }
                 }
             }
         }
 
-        return root
+        return docs
     }
 }
 
@@ -17263,31 +17283,47 @@ function this_addLine(line) {
 
 function resqrmToEsast(options = {}) {
 
-    return (root,file) => {
+    return (docs,file) => {
 
-        let src = `const h = this.libs.h;\nconst t = this.libs.t;\nconst json = this.json;\nconst hast = this.hast;\n`;
-        
-        for (let i=0 ; i<root.children.length ; i++) {
-            let child = root.children[i];
-            if (i>0) src += '\n';
-            if (child.type == 'script-line') {
-                src += child.code;
-            } else {
-                src += `sqrm(${i});`;
-            }
-        }
+        return {
+            type: 'document-scripts',
+            children: docs.children.map(doc => {
 
-        let prog = p$1.parser(src);
-
-        prog = estraverse.replace(prog, {
-            enter: function (node) {
-                if (node.type == 'CallExpression' && node.callee.name == 'sqrm') {
-                    return this_addLine(root.children[node.arguments[0].value])
+                let src = `const h = this.libs.h;\nconst t = this.libs.t;\nconst json = this.json;\nconst hast = this.hast;\n`;
+                
+                for (let i=0 ; i<doc.children.length ; i++) {
+                    let child = doc.children[i];
+                    if (i>0) src += '\n';
+                    if (child.type == 'script-line') {
+                        src += child.code;
+                    } else {
+                        src += `sqrm(${i});`;
+                    }
                 }
-            }
-        });
 
-        return prog
+                try {
+                    let prog = p$1.parser(src);
+
+                    prog = estraverse.replace(prog, {
+                        enter: function (node) {
+                            if (node.type == 'CallExpression' && node.callee.name == 'sqrm') {
+                                return this_addLine(doc.children[node.arguments[0].value])
+                            }
+                        }
+                    });
+
+                    return prog
+                } catch (e) {
+
+                    // console.log(e)
+                    // console.log(src)
+
+                    return p$1.parser('')
+                }
+
+            })
+
+        }
     }
 
 }
@@ -18518,24 +18554,28 @@ function compileEcma(options) {
   ({...self.data('settings'), ...options});
   self.compiler = compiler;
 
-  function compiler(tree) {
+  function compiler(docScripts) {
 
-    const {SourceMapGenerator, filePath, handlers} = self.settings || {};
-    const sourceMap = SourceMapGenerator
-      ? new SourceMapGenerator({file: filePath || '<unknown>.js'})
-      : undefined;
-  
-    const value = generate(
-      tree,
-      {
-        comments: true,
-        generator: {...GENERATOR, ...handlers},
-        sourceMap: sourceMap || undefined
-      }
-    );
-    const map = sourceMap ? sourceMap.toJSON() : undefined;
-  
-    return {value, map}
+    return docScripts.children.map(ecma => {
+
+      const {SourceMapGenerator, filePath, handlers} = self.settings || {};
+      const sourceMap = SourceMapGenerator
+        ? new SourceMapGenerator({file: filePath || '<unknown>.js'})
+        : undefined;
+    
+      const value = generate(
+        ecma,
+        {
+          comments: true,
+          generator: {...GENERATOR, ...handlers},
+          sourceMap: sourceMap || undefined
+        }
+      );
+      const map = sourceMap ? sourceMap.toJSON() : undefined;
+    
+      return {value, map}
+
+    });
   }
 }
 
@@ -21668,6 +21708,7 @@ class SqrmContext {
         this.json = this.jsonTree.json;
         this.blank = null;
         this.preIndent = -1;
+        this.yamlStringIndent = null;
         this.footnotes = [];
         this.linkDefinitions = [];
     }
@@ -21699,31 +21740,54 @@ class SqrmContext {
                     value: obj.text ? spaces(obj.indent-this.preIndent)+obj.text+'\n' : '\n'
                 });
             }
+
+        } else if (this.yamlStringIndent != null 
+                && obj.indent >= this.yamlStringIndent.indent ) {
+
+            if (this.yamlStringIndent.value.value != '') {
+                this.yamlStringIndent.value.value += '\n';
+            }
+
+            if (this.blank != null) {
+                this.yamlStringIndent.value.value += this.blank;
+                this.blank = null;
+            }
+
+            this.yamlStringIndent.value.value += obj.text;
+
         } else if (obj.type == 'blank-line') {
-            if (this.blank = null) {
+
+            if (this.blank == null) {
                 this.blank = '\n';
             } else {
                 this.blank += '\n';
             }
+
         } else {
 
             this.preIndent = -1;
+            this.yamlStringIndent = null;
 
             if (obj.yaml) {
                 // console.log(obj.yaml)
                 const yaml = obj.yaml.call(this);
                 // console.log(yaml);
-                let addedYaml = this.jsonTree.addLine(yaml,this) != null;
-                // console.log(addedYaml)
+                let addedYaml = this.jsonTree.addLine(yaml,this);
                 
-                if (addedYaml) {
-                    // console.log('json updated from yaml',this.json.toJSON())
+                if (addedYaml != null) {
 
-                    // if (this.blank = null) {
-                    //     this.blank = '\n'
-                    // } else {
-                    //     this.blank += '\n'
-                    // }
+                    // ignore and reset any preceding blank lines
+                    this.blank = null;
+
+                    if (yaml.value === '|') {
+
+                        this.yamlStringIndent = {
+                            indent: yaml.indent + 1,
+                            value: addedYaml
+                        };
+                        this.yamlStringIndent.value.value = '';
+
+                    }
     
                     return
                 }
@@ -22117,31 +22181,59 @@ function sqrm(src) {
         .use(compileEcma)
         .processSync(src);
 
-    const f = new Function(file.result.value);
+    const hast = h('div',{class: 'sqrm-docs'});
+    const json = [];
 
-    const self = new SqrmContext();
-    const req = {};
+    for (let i=0 ; i<file.result.length ; i++) {
 
-    try {
-        f.call(self,req);
-    } catch (e) {
-        console.error(e);
+        let f = null;
+        try {
+            f = new Function(file.result[i].value);
+        } catch (e) {
+            hast.children.push(h('div',{
+                class: 'sqrm-error'
+            },[h('pre',{},[h('code',{},[t(src)])])]));
+            json.push({ error: e.message});
+            continue
+        }
+
+        const self = new SqrmContext();
+        const req = {};
+
+        try {
+            f.call(self,req);
+        } catch (e) {
+            hast.children.push(h('div',{
+                class: 'sqrm-error'
+            },[h('pre',{},[h('code',{},[t(src)])])]));
+            json.push({ error: e.message});
+            continue
+        }
+
+        self.processFootnotes();
+
+        visit(self.hast, (node) => {
+            delete node.sqrm;
+        });
+
+        hast.children.push(self.hast);
+        json.push(self.json.toJSON());
+
     }
 
-    self.processFootnotes();
+    if (file.result.length == 1) {
+        const html = unified()
+            .use(rehypeStringify)
+            .stringify(hast.children[0]);
 
-    visit(self.hast, (node) => {
-        delete node.sqrm;
-    });
+        return {html,json: json[0]}
+    } else {
+        const html = unified()
+            .use(rehypeStringify)
+            .stringify(hast);
 
-    const html = unified()
-        .use(rehypeStringify)
-        .stringify(self.hast);
-
-    const json = self.json.toJSON();
-
-    return {html,json}
-
+        return {html,json}
+    }
 }
 
 export { sqrm as default };

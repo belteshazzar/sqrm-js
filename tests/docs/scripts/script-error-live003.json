@@ -3,5 +3,7 @@
         "age": 4,
         "name": "fred"
     },
-    {}
+    {
+        "error": "db is not defined"
+    }
 ]

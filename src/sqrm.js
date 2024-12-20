@@ -11,6 +11,8 @@ import {visit} from 'unist-util-visit'
 import rehypeStringify from 'rehype-stringify'
 // import rehypeParse from 'rehype-parse'
 import SqrmContext from '../src/sqrm-context.js';
+import {h} from 'hastscript'
+import {t} from '../src/util/hastscript-tools.js'
 
 export default function(src) {
 
@@ -21,29 +23,57 @@ export default function(src) {
         .use(compileEcma)
         .processSync(src)
 
-    const f = new Function(file.result.value)
+    const hast = h('div',{class: 'sqrm-docs'})
+    const json = []
 
-    const self = new SqrmContext()
-    const req = {};
+    for (let i=0 ; i<file.result.length ; i++) {
 
-    try {
-        f.call(self,req)
-    } catch (e) {
-        console.error(e)
+        let f = null
+        try {
+            f = new Function(file.result[i].value)
+        } catch (e) {
+            hast.children.push(h('div',{
+                class: 'sqrm-error'
+            },[h('pre',{},[h('code',{class: 'language-sqrm'},[t(src)])])]))
+            json.push({ error: e.message})
+            continue
+        }
+
+        const self = new SqrmContext()
+        const req = {};
+
+        try {
+            f.call(self,req)
+        } catch (e) {
+            hast.children.push(h('div',{
+                class: 'sqrm-error'
+            },[h('pre',{},[h('code',{class: 'language-sqrm'},[t(src)])])]))
+            json.push({ error: e.message})
+            continue
+        }
+
+        self.processFootnotes()
+
+        visit(self.hast, (node) => {
+            delete node.sqrm
+        })
+
+        hast.children.push(self.hast)
+        json.push(self.json.toJSON())
+
     }
 
-    self.processFootnotes()
+    if (file.result.length == 1) {
+        const html = unified()
+            .use(rehypeStringify)
+            .stringify(hast.children[0])
 
-    visit(self.hast, (node) => {
-        delete node.sqrm
-    })
+        return {html,json: json[0]}
+    } else {
+        const html = unified()
+            .use(rehypeStringify)
+            .stringify(hast)
 
-    const html = unified()
-        .use(rehypeStringify)
-        .stringify(self.hast)
-
-    const json = self.json.toJSON()
-
-    return {html,json}
-
+        return {html,json}
+    }
 }

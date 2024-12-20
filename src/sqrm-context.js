@@ -26,6 +26,7 @@ export default class SqrmContext {
         this.json = this.jsonTree.json
         this.blank = null;
         this.preIndent = -1;
+        this.yamlStringIndent = null;
         this.footnotes = []
         this.linkDefinitions = []
     }
@@ -57,31 +58,54 @@ export default class SqrmContext {
                     value: obj.text ? spaces(obj.indent-this.preIndent)+obj.text+'\n' : '\n'
                 })
             }
+
+        } else if (this.yamlStringIndent != null 
+                && obj.indent >= this.yamlStringIndent.indent ) {
+
+            if (this.yamlStringIndent.value.value != '') {
+                this.yamlStringIndent.value.value += '\n'
+            }
+
+            if (this.blank != null) {
+                this.yamlStringIndent.value.value += this.blank
+                this.blank = null
+            }
+
+            this.yamlStringIndent.value.value += obj.text
+
         } else if (obj.type == 'blank-line') {
-            if (this.blank = null) {
+
+            if (this.blank == null) {
                 this.blank = '\n'
             } else {
                 this.blank += '\n'
             }
+
         } else {
 
             this.preIndent = -1
+            this.yamlStringIndent = null
 
             if (obj.yaml) {
                 // console.log(obj.yaml)
                 const yaml = obj.yaml.call(this);
                 // console.log(yaml);
-                let addedYaml = this.jsonTree.addLine(yaml,this) != null
-                // console.log(addedYaml)
+                let addedYaml = this.jsonTree.addLine(yaml,this)
                 
-                if (addedYaml) {
-                    // console.log('json updated from yaml',this.json.toJSON())
+                if (addedYaml != null) {
 
-                    // if (this.blank = null) {
-                    //     this.blank = '\n'
-                    // } else {
-                    //     this.blank += '\n'
-                    // }
+                    // ignore and reset any preceding blank lines
+                    this.blank = null
+
+                    if (yaml.value === '|') {
+
+                        this.yamlStringIndent = {
+                            indent: yaml.indent + 1,
+                            value: addedYaml
+                        };
+                        this.yamlStringIndent.value.value = ''
+
+                    }
     
                     return
                 }

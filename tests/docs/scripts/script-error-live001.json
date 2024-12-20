@@ -11,5 +11,7 @@
         "age": 56,
         "name": "bob"
     },
-    {}
+    {
+        "error": "dbfind is not defined"
+    }
 ]    

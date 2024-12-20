@@ -1,23 +1,18 @@
 
-multi-line: >    
+multi_line: |      
   this is not a normal string it
   spans more than
-  one line
-  see? new lines are not maintained
 
-
-with-new-lines: |   
-  this is not a normal string it
-  spans more than
   one line
   see? new lines are maintained
 
-an-array:
-  - multi-line: >
+
+an_array:
+
+  - multi_line: |  
+
       fred was
       here and also
+
       here
-  - with-new-lines: |
-      fred was here
-      and here
-      as well
+

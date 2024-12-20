@@ -1,9 +1,10 @@
-<div class="p">before</div><pre>
+<div class="sqrm-docs"><div class="sqrm-error"><pre><code class="language-sqrm">
+name: fred
+age: 4
+
+---
 before
 &#x3C;%
   let people = db.find('default',{ name: {$x: true }})
-                  ^
-                  Error: Can't canonicalize query: BadValue unknown operator: $x
 %>
-after
-</pre>
+after</code></pre></div></div>
